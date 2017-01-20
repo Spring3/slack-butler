@@ -1,0 +1,30 @@
+{
+  "name": "slack-butler",
+  "version": "1.0.0",
+  "description": "Channel bot for slack. Collects links and attachments from the channel and provides a user-friendly api to use them later",
+  "main": "server.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Spring3/slack-butler.git"
+  },
+  "keywords": [
+    "slack",
+    "bot",
+    "chatbot",
+    "attachments"
+  ],
+  "author": "Daniyil Vasylenko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Spring3/slack-butler/issues"
+  },
+  "homepage": "https://github.com/Spring3/slack-butler#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "express": "^4.14.0",
+    "mongoose": "^4.7.7"
+  }
+}
