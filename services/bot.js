@@ -19,17 +19,13 @@ rtm.on(EVENTS.RTM.AUTHENTICATED, (data) => {
 });
 
 rtm.on(EVENTS.RTM.RTM_CONNECTION_OPENED, () => {
-  const greetings = [
-  'Star, bot for hire', 
-  'Star, at your service!', 
-  'Hi everyone :blush:!',
-  'Hey there!'];
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  // const greetings = [
+  // 'Star, bot for hire', 
+  // 'Star, at your service!', 
+  // 'Hi everyone :blush:!',
+  // 'Hey there!'];
+  // const greeting = greetings[Math.floor(Math.random() * greetings.length)];
   // rtm.sendMessage(greeting, writeChannel);
-});
-
-rtm.on(EVENTS.RTM.WS_CLOSE, () => {
-  rtm.sendMessage('*yawns* Off for some lunch. Whoops.. khm.. I mean, sleep', writeChannel);
 });
 
 rtm.on(EVENTS.RTM.RAW_MESSAGE, (msg) => {
@@ -40,7 +36,10 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, (msg) => {
     const channel = msg.channel;
     // link sent to private messages or into a channel
     if (text.indexOf('http://') >= 0 || text.indexOf('https://') >= 0) {
-      rtm.sendMessage(`<@${user}>, I'll remember that.. :smiling_imp:`, channel);
+      // rtm.sendMessage(`<@${user}>, I'll remember that.. :smiling_imp:`, channel);
+      const messages = new Map();
+      messages.set('chunk0', [msg]);
+      processMessages(messages, channel, false);
     }
     // if mention
     if (text.indexOf(`<@${botId}>`) >= 0) {
@@ -55,8 +54,10 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, (msg) => {
       // interations via mentions
       switch (mentionedMessage) {
         case 'scan': {
-          //rtm.sendMessage(`Scanning current channel for links and attachments...`, channel);
-          return fetchMessages(channel).then(processMessages);
+          rtm.sendMessage('On it!', channel);
+          return fetchMessages(channel).then((chunks) => {
+            processMessages(chunks, channel);
+          });
         }
         case 'clear': {
           return fetchMessages(channel).then((chunkOfMessages) => {
@@ -81,9 +82,25 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, (msg) => {
                   as_user: true,
                   channel
                 }
-              }, function(err, response) { console.log(response.body); });
+              }, (err, response) => { console.log(response.body); });
             });
           });
+        }
+        case 'total': {
+          db.getTotalLinks().then((count) => {
+            rtm.sendMessage(`Total links saved: ${count}`, channel);
+          });
+          break;
+        }
+        case 'list': {
+          db.getLinks().then((result) => {
+            web.files.upload('links', {
+              title: 'Total recap of links',
+              content: result,
+              channels: channel
+            }, (err, data) => { if (err) console.error(err); })
+          });
+          break;
         }
         case 'help': {
           rtm.sendMessage(`Hi, <@${user}>! My name is Star - and my purpose is to save the links and attachments that people share in this channel.`, channel);
@@ -92,12 +109,33 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, (msg) => {
                '\'list n\' - give a list of last n links saved.\n' +
                '\'list n-m\' - print the lsit of links from n (inc) to m (exc).\n' +
                '\'total\' - print the amount of links saved.\n' +
-               '\'clear\' - to remote my messages from this channel.\n' +
-               '\'scan\' - to scan current channel for links and attachments.\n```', channel);
+               '\'clear\' - to remove my messages from this channel. (no enough rights)\n' +
+               '\'scan\' - to scan current channel for links and attachments.\n' +
+               '\'scan n\' - [TODO] to scan first n messages starting from current\n' +
+               '\'show n\' - [TODO] print out the link for current user.\n' +
+               '\'next\' - [TODO] print the next link from the position the user stopped reviewing them\n```', channel);
           break;
         }
-        default: {}
-
+        default: {
+          if (mentionedMessage.indexOf('list') >= 0) {
+            const pattern = /\d+/g;
+            const result = mentionedMessage.match(pattern);
+            let offset, limit;
+            if (result.length === 2) {
+              offset = parseInt(result[0], 10);
+              limit = parseInt(result[1], 10) - offset;
+            } else if (result.length === 1) {
+              limit = parseInt(result[0], 10);
+            }
+            db.getLinks(limit, offset).then((links) => {
+              web.files.upload('links', {
+                title: 'requested links',
+                content: links,
+                channels: channel
+              }, (err, data) => { if (err) console.error(err); });
+            });
+          }
+        }
       }
     }
   }
@@ -135,7 +173,7 @@ function fetchMessages(channel) {
   });
 }
 
-function processMessages(chunks) {
+function processMessages(chunks, channel, printSummary = true) {
   const urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
   const links = new Set();
   const blacklist = process.env.LINK_BLACKLIST.split(',');
@@ -183,9 +221,10 @@ function processMessages(chunks) {
   const totalLinks = links.size;
   links.clear();
   db.insert(dbPayload).then((result) => {
-    console.log(`Total links found: ${totalLinks}. New: ${result.new}. Blacklist: ${blacklist}`);
+    if (printSummary) {
+      rtm.sendMessage(`Total links found: ${totalLinks}. New: ${result}. Blacklist: ${blacklist}`, channel);
+    }
   });
-  // to do - write total links / new links / blacklist
 }
 
 module.exports.start = () => {
