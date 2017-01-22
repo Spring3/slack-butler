@@ -1,22 +1,30 @@
-const pg = require('pg');
+const pg = require('pg-promise')();
+const db = pg(process.env.DATABASE_URL);
 
-const config = {
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  host: process.env.PGHOST,
-  port: process.env.PGPORT,
-  database: process.env.PGDATABASE,
-  max: process.env.POOL_MAX,
-  idleTimeoutMillis: process.env.PGTIMEOUT,
-  ssl: true
-};
-const pool = new pg.Pool(config);
-pool.connect((err, client, done) => {
-  if (err)
-    throw err;
-});
 
 class Database {
+  static init() {
+    return db.query('CREATE TABLE IF NOT EXISTS "links"(' +
+      '"id" SERIAL PRIMARY KEY,' +
+      '"caption" varchar(1024) NOT NULL,' +
+      '"link" varchar(1024) NOT NULL UNIQUE);');
+  }
+
+  static insert(objArray) {
+    const query = objArray.map((linkObj) => {
+      return `("${linkObj.caption}", "${linkObj.link}")`;
+    }).reduce((sum, current) => {
+      return sum.concat(`,${current}`);
+    });
+    console.log(query);
+    let was, is;
+    return db.query('SELECT COUNT(*) FROM links;').then((count) => {
+      was = count;
+      return db.query(`INSERT INTO links (caption, link) VALUES ${query} ON CONFLICT DO NOTHING;`);
+    }).then((result) => {
+      console.log(result);
+    });
+  }
 }
 
 module.exports = Database;
