@@ -1,8 +1,8 @@
 .PHONY: test
-init:
-	cp .env.tpl .env
 deps:
 	npm i
+	cp .env.tpl .env
+lint:
+	/node_modules/.bin/eslint .
 run:
-	make init
 	node server.js

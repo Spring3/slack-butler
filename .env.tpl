@@ -1,5 +1,7 @@
 SLACK_BOT_TOKEN=
 SLACK_API_TOKEN=
+# Main Slack channel to track all messages
 SLACK_CHANNEL=
 DATABASE_URL=
+MONGODB_URI=
 LINK_BLACKLIST=
