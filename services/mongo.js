@@ -1,13 +1,11 @@
 const { MongoClient } = require('mongodb');
+const assert = require('assert');
 
-let dbInstance;
+async function connect () {
+  assert(process.env.MONGODB_URI);
+  const dbInstance = await MongoClient.connect(process.env.MONGODB_URI);
+  console.log('Mongodb connection established');
+  module.exports.instance = dbInstance;
+};
 
-module.exports = async () => {
-  if (!dbInstance) {
-    assert(process.env.MONGODB_URI);
-    dbInstance = await MongoClient.connect(process.env.MONGODB_URI)
-    console.log('Mongodb connection established');
-    return dbInstance;
-  }
-  return dbInstance;
-}
+module.exports = connect;

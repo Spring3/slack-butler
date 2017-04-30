@@ -2,7 +2,7 @@ const assert = require('assert');
 
 class AbstractCommand {
   constructor(rtm, chatMessage) {
-    assert(this.rtm);
+    assert(rtm);
     this.rtm = rtm;
     this.chatMessage = chatMessage;
   }

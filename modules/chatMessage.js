@@ -1,8 +1,9 @@
 const Bot = require('./bot');
 const Command = require('./command');
+const url = require('url');
 
 const blackList = new Set();
-const urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/;
+const urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g;
 
 class ChatMessage {
   constructor(message) {
@@ -11,8 +12,8 @@ class ChatMessage {
     this.author = message.user;
     this.text = message.text;
     this.channel = message.channel;
-    this.containsLink = this.containsLink();
-    this.isDirect = this.isMention();
+    this.hasLink = this.containsLink() || false;
+    this.isDirect = this.isDirectMessage() || false;
   }
 
   isTextMessage() {
@@ -20,14 +21,14 @@ class ChatMessage {
   }
 
   containsLink() {
-    if (this.containsLink === undefined) {
+    if (this.hasLink === undefined && this.text) {
       return this.text.includes('http://') || this.text.includes('https://');
     }
-    return this.containsLink;
+    return this.hasLink;
   }
 
   isDirectMessage() {
-    if (this.isDirect === undefined) {
+    if (this.isDirect === undefined && this.text) {
       return this.text.includes(`<@${Bot.instance.id}`);
     }
     return this.isDirect;
@@ -35,38 +36,38 @@ class ChatMessage {
 
   getLinks() {
     const links = new Set();
-    this.text.match(urlPattern).filter((match) => {
-      if (!match) return false;
-      const link = match[0];
+    const matches = this.text.match(urlPattern) || [];
+    if (!matches) {
+      return [];
+    }
+    // filtering links from regex results
+    matches.filter((link) => {
+      if (!link) return false;
+      const urlObj = url.parse(link);
+      if (!urlObj.protocol || !urlObj.pathname) return false;
       let isValid = true;
-      for(const bannedLink of blackList) {
+      for (const bannedKeyword of blackList) {
         if (isValid) {
-          isValid = link.includes(bannedLink);
+          isValid = link.includes(bannedKeyword);
         }
       }
       return isValid;
     }).forEach(link => links.add(link));
 
     const payload = [];
-    for(const value of links.values()) {
-      // getting the link name, replacing / with spaces and getting the name part
-      // for /bnoguchi/hooks-js it will be hooks-js
-      let linkTitle;
-      if (value[3]) {
-        linkTitle = value[3].replace(new RegExp('/', 'g'), ' ').trim().split(' ');
-        linkTitle = linkTitle[linkTitle.length - 1];
-        if (linkTitle) {
-          linkTitle = linkTitle.split('?')[0]; // to get rid of query parameters
-        }
-      }
+    // setting up link title
+    for (const link of links.values()) {
+      const urlObj = url.parse(link);
+      const linkParts = urlObj.pathname.split('/');
+      let linkTitle = linkParts[linkParts.length - 1].replace('-', ' ');
       // if name was not set or it is a number
       if (!linkTitle || /^\d+$/.test(linkTitle)) {
         // just taking the website name as a caption for the link
-        linkTitle = value[0].split('//')[1].split('?')[0];
+        linkTitle = linkParts[0];
       }
       payload.push({
         caption: linkTitle,
-        href: value[0],
+        href: link,
       });
     }
     // rtm.sendMessage(`Total links found: ${totalLinks}. New: ${result}. Blacklist: ${blacklist}`, this.channel);
@@ -88,8 +89,7 @@ class ChatMessage {
   isCommand() {
     if (this.isDirectMessage()) {
       const mention = this.getDirectMessage();
-      const command = Command.isCommand(mention);
-      return command;
+      return Command.isCommand(mention);
     }
     return false;
   }

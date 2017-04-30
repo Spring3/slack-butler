@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "mocha test",
-    "start": "make run"
+    "start": "cp .env.tpl .env && node server.js",
+    "dev": "make run"
   },
   "repository": {
     "type": "git",
@@ -28,7 +29,6 @@
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "mongodb": "^2.2.26",
-    "pg-promise": "^5.5.2",
     "request": "^2.79.0"
   },
   "devDependencies": {

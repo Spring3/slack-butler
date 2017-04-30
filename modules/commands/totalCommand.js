@@ -1,17 +1,16 @@
 const AbstractCommand = require('./abstractCommand');
+const db = require('./../../services/mongo').instance;
+const links = db.collection('Links');
 
 class TotalCommand extends AbstractCommand {
   constructor(rtm, chatMessage) {
     super(rtm, chatMessage);
   }
 
-  handle(message, channel) {
+  async handle(message, channel) {
     super.handle(message, channel);
-    /*
-      db.getTotalLinks().then((count) => {
-        rtm.sendMessage(`Total links saved: ${count}`, channel);
-      });
-    */
+    const count = await links.count();
+    this.rtm.sendMessage(`Total links: ${count}`, channel);
   }
 }
 

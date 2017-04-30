@@ -1,3 +1,4 @@
+const Channel = require('./channel');
 const assert = require('assert');
 
 let botInstance;
@@ -6,20 +7,14 @@ class Bot {
   constructor(authData, channelData) {
     assert(authData);
     assert(channelData);
-    this.name = authData.self.name;
-    this.id = authData.self.id;
-    this.mainChannel = {
-      id: channelData.id,
-      name: channelData.name,
-    };
-    this.team = {
-      name: authData.team.name,
-    };
+    this.name = authData.name;
+    this.id = authData.id;
+    this.mainChannel = new Channel(channelData);
     botInstance = botInstance || this;
   }
 
   static get instance() {
-    return botInstnace;
+    return botInstance;
   }
 }
 

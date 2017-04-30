@@ -1,16 +1,18 @@
 const ScanCommand = require('./commands/scanCommand');
 const TotalCommand = require('./commands/totalCommand');
-const ListCommand = require('./commands/listCommand');
 const HelpCommand = require('./commands/helpCommand');
+const BlacklistCommand = require('./commands/blacklistCommand');
+const BanCommand = require('./commands/banCommand');
+const UnBanCommand = require('./commands/unbanCommand');
 
 const botCommands = {
   scan: ScanCommand,
   total: TotalCommand,
-  list: ListCommand,
   help: HelpCommand,
+  blacklist: BlacklistCommand,
+  ban: BanCommand,
+  unban: UnBanCommand,
 };
-
-const listRegex = /list(\s+)?(\d+)?/g;
 
 class Command {
   constructor(type, channel, chatMessage) {
@@ -29,7 +31,7 @@ class Command {
   }
 
   static getCommandType(text) {
-    for(const [key] of Object.entries(botCommands)) {
+    for (const [key] of Object.entries(botCommands)) {
       if (text.includes(key)) {
         return key;
       }
