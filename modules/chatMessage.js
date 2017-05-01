@@ -1,5 +1,5 @@
+const assert = require('assert');
 const Bot = require('./bot');
-const Command = require('./command');
 const url = require('url');
 
 const blackList = new Set();
@@ -7,17 +7,36 @@ const urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#
 
 class ChatMessage {
   constructor(message) {
+    assert(message);
     this.type = message.type;
     this.subtype = message.subtype;
     this.author = message.user;
     this.text = message.text;
+    this.timestamp = message.ts;
     this.channel = message.channel;
+    this.reactions = message.reactions || [];
     this.hasLink = this.containsLink() || false;
     this.isDirect = this.isDirectMessage() || false;
   }
 
   isTextMessage() {
     return (this.type === 'message' && !this.subtype);
+  }
+
+  isMarked() {
+    for (const reaction of this.reactions) {
+      if (reaction.name === 'star' && reaction.users.includes(Bot.instance.id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  mark() {
+    this.reactions.push({
+      name: 'star',
+      users: [Bot.instance.id],
+    });
   }
 
   containsLink() {
@@ -58,8 +77,8 @@ class ChatMessage {
     // setting up link title
     for (const link of links.values()) {
       const urlObj = url.parse(link);
-      const linkParts = urlObj.pathname.split('/');
-      let linkTitle = linkParts[linkParts.length - 1].replace('-', ' ');
+      const linkParts = urlObj.pathname.substring(0, urlObj.pathname.length - 1).split('/');
+      let linkTitle = linkParts[linkParts.length - 1].replace(/-/g, ' ');
       // if name was not set or it is a number
       if (!linkTitle || /^\d+$/.test(linkTitle)) {
         // just taking the website name as a caption for the link
@@ -76,22 +95,6 @@ class ChatMessage {
 
   getDirectMessage() {
     return this.text.replace(`<@${Bot.instance.id}>`, '').toLowerCase().trim();
-  }
-
-  getCommand() {
-    const commandType = this.isCommand();
-    if (commandType) {
-      return new Command(commandType, this.channel, this);
-    }
-    return undefined;
-  }
-
-  isCommand() {
-    if (this.isDirectMessage()) {
-      const mention = this.getDirectMessage();
-      return Command.isCommand(mention);
-    }
-    return false;
   }
 
   static ban(text) {

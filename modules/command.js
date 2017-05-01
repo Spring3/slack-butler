@@ -1,3 +1,4 @@
+const assert = require('assert');
 const ScanCommand = require('./commands/scanCommand');
 const TotalCommand = require('./commands/totalCommand');
 const HelpCommand = require('./commands/helpCommand');
@@ -25,15 +26,22 @@ class Command {
     new botCommands[this.type](rtm, this.chatMessage).handle(message, this.channel);
   }
 
-  static isCommand(text) {
-    if (!text) return false;
-    return Command.getCommandType(text);
-  }
-
   static getCommandType(text) {
+    if (!text) return undefined;
     for (const [key] of Object.entries(botCommands)) {
       if (text.includes(key)) {
         return key;
+      }
+    }
+    return undefined;
+  }
+
+  static fromMessage(chatMessage) {
+    if (chatMessage && chatMessage.isDirectMessage()) {
+      const mention = chatMessage.getDirectMessage();
+      const commandType = Command.getCommandType(mention);
+      if (commandType) {
+        return new Command(commandType, chatMessage.channel, chatMessage);
       }
     }
     return undefined;
