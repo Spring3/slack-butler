@@ -12,8 +12,10 @@ class ScanCommand extends AbstractCommand {
 
   async handle(message, channel) {
     super.handle(message, channel);
+    const startTime = process.hrtime();
     // getting all messages from the channel
     let messages = await Bot.instance.mainChannel.getMessages(Bot.instance);
+    const totalMessagesCount = messages.length;
     const linksToInsert = [];
     // filtering and getting only plain text messages with links, sent not by bot itself
     let chatMessagesWithLinks = messages.map((message) => {
@@ -25,6 +27,7 @@ class ScanCommand extends AbstractCommand {
     messages = null;
     // putting them into an array for the mongodb query
     let allLinks = [];
+    const messagesWithLinksCount = chatMessagesWithLinks.length;
     for (const chatMessage of chatMessagesWithLinks) {
       allLinks = allLinks.concat(chatMessage.getLinks().map((link) => link.href));
     }
@@ -39,7 +42,7 @@ class ScanCommand extends AbstractCommand {
     for (const chatMessage of chatMessagesWithLinks) {
       for (const link of chatMessage.getLinks()) {
         if (!result.includes(link.href)) {
-          batch.insert(link);
+          batch.insert(Object.assign(link, { author: chatMessage.author }));
           uniqueLinksCount ++;
         }
         if (!chatMessage.isMarked()) {
@@ -52,7 +55,11 @@ class ScanCommand extends AbstractCommand {
     if (uniqueLinksCount > 0) {
       batch.execute();
     }
-    this.rtm.sendMessage(`${uniqueLinksCount} new links saved`, channel);
+    const endTime = process.hrtime(startTime);
+    this.rtm.sendMessage(`${uniqueLinksCount} new links saved.\n` +
+      `Messages scanned: ${totalMessagesCount}\n` +
+      `Containing links: ${messagesWithLinksCount}\n` +
+      `Scanning complete in ${endTime[0]}s`, channel);
   }
 }
 

@@ -2,7 +2,6 @@ const assert = require('assert');
 const Bot = require('./bot');
 const url = require('url');
 
-const blackList = new Set();
 const urlPattern = /(http|ftp|https):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g;
 
 class ChatMessage {
@@ -55,7 +54,7 @@ class ChatMessage {
 
   getLinks() {
     const links = new Set();
-    const matches = this.text.match(urlPattern) || [];
+    const matches = this.text.match(urlPattern);
     if (!matches) {
       return [];
     }
@@ -65,14 +64,13 @@ class ChatMessage {
       const urlObj = url.parse(link);
       if (!urlObj.protocol || !urlObj.pathname) return false;
       let isValid = true;
-      for (const bannedKeyword of blackList) {
+      for (const bannedKeyword of Bot.instance.blacklist.getValues()) {
         if (isValid) {
-          isValid = link.includes(bannedKeyword);
+          isValid = !link.includes(bannedKeyword);
         }
       }
       return isValid;
     }).forEach(link => links.add(link));
-
     const payload = [];
     // setting up link title
     for (const link of links.values()) {
@@ -95,14 +93,6 @@ class ChatMessage {
 
   getDirectMessage() {
     return this.text.replace(`<@${Bot.instance.id}>`, '').toLowerCase().trim();
-  }
-
-  static ban(text) {
-    blackList.add(text);
-  }
-
-  static unban(text) {
-    blackList.delete(text);
   }
 }
 

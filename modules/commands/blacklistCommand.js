@@ -1,4 +1,5 @@
 const AbstractCommand = require('./abstractCommand');
+const Bot = require('./../bot');
 
 class BlacklistCommand extends AbstractCommand {
   constructor(rtm, chatMessage) {
@@ -7,6 +8,7 @@ class BlacklistCommand extends AbstractCommand {
 
   handle(message, channel) {
     super.handle(message, channel);
+    this.rtm.sendMessage(`Blacklist: ${Bot.instance.blacklist.getValues()}`, channel);
   }
 }
 

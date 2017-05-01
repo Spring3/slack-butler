@@ -17,6 +17,9 @@ const botCommands = {
 
 class Command {
   constructor(type, channel, chatMessage) {
+    assert(type);
+    assert(channel);
+    assert(chatMessage);
     this.type = type;
     this.channel = channel;
     this.chatMessage = chatMessage;
@@ -26,10 +29,11 @@ class Command {
     new botCommands[this.type](rtm, this.chatMessage).handle(message, this.channel);
   }
 
-  static getCommandType(text) {
-    if (!text) return undefined;
+  static getCommandType(directMessage) {
+    if (!directMessage) return undefined;
+    const command = directMessage.split(' ')[0];
     for (const [key] of Object.entries(botCommands)) {
-      if (text.includes(key)) {
+      if (command === key) {
         return key;
       }
     }

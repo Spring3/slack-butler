@@ -1,4 +1,5 @@
 const AbstractCommand = require('./abstractCommand');
+const Bot = require('./../bot');
 
 class UnBanCommand extends AbstractCommand {
   constructor(rtm, chatMessage) {
@@ -7,6 +8,9 @@ class UnBanCommand extends AbstractCommand {
 
   handle(message, channel) {
     super.handle(message, channel);
+    const bot = Bot.instance;
+    bot.blacklist.unban(message.split(' ')[1].toLowerCase().trim());
+    this.rtm.sendMessage(`Blacklist: ${bot.blacklist.getValues()}`, channel);
   }
 }
 

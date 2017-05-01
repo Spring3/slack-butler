@@ -31,7 +31,7 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, async (msg) => {
       for (const link of links) {
         const existing = await linksCollection.findOne({ href: link.href });
         if (!existing) {
-          linksCollection.insert(link);
+          await linksCollection.insert(Object.assign(link, { author: message.author }));
         }
       }
       if (!message.isMarked()) {
