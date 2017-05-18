@@ -47,4 +47,21 @@ rtm.on(EVENTS.RTM.RAW_MESSAGE, async (msg) => {
   }
 });
 
+rtm.on('member_joined_channel', (data) => {
+  const memberId = data.user;
+  const channelId = data.channel;
+  if (bot.mainChannel.id === channelId) {
+    bot.mainChannel.joined(memberId);
+    rtm.sendMessage(`Welcome to the \`${bot.mainChannel.name}\` channel, <@${memberId}>!`, channelId);
+  } 
+});
+
+rtm.on('member_left_channel', (data) => {
+  const memberId = data.user;
+  const channelId = data.channel;
+  if (bot.mainChannel.id === channelId) {
+    bot.mainChannel.left(memberId);
+  }
+});
+
 module.exports.start = () => rtm.start();

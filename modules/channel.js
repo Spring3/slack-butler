@@ -6,7 +6,10 @@ class Channel {
     this.id = data.id;
     this.name = data.name;
     // Array of channel member's ids
-    this.members = data.members;
+    this.members = new Set(data.members);
+    
+    this.joined = this.joined.bind(this);
+    this.left = this.left.bind(this);
   }
 
   async getMessages(bot) {
@@ -21,6 +24,14 @@ class Channel {
       latest = messages[count - 1].ts;
     } while(response.has_more);
     return messages;
+  }
+
+  joined(memberId) {
+    this.members.add(memberId);
+  }
+
+  left(memberId) {
+    this.members.delete(memberId);
   }
 }
 

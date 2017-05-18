@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Spring3/slack-butler#readme",
   "dependencies": {
-    "@slack/client": "^3.8.1",
+    "@slack/client": "^3.9.0",
     "dotenv": "^4.0.0",
     "express": "^4.14.0",
     "mongodb": "^2.2.26"
