@@ -7,6 +7,7 @@ module.exports = {
       "ecmaVersion": 7
     },
     "rules": {
-      "no-restricted-syntax": "off"
+      "no-restricted-syntax": "off",
+      "comma-dangle": "off"
     }
 };
