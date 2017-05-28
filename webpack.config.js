@@ -16,7 +16,7 @@ module.exports = {
       test: path.join(__dirname, 'web', 'dynamic'),
       loader: 'babel-loader',
       query: {
-        presets: ['es2016', 'es2017', 'react']
+        presets: ['es2015', 'es2016', 'es2017', 'react']
       }
     }, {
       test: /\.json?$/,
