@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha test",
     "start": "cp .env.tpl .env && node server.js",
-    "webpack": "./node_modules/.bin/webpack -p",
+    "webpack": "node_modules/.bin/webpack -p --watch",
     "dev": "nodemon server.js"
   },
   "repository": {
@@ -34,6 +34,7 @@
     "pug": "^2.0.0-rc.1",
     "react": "^15.5.4",
     "react-addons-css-transition-group": "^15.5.2",
+    "react-animations": "^0.1.0",
     "react-dom": "^15.5.4",
     "react-router": "^4.1.1",
     "redux": "^3.6.0",

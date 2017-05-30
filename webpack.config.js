@@ -1,3 +1,4 @@
+require('dotenv').load({ silent: true });
 const webpack = require('webpack');
 const path = require('path');
 
@@ -32,7 +33,11 @@ module.exports = {
       sourcemap: false,
       beautify: false,
       dead_code: true
-    })
+    }),
+    new webpack.EnvironmentPlugin([
+      'CLIENT_ID',
+      'CLIENT_SECRET'
+    ])
   ],
   watch: process.env.NODE_ENV !== 'production'
 };
