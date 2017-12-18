@@ -18,26 +18,20 @@ const botCommands = {
 class Command {
   constructor(type, channel, chatMessage) {
     assert(type);
-    assert(channel);
     assert(chatMessage);
     this.type = type;
     this.channel = channel;
     this.chatMessage = chatMessage;
   }
 
-  execute(rtm, message) {
-    new botCommands[this.type](rtm, this.chatMessage).handle(message, this.channel);
+  execute(message, bot) {
+    new botCommands[this.type](this.chatMessage, bot).handle(message, this.channel);
   }
 
   static getCommandType(directMessage) {
     if (!directMessage) return undefined;
-    const command = directMessage.split(' ')[0];
-    for (const [key] of Object.entries(botCommands)) {
-      if (command === key) {
-        return key;
-      }
-    }
-    return undefined;
+    const command = directMessage.split(' ')[0].toLowerCase();
+    return botCommands[command] ? command : undefined;
   }
 
   static fromMessage(chatMessage) {
@@ -45,7 +39,7 @@ class Command {
       const mention = chatMessage.getDirectMessage();
       const commandType = Command.getCommandType(mention);
       if (commandType) {
-        return new Command(commandType, chatMessage.channel, chatMessage);
+        return new Command(commandType, chatMessage.channel.id, chatMessage);
       }
     }
     return undefined;

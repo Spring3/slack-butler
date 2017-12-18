@@ -4,7 +4,7 @@
   "description": "Channel bot for slack. Collects links and attachments from the channel and provides a user-friendly api to use them later",
   "main": "server.js",
   "scripts": {
-    "test": "mocha test",
+    "test": "make test",
     "start": "cp .env.tpl .env && node server.js",
     "dev": "make run"
   },
@@ -25,14 +25,14 @@
   },
   "homepage": "https://github.com/Spring3/slack-butler#readme",
   "dependencies": {
-    "@slack/client": "^3.9.0",
+    "@slack/client": "^3.14.2",
     "dotenv": "^4.0.0",
-    "express": "^4.14.0",
-    "mongodb": "^2.2.26"
+    "express": "^4.16.2",
+    "mongodb": "^2.2.33"
   },
   "devDependencies": {
-    "eslint": "^3.19.0",
-    "eslint-config-airbnb-base": "^11.1.3",
-    "eslint-plugin-import": "^2.2.0"
+    "eslint": "^4.13.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   }
 }
