@@ -1,6 +1,6 @@
 require('dotenv').load({ silent: true });
 const app = require('express')();
-const Bot = require('./src/modules/bot.js');
+const { Bot } = require('./src/modules/bot.js');
 const mongo = require('./src/modules/mongo');
 
 (async () => {

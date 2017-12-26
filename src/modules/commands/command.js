@@ -2,15 +2,14 @@ const assert = require('assert');
 const { rtm } = require('../../utils/slack.js');
 
 class Command {
-  constructor(chatMessage, bot) {
+  constructor(chatMessage) {
     this.chatMessage = chatMessage;
-    this.bot = bot;
     this.rtm = rtm;
   }
 
   handle(message, channel) {
-    assert(message);
-    assert(channel);
+    assert(message, 'Command message is undefined');
+    assert(channel, 'Command channel is undefined');
   }
 }
 

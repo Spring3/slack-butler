@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "make test",
-    "start": "cp .env.tpl .env && node server.js",
+    "start": "node server.js",
     "dev": "make run"
   },
   "repository": {

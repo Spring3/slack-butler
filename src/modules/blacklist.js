@@ -12,12 +12,12 @@ class Blacklist {
   }
 
   ban(text) {
-    assert(text);
+    assert(text, 'Ban text is undefined');
     blacklist.add(text.toLowerCase().trim());
   }
 
   unban(text) {
-    assert(text);
+    assert(text, 'Unban text is undefined');
     blacklist.delete(text.toLowerCase().trim());
   }
 

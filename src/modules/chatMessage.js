@@ -1,20 +1,23 @@
 const assert = require('assert');
-const blacklist = require('../modules/blacklist.js');
-const { getTitles } = require('../utils/url.js');
 const url = require('url');
+const blacklist = require('../modules/blacklist.js');
+const Bot = require('./bot.js');
+const Command = require('./command.js');
+const { getTitles } = require('../utils/url.js');
 
 const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g;
 
 class ChatMessage {
   constructor(message, channel) {
-    assert(message);
+    assert(message, 'Chatmessage message is undefined');
     const payload = typeof message === 'string' ? JSON.parse(message) : message;
+    this.bot = Bot.getInstance();
     this.type = payload.type;
     this.subtype = payload.subtype;
     this.author = payload.user;
     this.text = payload.text;
     this.timestamp = payload.ts;
-    this.channel = channel;
+    this.channel = channel || payload.channel;
     this.reactions = payload.reactions || [];
     this.hasLink = this.containsLink() || false;
     this.isDirect = this.isDirectMessage() || false;
@@ -26,7 +29,7 @@ class ChatMessage {
 
   isMarked() {
     for (const reaction of this.reactions) {
-      if (reaction.name === 'star' && reaction.users.includes(this.channel.botId)) {
+      if (reaction.name === 'star' && reaction.users.includes(this.bot.id)) {
         return true;
       }
     }
@@ -36,7 +39,7 @@ class ChatMessage {
   mark() {
     this.reactions.push({
       name: 'star',
-      users: [this.channel.botId],
+      users: [this.bot.id],
     });
   }
 
@@ -49,7 +52,7 @@ class ChatMessage {
 
   isDirectMessage() {
     if (this.isDirect === undefined && this.text) {
-      return this.text.includes(`<@${this.channel.botId}>`);
+      return this.text.includes(`<@${this.bot.id}>`);
     }
     return this.isDirect;
   }
@@ -77,11 +80,20 @@ class ChatMessage {
         links.add(getTitles(link));
       }
     }
-    return links.values();
+    return Array.from(links.values());
   }
 
   getDirectMessage() {
-    return this.text.replace(`<@${this.channel.botId}>`, '').toLowerCase().trim();
+    return this.text.replace(`<@${this.bot.id}>`, '').toLowerCase().trim();
+  }
+
+  getCommand() {
+    if (this.isDirectMessage()) {
+      const mention = this.getDirectMessage();
+      const commandType = mention.split(' ')[0].toLowerCase();
+      return new Command(commandType, this);
+    }
+    return undefined;
   }
 }
 

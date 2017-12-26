@@ -1,4 +1,5 @@
 const Command = require('./command');
+const Bot = require('../bot.js');
 const mongo = require('./../mongo');
 
 class ScanCommand extends Command {
@@ -6,30 +7,38 @@ class ScanCommand extends Command {
     super(chatMessage);
   }
 
-  async handle(message, channel, options = {}) {
-    super.handle(message, channel);
+  async handle(message, channelId, options = {}) {
+    super.handle(message, channelId);
     const startTime = process.hrtime();
-    let slackChannel = this.bot.channels.get(channel) || this.chatMessage.channel;
+    const bot = Bot.getInstance();
+    let slackChannel = bot.channels.get(channelId) || this.chatMessage.channel;
     // getting only messages with links from the channel
-    const chatMessagesWithLinks = await slackChannel.getMessages();
-    const messagesWithLinksCount = chatMessagesWithLinks.length;
+    let chatMessagesWithLinks;
+    try {
+      chatMessagesWithLinks = await slackChannel.getMessages();
+    } catch (e) {
+      console.log(e);
+      return this.rtm.sendMessage('I am unable to scan this channel.', channelId);
+    }
     const db = await mongo.connect();
-    if (messagesWithLinksCount) {
+    if (chatMessagesWithLinks.length) {
       const batch = db.collection('Links').initializeUnorderedBulkOp();
       for (const chatMessage of chatMessagesWithLinks) {
-        for (const link of chatMessage.getLinks()) {
-          batch.find({ href: link.href, 'channel.id': channel }).upsert().updateOne({
-            $setOnInsert: Object.assign({}, link, {
+        for (const [link] of chatMessage.getLinks()) {
+          batch.find({ href: link.href, 'channel.id': channelId }).upsert().updateOne({
+            $setOnInsert: {
+              href: link.href,
+              caption: link.caption,
               author: chatMessage.author,
               channel: {
-                id: channel,
-                name: slackChannel.name || 'DM'
+                id: channelId,
+                name: slackChannel.name
               },
               createdAt: new Date()
-            })
+            }
           });
           if (!chatMessage.isMarked()) {
-            this.bot.react(chatMessage);
+            bot.react(chatMessage);
           }
         }
 
@@ -37,7 +46,7 @@ class ScanCommand extends Command {
       batch.execute();
       const endTime = process.hrtime(startTime);
       if (options.replyOnFinish) {
-        this.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channel);
+        this.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channelId);
       }
     }
   }

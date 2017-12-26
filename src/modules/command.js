@@ -5,6 +5,7 @@ const HelpCommand = require('./commands/helpCommand');
 const BlacklistCommand = require('./commands/blacklistCommand');
 const BanCommand = require('./commands/banCommand');
 const UnBanCommand = require('./commands/unbanCommand');
+const VersionCommand = require('./commands/versionCommand');
 
 const botCommands = {
   scan: ScanCommand,
@@ -13,36 +14,21 @@ const botCommands = {
   blacklist: BlacklistCommand,
   ban: BanCommand,
   unban: UnBanCommand,
+  version: VersionCommand
 };
 
 class Command {
-  constructor(type, channel, chatMessage) {
-    assert(type);
-    assert(chatMessage);
+  constructor(type, chatMessage) {
+    assert(type, 'Command type is undefined');
+    assert(chatMessage, 'Command chatMessage is undefined');
     this.type = type;
-    this.channel = channel;
     this.chatMessage = chatMessage;
   }
 
-  execute(message, bot) {
-    new botCommands[this.type](this.chatMessage, bot).handle(message, this.channel);
-  }
-
-  static getCommandType(directMessage) {
-    if (!directMessage) return undefined;
-    const command = directMessage.split(' ')[0].toLowerCase();
-    return botCommands[command] ? command : undefined;
-  }
-
-  static fromMessage(chatMessage) {
-    if (chatMessage && chatMessage.isDirectMessage()) {
-      const mention = chatMessage.getDirectMessage();
-      const commandType = Command.getCommandType(mention);
-      if (commandType) {
-        return new Command(commandType, chatMessage.channel.id, chatMessage);
-      }
+  execute(commandText, channelId) {
+    if (botCommands[this.type]) {
+      new botCommands[this.type](this.chatMessage).handle(commandText, channelId, { replyOnFinish: true });
     }
-    return undefined;
   }
 }
 

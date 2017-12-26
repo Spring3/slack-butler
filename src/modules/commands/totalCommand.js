@@ -1,4 +1,4 @@
-const Command = require('./Command');
+const Command = require('./command');
 const mongo = require('./../mongo');
 
 class TotalCommand extends Command {
