@@ -1,11 +1,12 @@
 const assert = require('assert');
+const { blacklist } = require('./configuration.js');
 
-const blacklist = new Set();
+const blacklistSet = new Set();
 
 class Blacklist {
   constructor() {
-    if (![null, undefined, 'undefined', ''].includes(process.env.LINK_BLACKLIST)) {
-      for (const blackListKey of process.env.LINK_BLACKLIST.split(',')) {
+    if (![null, undefined, 'undefined', ''].includes(blacklist) && typeof blacklist === 'string') {
+      for (const blackListKey of blacklist.split(',')) {
         this.ban(blackListKey);
       }
     }
@@ -13,16 +14,16 @@ class Blacklist {
 
   ban(text) {
     assert(text, 'Ban text is undefined');
-    blacklist.add(text.toLowerCase().trim());
+    blacklistSet.add(text.toLowerCase().trim());
   }
 
   unban(text) {
     assert(text, 'Unban text is undefined');
-    blacklist.delete(text.toLowerCase().trim());
+    blacklistSet.delete(text.toLowerCase().trim());
   }
 
   getValues() {
-    return Array.from(blacklist);
+    return Array.from(blacklistSet);
   }
 }
 

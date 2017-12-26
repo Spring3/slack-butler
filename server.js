@@ -1,5 +1,5 @@
-require('dotenv').load({ silent: true });
 const app = require('express')();
+const { port } = require('./src/modules/configuration.js');
 const { Bot } = require('./src/modules/bot.js');
 const mongo = require('./src/modules/mongo');
 
@@ -7,7 +7,7 @@ const mongo = require('./src/modules/mongo');
   await mongo.connect();
   Bot.start();
 
-  app.listen(process.env.PORT || 3000, () => {
-    console.log(`Listening to port ${process.env.PORT || 3000}`);
+  app.listen(port, () => {
+    console.log(`Listening to port ${port}`);
   });
 })();

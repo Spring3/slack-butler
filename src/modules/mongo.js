@@ -1,16 +1,13 @@
 const { MongoClient } = require('mongodb');
 const assert = require('assert');
+const { mongodb_uri } = require('./configuration.js');
 
 let instance;
 
 function connect() {
   if (!instance) {
-    assert(process.env.MONGODB_URI, 'MONGODB_URI is not given');
-    return MongoClient.connect(process.env.MONGODB_URI)
-      .then((connection) => {
-        instance = connection;
-        return instance;
-      });
+    assert(mongodb_uri, 'STARBOT_MONGODB_URI is not given');
+    return MongoClient.connect(mongodb_uri).then(connection => instance = connection);
   }
   return Promise.resolve(instance);
 }

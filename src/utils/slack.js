@@ -1,10 +1,11 @@
 const assert = require('assert');
 const { WebClient, RtmClient, CLIENT_EVENTS } = require('@slack/client');
+const { slack_token } = require('../modules/configuration.js');
 
-assert(process.env.SLACK_BOT_TOKEN, 'SLACK_BOT_TOKEN was not provided');
+assert(slack_token, 'STARBOT_SLACK_TOKEN was not provided');
 
 module.exports = {
-  rtm: new RtmClient(process.env.SLACK_BOT_TOKEN),
-  web: new WebClient(process.env.SLACK_BOT_TOKEN),
-  EVENTS: CLIENT_EVENTS,
+  rtm: new RtmClient(slack_token),
+  web: new WebClient(slack_token),
+  EVENTS: CLIENT_EVENTS
 };
