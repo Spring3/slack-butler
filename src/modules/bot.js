@@ -93,7 +93,7 @@ class Bot {
       }
     });
 
-    rtm.on(EVENTS.RTM.CHANNEL_RENAME, async (msg) => {
+    rtm.on('channels_rename', async (msg) => {
       const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
       const channelId = jsonMessage.channel.id;
       if (this.channels.has(channelId)) {
@@ -111,21 +111,33 @@ class Bot {
       }
     });
 
-    rtm.on(EVENTS.RTM.CHANNEL_JOINED, (data) => {
+    rtm.on('member_joined_channel', async (data) => {
       const memberId = data.user;
       const channelId = data.channel;
       if (this.channels.has(channelId)) {
+        // somebody joined a channel
         const channel = this.channels.get(channelId);
         channel.memberJoined(memberId);
         rtm.sendMessage(`Welcome to the \`${channel.name}\` channel, <@${memberId}>!`, channelId);
+      } else {
+        // bot joined a channel
+        let channelData = await web.channels.info(channelId);
+        channelData = typeof channelData === 'string' ? JSON.parse(channelData) : channelData;
+        this.channels.set(channelId, new Channel(channelData.channel, this.id));
       }
     });
 
-    rtm.on(EVENTS.RTM.CHANNEL_LEFT, (data) => {
+    rtm.on('member_left_channel', (data) => {
       const memberId = data.user;
       const channelId = data.channel;
       if (this.channels.has(channelId)) {
-        this.channels.get(channelId).memberLeft(memberId);
+        if (memberId === this.id) {
+          // bot left a channel
+          this.channels.delete(channelId);
+        } else {
+          // somebody left a channel
+          this.channels.get(channelId).memberLeft(memberId);
+        }   
       }
     });
   }
