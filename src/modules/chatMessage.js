@@ -1,5 +1,6 @@
 const assert = require('assert');
 const url = require('url');
+const { reaction_emoji, scan_trigger_emoji } = require('./configuration.js');
 const blacklist = require('../modules/blacklist.js');
 const Bot = require('./bot.js');
 const Command = require('./command.js');
@@ -9,7 +10,7 @@ const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[
 
 class ChatMessage {
   constructor(message, channel) {
-    assert(message, 'Chatmessage message is undefined');
+    assert(message, 'ChatMessage message is undefined');
     const payload = typeof message === 'string' ? JSON.parse(message) : message;
     this.bot = Bot.getInstance();
     this.type = payload.type;
@@ -29,7 +30,17 @@ class ChatMessage {
 
   isMarked() {
     for (const reaction of this.reactions) {
-      if (reaction.name === 'star' && reaction.users.includes(this.bot.id)) {
+      if (reaction.name === reaction_emoji.toLowerCase() && reaction.users.includes(this.bot.id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  isMarkedToScan() {
+    if (!scan_trigger_emoji) return true;
+    for (const reaction of this.reactions) {
+      if (reaction.name === scan_trigger_emoji.toLowerCase() && !reaction.users.includes(this.bot.id)) {
         return true;
       }
     }
@@ -38,7 +49,7 @@ class ChatMessage {
 
   mark() {
     this.reactions.push({
-      name: 'star',
+      name: reaction_emoji.toLowerCase(),
       users: [this.bot.id],
     });
   }

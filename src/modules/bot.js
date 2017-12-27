@@ -1,5 +1,7 @@
-const { rtm, web, EVENTS } = require('../utils/slack.js');
+const { rtm, userRtm, web, EVENTS } = require('../utils/slack.js');
+const { auto_scan_interval, scan_trigger_emoji, reaction_emoji } = require('./configuration.js');
 const mongo = require('./mongo');
+const Links = require('./entities/links.js');
 const Channel = require('./channel');
 const assert = require('assert');
 const blacklist = require('./blacklist');
@@ -13,9 +15,12 @@ class Bot {
     this.id = id;
     this.channels = new Map(channels.map(channelData => [channelData.id, new Channel(channelData, this.id)]));
     this.blacklist = blacklist;
+    if (auto_scan_interval) {
+      this.scanningInterval = this.beginScanningInterval();
+    }
   }
 
-  async react(message, emoji = 'star') {
+  async react(message, emoji = reaction_emoji.toLowerCase()) {
     try {
       await web.reactions.add(emoji, {
         channel: message.channel.id || message.channel,
@@ -24,6 +29,25 @@ class Bot {
       message.mark();
     } catch (e) {
       console.error(e);
+    }
+  }
+
+  beginScanningInterval() {
+    return setInterval(() => {
+      const command = `<@${this.id}> scan`
+      for (const [id, channel] of this.channels.entries()) {
+        const chatMessage = channel.getMessage({
+          type: 'message',
+          text: command
+        });
+        chatMessage.getCommand().execute(chatMessage.getDirectMessage(), channel.id);
+      }
+    }, parseInt(auto_scan_interval, 10));
+  }
+
+  static shutdown() {
+    if (botInstance && botInstance.scanningInterval) {
+      clearInterval(botInstance.scanningInterval)
     }
   }
 
@@ -38,31 +62,32 @@ class Bot {
         const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id );
         const message = channel.getMessage(msg);
         if (message.isTextMessage() && message.author !== this.id) {
-          if (message.hasLink) {
-            const links = message.getLinks();
-            const db = await mongo.connect();
-            for (const [link] of links) {
-              db.collection('Links').findOneAndUpdate({ href: link.href, 'channel.id': message.channel.id }, {
-                $setOnInsert: {
-                  href: link.href,
-                  caption: link.caption,
-                  channel: {
-                    id: message.channel.id,
-                    name: channel.name
-                  },
-                  author: message.author,
-                  createdAt: new Date()
-                },
-              }, { upsert: true });
-            }
+          if (message.hasLink && message.isMarkedToScan()) {
+            Links.save(message);
             if (!message.isMarked()) {
               this.react(message);
             }
           } else {
             const command = message.getCommand();
             if (command) {
-              command.execute(message.getDirectMessage(), message.channel.id);
+              command.execute(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
             }
+          }
+        }
+      }
+    });
+
+    userRtm.on(EVENTS.RTM.REACTION_ADDED, async (msg) => {
+      const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
+      if (!scan_trigger_emoji) return;
+      const payload = jsonMessage.item;
+      if (jsonMessage.reaction === scan_trigger_emoji.toLowerCase() && jsonMessage.user !== this.id && payload.type === 'message') {
+        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'unknown'}, this.id);
+        const message = await channel.fetchMessage(payload.ts);
+        if (message.isTextMessage() && message.isMarkedToScan() && message.hasLink) {
+          Links.save(message);
+          if (!message.isMarked()) {
+            this.react(message);
           }
         }
       }

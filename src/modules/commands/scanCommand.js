@@ -15,7 +15,7 @@ class ScanCommand extends Command {
     // getting only messages with links from the channel
     let chatMessagesWithLinks;
     try {
-      chatMessagesWithLinks = await slackChannel.getMessages();
+      chatMessagesWithLinks = await slackChannel.fetchMessages();
     } catch (e) {
       console.log(e);
       return this.rtm.sendMessage('I am unable to scan this channel.', channelId);

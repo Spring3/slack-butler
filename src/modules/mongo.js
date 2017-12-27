@@ -12,4 +12,10 @@ function connect() {
   return Promise.resolve(instance);
 }
 
-module.exports = { connect };
+function close() {
+  if (instance) {
+    instance.close();
+  }
+}
+
+module.exports = { connect, close };

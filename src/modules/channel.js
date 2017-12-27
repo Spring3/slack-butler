@@ -13,13 +13,13 @@ class Channel {
     this.members = new Set(data.members);
   }
 
-  async getMessages(filter = {}) {
+  async fetchMessages(filter = {}) {
     let messages = [];
     let response;
     let next;
     do {
-      const cursor = next ? { cursor: next } : {};
-      response = await web.conversations.history(this.id, cursor);
+      const options = next ? { cursor: next, inclusive: true } : { inclusive: true };
+      response = await web.conversations.history(this.id, options);
       response = typeof response === 'string' ? JSON.parse(response) : response;
       const chatMessages = response.messages.map(message => new ChatMessage(message, this));
       next = response.response_metadata && response.response_metadata.next_cursor;
@@ -29,6 +29,12 @@ class Channel {
       );
     } while(response.has_more);
     return messages;
+  }
+
+  async fetchMessage(timestamp) {
+    let response = await web.conversations.history(this.id, { latest: timestamp, count: 1, inclusive: true });
+    response = typeof response === 'string' ? JSON.parse(response) : response;
+    return this.getMessage(response.messages[0]);
   }
 
   memberJoined (memberId) {

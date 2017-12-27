@@ -25,9 +25,9 @@ class Command {
     this.chatMessage = chatMessage;
   }
 
-  execute(commandText, channelId) {
+  execute(commandText, channelId, options) {
     if (botCommands[this.type]) {
-      new botCommands[this.type](this.chatMessage).handle(commandText, channelId, { replyOnFinish: true });
+      new botCommands[this.type](this.chatMessage).handle(commandText, channelId, options);
     }
   }
 }
