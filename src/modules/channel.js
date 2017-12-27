@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { web } = require('../utils/slack.js');
+const { web, userWeb } = require('../utils/slack.js');
 const ChatMessage = require('./chatMessage.js');
 
 class Channel {
@@ -19,7 +19,7 @@ class Channel {
     let next;
     do {
       const options = next ? { cursor: next, inclusive: true } : { inclusive: true };
-      response = await web.conversations.history(this.id, options);
+      response = await userWeb.conversations.history(this.id, options);
       response = typeof response === 'string' ? JSON.parse(response) : response;
       const chatMessages = response.messages.map(message => new ChatMessage(message, this));
       next = response.response_metadata && response.response_metadata.next_cursor;
@@ -32,7 +32,7 @@ class Channel {
   }
 
   async fetchMessage(timestamp) {
-    let response = await web.conversations.history(this.id, { latest: timestamp, count: 1, inclusive: true });
+    let response = await userWeb.conversations.history(this.id, { latest: timestamp, limit: 1, inclusive: true });
     response = typeof response === 'string' ? JSON.parse(response) : response;
     return this.getMessage(response.messages[0]);
   }

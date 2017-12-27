@@ -6,6 +6,7 @@ assert(slack_bot_token, 'STARBOT_SLACK_BOT_TOKEN was not provided');
 
 module.exports = {
   rtm: new RtmClient(slack_bot_token),
+  userWeb: new WebClient(slack_user_token),
   web: new WebClient(slack_bot_token),
   EVENTS: CLIENT_EVENTS
 };

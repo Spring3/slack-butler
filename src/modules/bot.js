@@ -1,7 +1,8 @@
 const { rtm, web, EVENTS } = require('../utils/slack.js');
-const { auto_scan_interval, scan_trigger_emoji, reaction_emoji } = require('./configuration.js');
+const { auto_scan_interval, scan_trigger_emoji, reaction_emoji, favorites_reaction_emoji } = require('./configuration.js');
 const mongo = require('./mongo');
 const Links = require('./entities/links.js');
+const Highlights = require('./entities/highlights.js');
 const Channel = require('./channel');
 const assert = require('assert');
 const blacklist = require('./blacklist');
@@ -82,12 +83,12 @@ class Bot {
       if (!scan_trigger_emoji) return;
       const payload = jsonMessage.item;
       if (jsonMessage.reaction === scan_trigger_emoji.toLowerCase() && jsonMessage.user !== this.id && payload.type === 'message') {
-        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'unknown'}, this.id);
+        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM'}, this.id);
         const message = await channel.fetchMessage(payload.ts);
         if (message.isTextMessage() && message.isMarkedToScan() && message.hasLink) {
-          Links.save(message);
+          Links.save(message).then(() => Highlights.save(message));
           if (!message.isMarked()) {
-            this.react(message);
+            this.react(message, favorites_reaction_emoji.toLowerCase());
           }
         }
       }
@@ -143,10 +144,13 @@ class Bot {
   }
 }
 
-rtm.on(EVENTS.RTM.AUTHENTICATED, (data) => {
+rtm.on(EVENTS.RTM.AUTHENTICATED, async (data) => {
   if (!botInstance) {
     botInstance = new Bot(data.self, data.channels.filter((channel => channel.is_channel && channel.is_member)));
     botInstance.init();
+    console.log(await web.conversations.history('C03NGV4HG', { latest: '1514365870.000046', limit: 1, inclusive: true }));
+    console.log(await web.channels.history('C03NGV4HG', { latest: '1514365870.000046', count: 1, inclusive: true }));
+    console.log(await botInstance.channels.get('C03NGV4HG').fetchMessage('1514365870.000046'));
   }
 });
 
