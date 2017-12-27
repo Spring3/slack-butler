@@ -1,4 +1,4 @@
-const { rtm, userRtm, web, EVENTS } = require('../utils/slack.js');
+const { rtm, web, EVENTS } = require('../utils/slack.js');
 const { auto_scan_interval, scan_trigger_emoji, reaction_emoji } = require('./configuration.js');
 const mongo = require('./mongo');
 const Links = require('./entities/links.js');
@@ -77,7 +77,7 @@ class Bot {
       }
     });
 
-    userRtm.on(EVENTS.RTM.REACTION_ADDED, async (msg) => {
+    rtm.on('reaction_added', async (msg) => {
       const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
       if (!scan_trigger_emoji) return;
       const payload = jsonMessage.item;
