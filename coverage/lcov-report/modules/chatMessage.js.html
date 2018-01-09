@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Code coverage report for modules/chatMessage.js</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../prettify.css" />
+    <link rel="stylesheet" href="../base.css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+<body>
+<div class='wrapper'>
+  <div class='pad1'>
+    <h1>
+      <a href="../index.html">All files</a> / <a href="index.html">modules</a> chatMessage.js
+    </h1>
+    <div class='clearfix'>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">14.75% </span>
+        <span class="quiet">Statements</span>
+        <span class='fraction'>9/61</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Branches</span>
+        <span class='fraction'>0/44</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">0% </span>
+        <span class="quiet">Functions</span>
+        <span class='fraction'>0/10</span>
+      </div>
+      <div class='fl pad1y space-right2'>
+        <span class="strong">15.25% </span>
+        <span class="quiet">Lines</span>
+        <span class='fraction'>9/59</span>
+      </div>
+    </div>
+  </div>
+  <div class='status-line low'></div>
+<pre><table class="coverage">
+<tr><td class="line-count quiet">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113</td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">const assert = require('assert');
+const url = require('url');
+const { reactionEmoji, scanTriggerEmoji } = require('./configuration.js');
+const blacklist = require('../modules/blacklist.js');
+const Bot = require('./bot.js');
+const Command = require('./command.js');
+const { getTitles } = require('../utils/url.js');
+&nbsp;
+const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;amp;:\/~+#-]*[\w@?^=%&amp;amp;\/~+#-])?/g;
+&nbsp;
+class ChatMessage {
+<span class="fstat-no" title="function not covered" >  co</span>nstructor(message, channel) {
+<span class="cstat-no" title="statement not covered" >    assert(message, 'ChatMessage message is undefined');</span>
+    const payload = <span class="cstat-no" title="statement not covered" >typeof message === 'string' ? JSON.parse(message) : message;</span>
+<span class="cstat-no" title="statement not covered" >    this.bot = Bot.getInstance();</span>
+<span class="cstat-no" title="statement not covered" >    this.type = payload.type;</span>
+<span class="cstat-no" title="statement not covered" >    this.subtype = payload.subtype;</span>
+<span class="cstat-no" title="statement not covered" >    this.author = payload.user;</span>
+<span class="cstat-no" title="statement not covered" >    this.text = payload.text;</span>
+<span class="cstat-no" title="statement not covered" >    this.timestamp = payload.ts;</span>
+<span class="cstat-no" title="statement not covered" >    this.channel = channel || payload.channel;</span>
+<span class="cstat-no" title="statement not covered" >    this.reactions = payload.reactions || [];</span>
+<span class="cstat-no" title="statement not covered" >    this.hasLink = this.containsLink() || false;</span>
+<span class="cstat-no" title="statement not covered" >    this.isDirect = this.isDirectMessage() || false;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  is</span>TextMessage() {
+<span class="cstat-no" title="statement not covered" >    return (this.type === 'message' &amp;&amp; !this.subtype);</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  is</span>Marked() {
+<span class="cstat-no" title="statement not covered" >    for (const reaction of this.reactions) {</span>
+<span class="cstat-no" title="statement not covered" >      if (reaction.name === reactionEmoji.toLowerCase() &amp;&amp; reaction.users.includes(this.bot.id)) {</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+      }
+    }
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  is</span>MarkedToScan() {
+<span class="cstat-no" title="statement not covered" >    if (!scanTriggerEmoji) <span class="cstat-no" title="statement not covered" >return true;</span></span>
+<span class="cstat-no" title="statement not covered" >    for (const reaction of this.reactions) {</span>
+<span class="cstat-no" title="statement not covered" >      if (reaction.name === scanTriggerEmoji.toLowerCase() &amp;&amp; !reaction.users.includes(this.bot.id)) {</span>
+<span class="cstat-no" title="statement not covered" >        return true;</span>
+      }
+    }
+<span class="cstat-no" title="statement not covered" >    return false;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ma</span>rk() {
+<span class="cstat-no" title="statement not covered" >    this.reactions.push({</span>
+      name: reactionEmoji.toLowerCase(),
+      users: [this.bot.id],
+    });
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  co</span>ntainsLink() {
+<span class="cstat-no" title="statement not covered" >    if (this.hasLink === undefined &amp;&amp; this.text) {</span>
+<span class="cstat-no" title="statement not covered" >      return /(https?|ftp):\/\//gm.test(this.text);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return this.hasLink;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  is</span>DirectMessage() {
+<span class="cstat-no" title="statement not covered" >    if (this.isDirect === undefined &amp;&amp; this.text) {</span>
+<span class="cstat-no" title="statement not covered" >      return this.text.includes(`&lt;@${this.bot.id}&gt;`);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return this.isDirect;</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ge</span>tLinks() {
+    const matches = <span class="cstat-no" title="statement not covered" >this.text.match(urlPattern);</span>
+<span class="cstat-no" title="statement not covered" >    if (matches === null) {</span>
+<span class="cstat-no" title="statement not covered" >      return [];</span>
+    }
+&nbsp;
+    const links = <span class="cstat-no" title="statement not covered" >new Set();</span>
+&nbsp;
+    // filtering links from regex results
+<span class="cstat-no" title="statement not covered" >    for (const link of matches) {</span>
+<span class="cstat-no" title="statement not covered" >      if (!link) <span class="cstat-no" title="statement not covered" >continue; </span></span>// eslint-disable-line
+      const urlObj = <span class="cstat-no" title="statement not covered" >url.parse(link);</span>
+<span class="cstat-no" title="statement not covered" >      if (urlObj.protocol &amp;&amp; urlObj.pathname) {</span>
+        let isValid = <span class="cstat-no" title="statement not covered" >true;</span>
+<span class="cstat-no" title="statement not covered" >        for (const bannedKeyword of blacklist.getValues()) {</span>
+<span class="cstat-no" title="statement not covered" >          if (isValid) {</span>
+<span class="cstat-no" title="statement not covered" >            isValid = !link.includes(bannedKeyword);</span>
+          }
+        }
+<span class="cstat-no" title="statement not covered" >        if (isValid) {</span>
+<span class="cstat-no" title="statement not covered" >          links.add(getTitles(link));</span>
+        }
+      }
+    }
+<span class="cstat-no" title="statement not covered" >    return Array.from(links.values());</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ge</span>tDirectMessage() {
+<span class="cstat-no" title="statement not covered" >    return this.text.replace(`&lt;@${this.bot.id}&gt;`, '').toLowerCase().trim();</span>
+  }
+&nbsp;
+<span class="fstat-no" title="function not covered" >  ge</span>tCommand() {
+<span class="cstat-no" title="statement not covered" >    if (this.isDirectMessage()) {</span>
+      const mention = <span class="cstat-no" title="statement not covered" >this.getDirectMessage();</span>
+      const commandType = <span class="cstat-no" title="statement not covered" >mention.split(' ')[0].toLowerCase();</span>
+<span class="cstat-no" title="statement not covered" >      return new Command(commandType, this);</span>
+    }
+<span class="cstat-no" title="statement not covered" >    return undefined;</span>
+  }
+}
+&nbsp;
+module.exports = ChatMessage;
+&nbsp;</pre></td></tr>
+</table></pre>
+<div class='push'></div><!-- for sticky footer -->
+</div><!-- /wrapper -->
+<div class='footer quiet pad2 space-top1 center small'>
+  Code coverage
+  generated by <a href="https://istanbul.js.org/" target="_blank">istanbul</a> at Tue Jan 09 2018 02:45:25 GMT+0200 (EET)
+</div>
+</div>
+<script src="../prettify.js"></script>
+<script>
+window.onload = function () {
+        if (typeof prettyPrint === 'function') {
+            prettyPrint();
+        }
+};
+</script>
+<script src="../sorter.js"></script>
+</body>
+</html>

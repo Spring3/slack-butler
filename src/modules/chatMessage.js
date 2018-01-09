@@ -1,6 +1,6 @@
 const assert = require('assert');
 const url = require('url');
-const { reaction_emoji, scan_trigger_emoji } = require('./configuration.js');
+const { reactionEmoji, scanTriggerEmoji } = require('./configuration.js');
 const blacklist = require('../modules/blacklist.js');
 const Bot = require('./bot.js');
 const Command = require('./command.js');
@@ -30,7 +30,7 @@ class ChatMessage {
 
   isMarked() {
     for (const reaction of this.reactions) {
-      if (reaction.name === reaction_emoji.toLowerCase() && reaction.users.includes(this.bot.id)) {
+      if (reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id)) {
         return true;
       }
     }
@@ -38,9 +38,9 @@ class ChatMessage {
   }
 
   isMarkedToScan() {
-    if (!scan_trigger_emoji) return true;
+    if (!scanTriggerEmoji) return true;
     for (const reaction of this.reactions) {
-      if (reaction.name === scan_trigger_emoji.toLowerCase() && !reaction.users.includes(this.bot.id)) {
+      if (reaction.name === scanTriggerEmoji.toLowerCase() && !reaction.users.includes(this.bot.id)) {
         return true;
       }
     }
@@ -49,7 +49,7 @@ class ChatMessage {
 
   mark() {
     this.reactions.push({
-      name: reaction_emoji.toLowerCase(),
+      name: reactionEmoji.toLowerCase(),
       users: [this.bot.id],
     });
   }
@@ -78,17 +78,18 @@ class ChatMessage {
 
     // filtering links from regex results
     for (const link of matches) {
-      if (!link) continue;
+      if (!link) continue; // eslint-disable-line
       const urlObj = url.parse(link);
-      if (!urlObj.protocol || !urlObj.pathname) continue;
-      let isValid = true;
-      for (const bannedKeyword of blacklist.getValues()) {
-        if (isValid) {
-          isValid = !link.includes(bannedKeyword);
+      if (urlObj.protocol && urlObj.pathname) {
+        let isValid = true;
+        for (const bannedKeyword of blacklist.getValues()) {
+          if (isValid) {
+            isValid = !link.includes(bannedKeyword);
+          }
         }
-      }
-      if (isValid) {
-        links.add(getTitles(link));
+        if (isValid) {
+          links.add(getTitles(link));
+        }
       }
     }
     return Array.from(links.values());

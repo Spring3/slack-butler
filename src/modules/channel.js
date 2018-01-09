@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { web, userWeb } = require('../utils/slack.js');
+const { userWeb } = require('../utils/slack.js');
 const ChatMessage = require('./chatMessage.js');
 
 class Channel {
@@ -19,15 +19,14 @@ class Channel {
     let next;
     do {
       const options = next ? { cursor: next, inclusive: true } : { inclusive: true };
-      response = await userWeb.conversations.history(this.id, options);
+      response = await userWeb.conversations.history(this.id, options); // eslint-disable-line no-await-in-loop
       response = typeof response === 'string' ? JSON.parse(response) : response;
       const chatMessages = response.messages.map(message => new ChatMessage(message, this));
       next = response.response_metadata && response.response_metadata.next_cursor;
-      messages = messages.concat(filter.all ?
-        chatMessages :
-        chatMessages.filter(chatMessage => chatMessage.isTextMessage() && chatMessage.author !== this.botId && chatMessage.containsLink())
-      );
-    } while(response.has_more);
+      messages = messages.concat(filter.all ? chatMessages :
+        chatMessages.filter(chatMessage =>
+          chatMessage.isTextMessage() && chatMessage.author !== this.botId && chatMessage.containsLink()));
+    } while (response.has_more);
     return messages;
   }
 
@@ -37,11 +36,11 @@ class Channel {
     return this.getMessage(response.messages[0]);
   }
 
-  memberJoined (memberId) {
+  memberJoined(memberId) {
     this.members.add(memberId);
   }
 
-  memberLeft (memberId) {
+  memberLeft(memberId) {
     this.members.delete(memberId);
   }
 

@@ -1,5 +1,10 @@
 const { rtm, web, EVENTS } = require('../utils/slack.js');
-const { auto_scan_interval, scan_trigger_emoji, reaction_emoji, favorites_reaction_emoji } = require('./configuration.js');
+const {
+  autoScanInterval,
+  scanTriggerEmoji,
+  reactionEmoji,
+  favoritesReactionEmoji
+} = require('./configuration.js');
 const mongo = require('./mongo');
 const Links = require('./entities/links.js');
 const Highlights = require('./entities/highlights.js');
@@ -16,12 +21,12 @@ class Bot {
     this.id = id;
     this.channels = new Map(channels.map(channelData => [channelData.id, new Channel(channelData, this.id)]));
     this.blacklist = blacklist;
-    if (auto_scan_interval) {
+    if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
     }
   }
 
-  async react(message, emoji = reaction_emoji.toLowerCase()) {
+  async react(message, emoji = reactionEmoji.toLowerCase()) {
     try {
       await web.reactions.add(emoji, {
         channel: message.channel.id || message.channel,
@@ -35,20 +40,20 @@ class Bot {
 
   beginScanningInterval() {
     return setInterval(() => {
-      const command = `<@${this.id}> scan`
-      for (const [id, channel] of this.channels.entries()) {
+      const command = `<@${this.id}> scan`;
+      for (const [id, channel] of this.channels.entries()) { // eslint-disable-line no-unused-vars
         const chatMessage = channel.getMessage({
           type: 'message',
           text: command
         });
-        chatMessage.getCommand().execute(chatMessage.getDirectMessage(), channel.id);
+        chatMessage.getCommand().getHandler().handle(chatMessage.getDirectMessage(), channel.id);
       }
-    }, parseInt(auto_scan_interval, 10));
+    }, parseInt(autoScanInterval, 10));
   }
 
   static shutdown() {
     if (botInstance && botInstance.scanningInterval) {
-      clearInterval(botInstance.scanningInterval)
+      clearInterval(botInstance.scanningInterval);
     }
   }
 
@@ -60,7 +65,7 @@ class Bot {
     rtm.on(EVENTS.RTM.RAW_MESSAGE, async (msg) => {
       const jsonMessage = JSON.parse(msg);
       if (jsonMessage.channel) {
-        const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id );
+        const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id);
         const message = channel.getMessage(msg);
         if (message.isTextMessage() && message.author !== this.id) {
           if (message.hasLink && message.isMarkedToScan()) {
@@ -71,7 +76,7 @@ class Bot {
           } else {
             const command = message.getCommand();
             if (command) {
-              command.execute(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
+              command.getHandler().handle(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
             }
           }
         }
@@ -80,15 +85,19 @@ class Bot {
 
     rtm.on('reaction_added', async (msg) => {
       const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
-      if (!scan_trigger_emoji) return;
+      if (!scanTriggerEmoji) return;
       const payload = jsonMessage.item;
-      if (jsonMessage.reaction === scan_trigger_emoji.toLowerCase() && jsonMessage.user !== this.id && payload.type === 'message') {
-        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM'}, this.id);
+      if (
+        jsonMessage.reaction === scanTriggerEmoji.toLowerCase()
+        && jsonMessage.user !== this.id
+        && payload.type === 'message'
+      ) {
+        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.id);
         const message = await channel.fetchMessage(payload.ts);
         if (message.isTextMessage() && message.isMarkedToScan() && message.hasLink) {
           Links.save(message).then(() => Highlights.save(message));
           if (!message.isMarked()) {
-            this.react(message, favorites_reaction_emoji.toLowerCase());
+            this.react(message, favoritesReactionEmoji.toLowerCase());
           }
         }
       }
@@ -138,7 +147,7 @@ class Bot {
         } else {
           // somebody left a channel
           this.channels.get(channelId).memberLeft(memberId);
-        }   
+        }
       }
     });
   }
@@ -148,13 +157,8 @@ rtm.on(EVENTS.RTM.AUTHENTICATED, async (data) => {
   if (!botInstance) {
     botInstance = new Bot(data.self, data.channels.filter((channel => channel.is_channel && channel.is_member)));
     botInstance.init();
-    console.log(await web.conversations.history('C03NGV4HG', { latest: '1514365870.000046', limit: 1, inclusive: true }));
-    console.log(await web.channels.history('C03NGV4HG', { latest: '1514365870.000046', count: 1, inclusive: true }));
-    console.log(await botInstance.channels.get('C03NGV4HG').fetchMessage('1514365870.000046'));
   }
 });
 
 module.exports.Bot = Bot;
-module.exports.getInstance = () => {
-  return botInstance;
-};
+module.exports.getInstance = () => botInstance;

@@ -25,10 +25,11 @@ class Command {
     this.chatMessage = chatMessage;
   }
 
-  execute(commandText, channelId, options) {
+  getHandler() {
     if (botCommands[this.type]) {
-      new botCommands[this.type](this.chatMessage).handle(commandText, channelId, options);
+      return new botCommands[this.type](this.chatMessage);
     }
+    return undefined;
   }
 }
 

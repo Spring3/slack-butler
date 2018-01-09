@@ -17,7 +17,7 @@ function shutdown() {
   Bot.shutdown();
   mongo.close();
   process.exit(0);
-};
+}
 
 process.once('SIGINT', shutdown);
 process.once('SIGTERM', shutdown);

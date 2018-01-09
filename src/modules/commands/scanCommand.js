@@ -11,13 +11,13 @@ class ScanCommand extends Command {
     super.handle(message, channelId);
     const startTime = process.hrtime();
     const bot = Bot.getInstance();
-    let slackChannel = bot.channels.get(channelId) || this.chatMessage.channel;
+    const slackChannel = bot.channels.has(channelId) ? bot.channels.get(channelId) : this.chatMessage.channel;
     // getting only messages with links from the channel
     let chatMessagesWithLinks;
     try {
       chatMessagesWithLinks = await slackChannel.fetchMessages();
     } catch (e) {
-      console.log(e);
+      console.error(e);
       return this.rtm.sendMessage('I am unable to scan this channel.', channelId);
     }
     const db = await mongo.connect();
@@ -41,7 +41,6 @@ class ScanCommand extends Command {
             bot.react(chatMessage);
           }
         }
-
       }
       batch.execute();
       const endTime = process.hrtime(startTime);
@@ -49,6 +48,7 @@ class ScanCommand extends Command {
         this.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channelId);
       }
     }
+    return undefined;
   }
 }
 

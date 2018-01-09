@@ -1,11 +1,12 @@
 const url = require('url');
 
 function getTitles(links) {
-  const refs = Array.isArray(links) ? links : [links];
+  const data = [null, undefined].includes(links) ? [] : links;
+  const refs = Array.isArray(data) ? data : [data];
   const payload = [];
   // setting up link title
   for (const link of refs) {
-    const pathname = url.parse(link).pathname;
+    const { pathname } = url.parse(link);
     let linkParts;
     if (pathname.charAt(pathname.length - 1) === '/') {
       linkParts = pathname.substring(0, pathname.length - 1).split('/');
@@ -16,7 +17,7 @@ function getTitles(links) {
     // if name was not set or it is a number
     if (!linkTitle || /^\d+$/.test(linkTitle)) {
       // just taking the website name as a caption for the link
-      linkTitle = linkParts[0];
+      linkTitle = linkParts[0]; // eslint-disable-line
     }
     payload.push({
       caption: linkTitle.replace(linkTitle.charAt(0), linkTitle.charAt(0).toUpperCase()),
@@ -28,4 +29,4 @@ function getTitles(links) {
 
 module.exports = {
   getTitles
-}
+};
