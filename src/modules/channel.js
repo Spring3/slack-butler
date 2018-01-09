@@ -37,11 +37,15 @@ class Channel {
   }
 
   memberJoined(memberId) {
-    this.members.add(memberId);
+    if (memberId) {
+      this.members.add(memberId);
+    }
   }
 
   memberLeft(memberId) {
-    this.members.delete(memberId);
+    if (memberId) {
+      this.members.delete(memberId);
+    }
   }
 
   getMessage(message) {

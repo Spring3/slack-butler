@@ -8,7 +8,10 @@ class BanCommand extends Command {
 
   handle(message, channel) {
     super.handle(message, channel);
-    blacklist.ban(message.split(' ')[1].toLowerCase().trim());
+    const messageParts = message.split(' ');
+    if (messageParts.length > 1) {
+      blacklist.ban(messageParts[1].toLowerCase().trim());
+    }
     this.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channel);
   }
 }
