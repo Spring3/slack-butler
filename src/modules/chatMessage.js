@@ -29,29 +29,29 @@ class ChatMessage {
   }
 
   isMarked() {
-    for (const reaction of this.reactions) {
-      if (reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id)) {
-        return true;
-      }
-    }
-    return false;
+    const found = this.reactions.filter(reaction =>
+      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id))[0];
+    return found !== undefined;
   }
 
-  isMarkedToScan() {
+  isMarkedAsFavorite() {
     if (!scanTriggerEmoji) return true;
-    for (const reaction of this.reactions) {
-      if (reaction.name === scanTriggerEmoji.toLowerCase() && !reaction.users.includes(this.bot.id)) {
-        return true;
-      }
-    }
-    return false;
+    const found = this.reactions.filter(reaction =>
+      reaction.name === scanTriggerEmoji.toLowerCase() && !reaction.users.includes(this.bot.id))[0];
+    return found !== undefined;
   }
 
   mark() {
-    this.reactions.push({
-      name: reactionEmoji.toLowerCase(),
-      users: [this.bot.id],
-    });
+    const lowReactionEmoji = reactionEmoji.toLowerCase();
+    const existingReaction = this.reactions.filter(reaction => reaction.name === lowReactionEmoji)[0];
+    if (existingReaction === undefined) {
+      this.reactions.push({
+        name: lowReactionEmoji,
+        users: [this.bot.id],
+      });
+    } else if (!existingReaction.users.includes(this.bot.id)) {
+      existingReaction.users.push(this.bot.id);
+    }
   }
 
   containsLink() {
@@ -88,11 +88,13 @@ class ChatMessage {
           }
         }
         if (isValid) {
-          links.add(getTitles(link));
+          for (const title of getTitles(link)) {
+            links.add(title);
+          }
         }
       }
     }
-    return Array.from(links.values());
+    return [...links];
   }
 
   getDirectMessage() {

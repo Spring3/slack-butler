@@ -24,7 +24,7 @@ class ScanCommand extends Command {
     if (chatMessagesWithLinks.length) {
       const batch = db.collection('Links').initializeUnorderedBulkOp();
       for (const chatMessage of chatMessagesWithLinks) {
-        for (const [link] of chatMessage.getLinks()) {
+        for (const link of chatMessage.getLinks()) {
           batch.find({ href: link.href, 'channel.id': channelId }).upsert().updateOne({
             $setOnInsert: {
               href: link.href,

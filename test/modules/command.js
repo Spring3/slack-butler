@@ -9,6 +9,15 @@ const blacklist = require('../../src/modules/blacklist.js');
 const totalCommand = rewire('../../src/modules/commands/totalCommand.js');
 const scanCommand = rewire('../../src/modules/commands/scanCommand.js');
 
+const mongodbStub = {
+  collection: () => ({
+    count: sinon.stub.resolves(1),
+    find: () => ({
+      count: sinon.stub.resolves(1)
+    })
+  })
+};
+
 describe('Commands', () => {
   it('should throw if type of chatMessage is not given', () => {
     assert.throws(() => new Command(null, null));
@@ -61,7 +70,7 @@ describe('Commands', () => {
   it('should execute totalCommand', async () => {
     const command = new Command('total', {}).getHandler();
     let mongo = totalCommand.__get__('mongo'); // eslint-disable-line
-    sinon.spy(mongo, 'connect');
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
     sinon.stub(command.rtm, 'sendMessage').returns(undefined);
     await command.handle('total', '123abc');
     assert(command.rtm.sendMessage.calledOnce);
@@ -89,7 +98,7 @@ describe('Commands', () => {
     const command = new Command('scan', stubMessage).getHandler();
     let mongo = scanCommand.__get__('mongo'); // eslint-disable-line
     const mongoConnect = mongo.connect;
-    sinon.spy(mongo, 'connect');
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
     sinon.stub(command.rtm, 'sendMessage').returns(undefined);
     sinon.stub(Bot, 'getInstance').returns({
       channels: new Map(),

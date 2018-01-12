@@ -6,7 +6,9 @@ let instance;
 
 function connect() {
   if (!instance) {
-    assert(mongodbUri, 'STARBOT_MONGODB_URI is not given');
+    if (process.env.NODE_ENV !== 'test') {
+      assert(mongodbUri, 'STARBOT_MONGODB_URI is not given');
+    }
     return MongoClient.connect(mongodbUri).then((connection) => {
       instance = connection;
       return instance;

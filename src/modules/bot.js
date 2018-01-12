@@ -68,7 +68,7 @@ class Bot {
         const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id);
         const message = channel.getMessage(msg);
         if (message.isTextMessage() && message.author !== this.id) {
-          if (message.hasLink && message.isMarkedToScan()) {
+          if (message.hasLink && message.isMarkedAsFavorite()) {
             Links.save(message);
             if (!message.isMarked()) {
               this.react(message);
@@ -94,7 +94,7 @@ class Bot {
       ) {
         const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.id);
         const message = await channel.fetchMessage(payload.ts);
-        if (message.isTextMessage() && message.isMarkedToScan() && message.hasLink) {
+        if (message.isTextMessage() && message.isMarkedAsFavorite() && message.hasLink) {
           Links.save(message).then(() => Highlights.save(message));
           if (!message.isMarked()) {
             this.react(message, favoritesReactionEmoji.toLowerCase());

@@ -1,5 +1,5 @@
 {
-  "name": "slack-butler",
+  "name": "starbot",
   "version": "1.0.0",
   "description": "Channel bot for slack. Collects links and attachments from the channel and provides a user-friendly api to use them later",
   "main": "server.js",
