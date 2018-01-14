@@ -4,7 +4,7 @@ module.exports = {
   save: async (message) => {
     const links = message.getLinks();
     const db = await mongo.connect();
-    for (const [link] of links) {
+    for (const link of links) {
       db.collection('Links').findOneAndUpdate({
         href: link.href,
         'channel.id': message.channel.id
