@@ -52,7 +52,9 @@ class ChatMessage {
   isMarkedAsFavorite() {
     if (!scanTriggerEmoji) return true;
     const found = this.reactions.filter(reaction =>
-      reaction.name === scanTriggerEmoji.toLowerCase() && !reaction.users.includes(this.bot.id))[0];
+      reaction.name === scanTriggerEmoji.toLowerCase() &&
+      !reaction.users.includes(this.author) &&
+      !reaction.users.includes(this.bot.id))[0];
     return found !== undefined;
   }
 
