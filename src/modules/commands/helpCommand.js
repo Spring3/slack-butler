@@ -19,6 +19,8 @@ class HelpCommand extends Command {
       '*ban <keyword>* - add a key word to the blacklist.\n' +
       '*unban <keyword>* - remove a key word from the blacklist.\n' +
       '*scan* - to scan this channel for links and attachments.\n' +
+      '*print* - perform a search and print the requested amount of links\n' +
+      'Example: `print top 10`, `print top 3 favorites`, `print /github.com/ 2`\n' +
       '*version* - to print the version of the bot\n', channel);
   }
 }

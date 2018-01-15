@@ -25,7 +25,7 @@ class ScanCommand extends Command {
     }
     const db = await mongo.connect();
     if (chatMessagesWithLinks.length) {
-      const batch = db.collection('Links').initializeUnorderedBulkOp();
+      const batch = db.collection('Links').initializeOrderedBulkOp();
       for (const chatMessage of chatMessagesWithLinks) {
         for (const link of chatMessage.getLinks()) {
           batch.find({ href: link.href, 'channel.id': channelId }).upsert().updateOne({

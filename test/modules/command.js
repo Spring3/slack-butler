@@ -8,17 +8,47 @@ const blacklist = require('../../src/modules/blacklist.js');
 
 const totalCommand = rewire('../../src/modules/commands/totalCommand.js');
 const scanCommand = rewire('../../src/modules/commands/scanCommand.js');
+const printCommand = rewire('../../src/modules/commands/printCommand.js');
+
+let toArrayStub = sinon.stub().resolves([]);
+let limitStub = sinon.stub().returns({
+  toArray: toArrayStub
+});
+let countStub = sinon.stub().resolves(1);
+let findStub = sinon.stub().returns({
+  sort: () => ({
+    limit: limitStub
+  }),
+  count: countStub
+});
+let collectionStub = {
+  count: countStub,
+  find: findStub
+};
 
 const mongodbStub = {
-  collection: () => ({
-    count: sinon.stub.resolves(1),
-    find: () => ({
-      count: sinon.stub.resolves(1)
-    })
-  })
+  collection: () => collectionStub
 };
 
 describe('Commands', () => {
+  afterEach(() => {
+    toArrayStub = sinon.stub().resolves([]);
+    limitStub = sinon.stub().returns({
+      toArray: toArrayStub
+    });
+    countStub = sinon.stub().resolves(1);
+    findStub = sinon.stub().returns({
+      sort: () => ({
+        limit: limitStub
+      }),
+      count: countStub
+    });
+    collectionStub = {
+      count: countStub,
+      find: findStub
+    };
+  });
+
   it('should throw if type of chatMessage is not given', () => {
     assert.throws(() => new Command(null, null));
     assert.throws(() => new Command('help', null));
@@ -83,7 +113,7 @@ describe('Commands', () => {
     const command = new Command('version', {}).getHandler();
     sinon.stub(command.rtm, 'sendMessage').returns(undefined);
     command.handle('version', {});
-    assert(command.rtm.sendMessage.calledWith(`[feature/polishing, wip] v${process.env.npm_package_version}`), {});
+    assert(command.rtm.sendMessage.calledWith('v2.0-alpha', {}));
     command.rtm.sendMessage.restore();
   });
 
@@ -113,5 +143,114 @@ describe('Commands', () => {
     mongo.connect = mongoConnect;
     Bot.getInstance.restore();
     command.rtm.sendMessage.restore();
+  });
+
+  it('should not fail if no enough parameters provided', async () => {
+    const command = new Command('print', { author: '123abc' }).getHandler();
+    let mongo = printCommand.__get__('mongo'); // eslint-disable-line
+    const mongoConnect = mongo.connect;
+    mongodbStub.collection = (name) => {
+      assert.equal(name, 'Links');
+      return collectionStub;
+    };
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print', {});
+    assert(mongo.connect.called);
+    assert(command.rtm.sendMessage.calledWith('Unable to process such command', {}));
+    mongo.connect.restore();
+    mongo.connect = mongoConnect;
+    command.rtm.sendMessage.restore();
+  });
+
+  it('should execute printCommand with a reserved word', async () => {
+    let command = new Command('print', { author: '123abc' }).getHandler();
+    let mongo = printCommand.__get__('mongo'); // eslint-disable-line
+    const mongoConnect = mongo.connect;
+    mongodbStub.collection = (name) => {
+      assert.equal(name, 'Links');
+      return collectionStub;
+    };
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print total 3', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(3));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    command.rtm.sendMessage.restore();
+
+    command = new Command('print', { author: '123abc' }).getHandler();
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print last 4', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(4));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    command.rtm.sendMessage.restore();
+
+    command = new Command('print', { author: '123abc' }).getHandler();
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print latest 5', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(5));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    command.rtm.sendMessage.restore();
+
+    command = new Command('print', { author: '123abc' }).getHandler();
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print newest 11', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(11));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    mongo.connect = mongoConnect;
+    command.rtm.sendMessage.restore();
+  });
+
+  it('should execute printCommand with default limit', async () => {
+    const command = new Command('print', { author: '123abc' }).getHandler();
+    let mongo = printCommand.__get__('mongo'); // eslint-disable-line
+    const mongoConnect = mongo.connect;
+    mongodbStub.collection = (name) => {
+      assert.equal(name, 'Links');
+      return collectionStub;
+    };
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print total', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(5));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    mongo.connect = mongoConnect;
+    command.rtm.sendMessage.restore();
+  });
+
+  it('should execute printCommand for favorites collection', async () => {
+    const command = new Command('print', { author: '123abc' }).getHandler();
+    let mongo = printCommand.__get__('mongo'); // eslint-disable-line
+    const mongoConnect = mongo.connect;
+    mongodbStub.collection = (name) => {
+      assert.equal(name, 'Highlights');
+      return collectionStub;
+    };
+    sinon.stub(mongo, 'connect').resolves(mongodbStub);
+    sinon.stub(command.rtm, 'sendMessage').returns(undefined);
+    await command.handle('print total favorites', {});
+    assert(mongo.connect.called);
+    assert(limitStub.calledWith(5));
+    assert(command.rtm.sendMessage.calledOnce);
+    mongo.connect.restore();
+    mongo.connect = mongoConnect;
+    command.rtm.sendMessage.restore();
+  });
+
+  it('should execute printCommand with regex', () => {
+
   });
 });

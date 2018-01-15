@@ -101,7 +101,10 @@ class Bot {
           } else {
             const command = message.getCommand();
             if (command) {
-              command.getHandler().handle(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
+              const handler = command.getHandler();
+              if (handler) {
+                handler.handle(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
+              }
             }
           }
         }

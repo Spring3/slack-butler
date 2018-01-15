@@ -15,9 +15,6 @@ class Command {
   /**
    * Command handler function
    * @param  {string} message - command options.
-   * Example:
-   * in case the command is "total", there message will be ''
-   * in case the command is "ban test", the message will be "test"
    * @param  {string} channel - slack id of the channel
    * @return {undefined}
    */
