@@ -26,15 +26,17 @@ class PrintCommand extends Command {
     limit = Number.isNaN(limit) ? 5 : limit;
     let results = [];
     if (['top', 'last', 'latest', 'newest'].includes(messageParts[1])) {
+      const filter = amongFavorite ? { author: this.chatMessage.author } : {};
       results = await db.collection(collection)
-        .find({}, { href: 1 })
+        .find(filter, { href: 1 })
         .sort({ createdAt: -1 })
         .limit(limit)
         .toArray();
     } else if (this.isValidRegex(messageParts[1])) {
       const regex = new RegExp(messageParts[1], 'g');
+      const filter = Object.assign({ href: regex }, amongFavorite ? { author: this.chatMessage.author } : {});
       results = await db.collection(collection)
-        .find({ href: regex }, { href: 1 })
+        .find(filter, { href: 1 })
         .sort({ createdAt: -1 })
         .limit(limit)
         .toArray();
