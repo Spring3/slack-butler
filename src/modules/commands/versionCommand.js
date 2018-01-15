@@ -10,7 +10,7 @@ class VersionCommand extends Command {
 
   handle(message, channel) {
     super.handle(message, channel);
-    this.rtm.sendMessage(`[feature/polishing, wip] v${process.env.npm_package_version}`, channel);
+    this.rtm.sendMessage('v2.0-alpha', channel);
   }
 }
 
