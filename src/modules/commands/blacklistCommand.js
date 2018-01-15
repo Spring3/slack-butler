@@ -1,6 +1,9 @@
 const Command = require('./command');
 const blacklist = require('../blacklist.js');
 
+/**
+ * A command to display the current blacklist of urls
+ */
 class BlacklistCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

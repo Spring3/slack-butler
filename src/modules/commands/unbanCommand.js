@@ -1,6 +1,9 @@
 const Command = require('./command');
 const blacklist = require('../blacklist.js');
 
+/**
+ * Command to remove the url from the blacklist
+ */
 class UnBanCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

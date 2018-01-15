@@ -1,5 +1,10 @@
 const url = require('url');
 
+/**
+ * Get link titles based on the link name
+ * @param  {Array|string} links - array of links or a single link
+ * @return {[object]]}
+ */
 function getTitles(links) {
   const data = [null, undefined].includes(links) ? [] : links;
   const refs = Array.isArray(data) ? data : [data];

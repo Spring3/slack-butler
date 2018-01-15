@@ -2,6 +2,9 @@ const Command = require('./command');
 const Bot = require('../bot.js');
 const mongo = require('./../mongo');
 
+/**
+ * Command to run a scan of the channel for new links
+ */
 class ScanCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

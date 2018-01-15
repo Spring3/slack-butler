@@ -1,5 +1,8 @@
 const Command = require('./command.js');
 
+/**
+ * Command to display the verion of the bot
+ */
 class VersionCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

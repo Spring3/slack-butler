@@ -1,5 +1,8 @@
 const Command = require('./command');
 
+/**
+ * Command to display help message
+ */
 class HelpCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

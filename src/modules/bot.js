@@ -14,6 +14,9 @@ const blacklist = require('./blacklist');
 
 let botInstance;
 
+/**
+ * A class of a slack bot
+ */
 class Bot {
   constructor({ name, id }, channels) {
     assert(Array.isArray(channels), 'Channels array is undefined');
@@ -26,6 +29,12 @@ class Bot {
     }
   }
 
+  /**
+   * Put an reaction emoji on the behalf of the bot
+   * @param  {ChatMessage} message
+   * @param  {string} emoji   - code for the emoji without colon sign (:)
+   * @return {Promise}
+   */
   async react(message, emoji = reactionEmoji.toLowerCase()) {
     try {
       await web.reactions.add(emoji, {
@@ -38,6 +47,10 @@ class Bot {
     }
   }
 
+  /**
+   * Starts the automatic scan interval
+   * @return {function} - function to stop the interval
+   */
   beginScanningInterval() {
     return setInterval(() => {
       const command = `<@${this.id}> scan`;
@@ -51,16 +64,28 @@ class Bot {
     }, parseInt(autoScanInterval, 10));
   }
 
+  /**
+   * Stop the bot activity
+   * @return {undefined}
+   */
   static shutdown() {
     if (botInstance && botInstance.scanningInterval) {
       clearInterval(botInstance.scanningInterval);
     }
   }
 
+  /**
+   * Start the bot activity
+   * @return {undefined}
+   */
   static start() {
     rtm.start();
   }
 
+  /**
+   * Initialize the bot
+   * @return {undefined}
+   */
   init() {
     rtm.on(EVENTS.RTM.RAW_MESSAGE, async (msg) => {
       const jsonMessage = JSON.parse(msg);

@@ -1,6 +1,9 @@
 const Command = require('./command');
 const blacklist = require('../blacklist.js');
 
+/**
+ * BanCommand - a command to exclude the links that contain a mentioned word
+ */
 class BanCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);

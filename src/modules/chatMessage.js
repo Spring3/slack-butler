@@ -8,6 +8,9 @@ const { getTitles } = require('../utils/url.js');
 
 const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g;
 
+/**
+ * Representation of a slack message
+ */
 class ChatMessage {
   constructor(message, channel) {
     assert(message, 'ChatMessage message is undefined');
@@ -24,16 +27,28 @@ class ChatMessage {
     this.isDirect = this.isDirectMessage() || false;
   }
 
+  /**
+   * Check if a message is a plain text type
+   * @return {Boolean}
+   */
   isTextMessage() {
     return (this.type === 'message' && !this.subtype);
   }
 
+  /**
+   * Check if the message was already marked as processed by the bot
+   * @return {Boolean}
+   */
   isMarked() {
     const found = this.reactions.filter(reaction =>
       reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id))[0];
     return found !== undefined;
   }
 
+  /**
+   * Check if the message was makred  by slack user to be processed by the bot
+   * @return {Boolean}
+   */
   isMarkedAsFavorite() {
     if (!scanTriggerEmoji) return true;
     const found = this.reactions.filter(reaction =>
@@ -41,6 +56,10 @@ class ChatMessage {
     return found !== undefined;
   }
 
+  /**
+   * Mark the slack message with the reaction emoji
+   * @return {undefined}
+   */
   mark() {
     const lowReactionEmoji = reactionEmoji.toLowerCase();
     const existingReaction = this.reactions.filter(reaction => reaction.name === lowReactionEmoji)[0];
@@ -54,6 +73,10 @@ class ChatMessage {
     }
   }
 
+  /**
+   * Check if the message contains a link
+   * @return {Boolean}
+   */
   containsLink() {
     if (this.hasLink === undefined && this.text) {
       return /(https?|ftp):\/\//gm.test(this.text);
@@ -61,6 +84,10 @@ class ChatMessage {
     return this.hasLink;
   }
 
+  /**
+   * Check if the message is a direct message to the bot
+   * @return {Boolean}
+   */
   isDirectMessage() {
     if (this.isDirect === undefined && this.text) {
       return this.text.includes(`<@${this.bot.id}>`);
@@ -68,6 +95,10 @@ class ChatMessage {
     return this.isDirect;
   }
 
+  /**
+   * Get links from the message
+   * @return {[object]}
+   */
   getLinks() {
     const matches = this.text.match(urlPattern);
     if (matches === null) {
@@ -97,10 +128,18 @@ class ChatMessage {
     return [...links];
   }
 
+  /**
+   * Get the content of a direct message
+   * @return {string}
+   */
   getDirectMessage() {
     return this.text.replace(`<@${this.bot.id}>`, '').toLowerCase().trim();
   }
 
+  /**
+   * Convert the message to a command if possible
+   * @return {undefined|Command}
+   */
   getCommand() {
     if (this.isDirectMessage()) {
       const mention = this.getDirectMessage();

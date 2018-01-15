@@ -17,6 +17,9 @@ const botCommands = {
   version: VersionCommand
 };
 
+/**
+ * Command based on the direct message to the bot
+ */
 class Command {
   constructor(type, chatMessage) {
     assert(type, 'Command type is undefined');
@@ -25,6 +28,10 @@ class Command {
     this.chatMessage = chatMessage;
   }
 
+  /**
+   * Get comamnd handler based on it's type if possible
+   * @return {undefined|Command} - undefined if a command is not supported
+   */
   getHandler() {
     if (botCommands[this.type]) {
       return new botCommands[this.type](this.chatMessage);

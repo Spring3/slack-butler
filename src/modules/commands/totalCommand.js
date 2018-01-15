@@ -1,6 +1,9 @@
 const Command = require('./command');
 const mongo = require('./../mongo');
 
+/**
+ * Command to display the total amount of links in the database
+ */
 class TotalCommand extends Command {
   constructor(chatMessage) {
     super(chatMessage);
