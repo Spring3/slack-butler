@@ -1,0 +1,22 @@
+{
+    "extends": "airbnb-base",
+    "plugins": [],
+    "env": {
+      "node": true,
+      "mocha": true,
+      "es6": true,
+      "mongo": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 8
+    },
+    "rules": {
+      "no-restricted-syntax": "off",
+      "comma-dangle": 0,
+      "no-plusplus": 0,
+      "no-useless-escape": 1,
+      "max-len": ["error", { "code": 120 }],
+      "no-useless-constructor": 1,
+      "class-methods-use-this": 0
+    }
+}

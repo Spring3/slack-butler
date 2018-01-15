@@ -1,14 +1,23 @@
-require('dotenv').load({ silent: true });
 const app = require('express')();
-const mongo = require('./services/mongo');
 
-async function start() {
-  const db = await mongo();
-  require('./services/bot').start();
+const { port } = require('./src/modules/configuration.js');
+const { Bot } = require('./src/modules/bot.js');
+const mongo = require('./src/modules/mongo');
 
-  app.listen(process.env.PORT || 3000, () => {
-    console.log(`Listening to port ${process.env.PORT || 3000}`);
+(async () => {
+  await mongo.connect();
+  Bot.start();
+
+  app.listen(port, () => {
+    console.log(`Listening to port ${port}`);
   });
+})();
+
+function shutdown() {
+  Bot.shutdown();
+  mongo.close();
+  process.exit(0);
 }
 
-start();
+process.once('SIGINT', shutdown);
+process.once('SIGTERM', shutdown);
