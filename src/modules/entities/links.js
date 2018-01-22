@@ -17,6 +17,7 @@ module.exports = {
             name: message.channel.name
           },
           author: message.author,
+          timestamp: message.timestamp,
           createdAt: new Date()
         },
       }, {
