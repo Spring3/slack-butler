@@ -1,6 +1,6 @@
 const assert = require('assert');
 const url = require('url');
-const { reactionEmoji, scanTriggerEmoji } = require('./configuration.js');
+const { reactionEmoji } = require('./configuration.js');
 const blacklist = require('../modules/blacklist.js');
 const Bot = require('./bot.js');
 const Command = require('./command.js');
@@ -42,19 +42,6 @@ class ChatMessage {
   isMarked() {
     const found = this.reactions.filter(reaction =>
       reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id))[0];
-    return found !== undefined;
-  }
-
-  /**
-   * Check if the message was makred  by slack user to be processed by the bot
-   * @return {Boolean}
-   */
-  isMarkedAsFavorite() {
-    if (!scanTriggerEmoji) return true;
-    const found = this.reactions.filter(reaction =>
-      reaction.name === scanTriggerEmoji.toLowerCase() &&
-      !reaction.users.includes(this.author) &&
-      !reaction.users.includes(this.bot.id))[0];
     return found !== undefined;
   }
 

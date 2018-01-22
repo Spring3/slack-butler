@@ -1,13 +1,13 @@
 const mongo = require('../mongo.js');
 
 module.exports = {
-  save: async (message) => {
+  save: async (message, userId) => {
     const links = message.getLinks();
     const db = await mongo.connect();
     for (const link of links) {
       db.collection('Highlights').findOneAndUpdate({
         href: link.href,
-        author: message.author
+        user: userId
       }, {
         $setOnInsert: {
           href: link.href,
@@ -17,6 +17,8 @@ module.exports = {
             name: message.channel.name
           },
           author: message.author,
+          user: userId,
+          timestamp: message.timestamp,
           createdAt: new Date()
         },
       }, {

@@ -36,14 +36,16 @@ class Bot {
    * @return {Promise}
    */
   async react(message, emoji = reactionEmoji.toLowerCase()) {
-    try {
-      await web.reactions.add(emoji, {
-        channel: message.channel.id || message.channel,
-        timestamp: message.timestamp,
-      });
-      message.mark();
-    } catch (e) {
-      console.error(e);
+    if (!message.isMarked()) {
+      try {
+        await web.reactions.add(emoji, {
+          channel: message.channel.id || message.channel,
+          timestamp: message.timestamp,
+        });
+        message.mark();
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
@@ -122,11 +124,10 @@ class Bot {
       ) {
         const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.id);
         const message = await channel.fetchMessage(payload.ts);
-        if (message.isTextMessage() && message.isMarkedAsFavorite() && message.hasLink) {
-          Links.save(message).then(() => Highlights.save(message));
-          if (!message.isMarked()) {
-            this.react(message, favoritesReactionEmoji.toLowerCase());
-          }
+        if (message.isTextMessage() && message.hasLink) {
+          Links.save(message)
+            .then(() => Highlights.save(message, jsonMessage.user))
+            .then(() => this.react(message, favoritesReactionEmoji.toLowerCase()));
         }
       }
     });

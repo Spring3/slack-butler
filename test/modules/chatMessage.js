@@ -1,9 +1,6 @@
 const assert = require('assert');
 const rewire = require('rewire');
-const {
-  reactionEmoji,
-  scanTriggerEmoji
-} = require('../../src/modules/configuration.js');
+const { reactionEmoji } = require('../../src/modules/configuration.js');
 
 let ChatMessage = rewire('../../src/modules/chatMessage.js'); // eslint-disable-line prefer-const
 
@@ -63,7 +60,6 @@ describe('ChatMessage', () => {
     const message = new ChatMessage(fixture);
     assert.equal(typeof message.isTextMessage, 'function');
     assert.equal(typeof message.isMarked, 'function');
-    assert.equal(typeof message.isMarkedAsFavorite, 'function');
     assert.equal(typeof message.mark, 'function');
     assert.equal(typeof message.containsLink, 'function');
     assert.equal(typeof message.isDirectMessage, 'function');
@@ -119,38 +115,6 @@ describe('ChatMessage', () => {
       }]
     });
     assert(message.isMarked());
-  });
-
-  it('should detect if it was marked as favorites', () => {
-    let message = new ChatMessage(fixture);
-    assert(!message.isMarkedAsFavorite());
-    message = new ChatMessage({
-      ...fixture,
-      reactions: [{
-        name: scanTriggerEmoji,
-        users: ['someone']
-      }]
-    });
-    // 'someone' marked this as his favorite
-    assert(message.isMarkedAsFavorite());
-    message = new ChatMessage({
-      ...fixture,
-      reactions: [{
-        name: 'pineapple',
-        users: [botStub.id]
-      }]
-    });
-    // because wrong emoji
-    assert(!message.isMarkedAsFavorite());
-    message = new ChatMessage({
-      ...fixture,
-      reactions: [{
-        name: scanTriggerEmoji,
-        users: [botStub.id]
-      }]
-    });
-    // becuase it is bot who put this emoji, not another user
-    assert(!message.isMarkedAsFavorite());
   });
 
   it('should mark the message only once', () => {
