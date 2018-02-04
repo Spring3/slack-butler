@@ -1,5 +1,5 @@
 const Command = require('./command');
-const mongo = require('./../mongo');
+const mongo = require('./../modules/mongo');
 
 /**
  * Command to display the total amount of links in the database

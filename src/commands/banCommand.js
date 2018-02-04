@@ -1,5 +1,5 @@
 const Command = require('./command');
-const blacklist = require('../blacklist.js');
+const blacklist = require('../modules/blacklist.js');
 
 /**
  * BanCommand - a command to exclude the links that contain a mentioned word

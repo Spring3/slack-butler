@@ -1,5 +1,5 @@
 const Command = require('./command');
-const blacklist = require('../blacklist.js');
+const blacklist = require('../modules/blacklist.js');
 
 /**
  * Command to remove the url from the blacklist

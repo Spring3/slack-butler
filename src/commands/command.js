@@ -1,5 +1,4 @@
 const assert = require('assert');
-const { rtm } = require('../../utils/slack.js');
 
 class Command {
   /**

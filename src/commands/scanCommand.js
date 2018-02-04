@@ -1,6 +1,6 @@
 const Command = require('./command');
-const Bot = require('../bot.js');
-const mongo = require('./../mongo');
+const Bot = require('../modules/bot.js');
+const mongo = require('./../modules/mongo');
 
 /**
  * Command to run a scan of the channel for new links

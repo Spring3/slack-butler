@@ -1,5 +1,5 @@
 const Command = require('./command');
-const blacklist = require('../blacklist.js');
+const blacklist = require('../modules/blacklist.js');
 
 /**
  * A command to display the current blacklist of urls

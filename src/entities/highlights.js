@@ -1,4 +1,4 @@
-const mongo = require('../mongo.js');
+const mongo = require('../modules/mongo.js');
 
 module.exports = {
   save: async (message, userId) => {

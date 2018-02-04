@@ -1,4 +1,4 @@
-const { rtm, web, EVENTS } = require('../utils/slack.js');
+const { WebClient, RtmClient, CLIENT_EVENTS } = require('@slack/client');
 const {
   autoScanInterval,
   scanTriggerEmoji,
@@ -6,24 +6,32 @@ const {
   favoritesReactionEmoji
 } = require('./configuration.js');
 const mongo = require('./mongo');
-const Links = require('./entities/links.js');
-const Highlights = require('./entities/highlights.js');
+const Links = require('../entities/links.js');
+const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
-const assert = require('assert');
 const blacklist = require('./blacklist');
-
-let botInstance;
 
 /**
  * A class of a slack bot
  */
 class Bot {
-  constructor({ name, id }, channels) {
-    assert(Array.isArray(channels), 'Channels array is undefined');
-    this.name = name;
-    this.id = id;
-    this.channels = new Map(channels.map(channelData => [channelData.id, new Channel(channelData, this.id)]));
+  constructor(team) {
+    this.team = team;
+    this.id = team.bot.id;
+    this.channels = new Map();
     this.blacklist = blacklist;
+    this.tokens = {
+      bot: team.bot.token,
+      user: team.accessToken
+    };
+    this.rtm = new RtmClient(this.tokens.bot, {
+      useRtmConnect: true,
+      dataStore: false
+    });
+    this.web = {
+      bot: new WebClient(this.tokens.bot),
+      user: new WebClient(this.tokens.user)
+    };
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
     }
@@ -38,7 +46,7 @@ class Bot {
   async react(message, emoji = reactionEmoji.toLowerCase()) {
     if (!message.isMarked()) {
       try {
-        await web.reactions.add(emoji, {
+        await this.botWeb.reactions.add(emoji, {
           channel: message.channel.id || message.channel,
           timestamp: message.timestamp,
         });
@@ -70,18 +78,17 @@ class Bot {
    * Stop the bot activity
    * @return {undefined}
    */
-  static shutdown() {
-    if (botInstance && botInstance.scanningInterval) {
-      clearInterval(botInstance.scanningInterval);
-    }
+  shutdown() {
+    clearInterval(this.scanningInterval);
   }
 
   /**
    * Start the bot activity
    * @return {undefined}
    */
-  static start() {
-    rtm.start();
+  start() {
+    this.init();
+    this.rtm.start();
   }
 
   /**
@@ -89,7 +96,16 @@ class Bot {
    * @return {undefined}
    */
   init() {
-    rtm.on(EVENTS.RTM.RAW_MESSAGE, async (msg) => {
+    this.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, async (data) => {
+      console.log(data);
+      if (data.channels) {
+        this.channels = new Map(data.channels
+          .filter((channel => channel.is_channel && channel.is_member))
+          .map(channelData => [channelData.id, new Channel(channelData, this.id)]));
+      }
+    });
+
+    this.rtm.on(CLIENT_EVENTS.RTM.RAW_MESSAGE, async (msg) => {
       const jsonMessage = JSON.parse(msg);
       if (jsonMessage.channel) {
         const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id);
@@ -113,7 +129,7 @@ class Bot {
       }
     });
 
-    rtm.on('reaction_added', async (msg) => {
+    this.rtm.on('reaction_added', async (msg) => {
       const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
       if (!scanTriggerEmoji) return;
       const payload = jsonMessage.item;
@@ -132,7 +148,7 @@ class Bot {
       }
     });
 
-    rtm.on('channels_rename', async (msg) => {
+    this.rtm.on('channels_rename', async (msg) => {
       const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
       const channelId = jsonMessage.channel.id;
       if (this.channels.has(channelId)) {
@@ -150,23 +166,23 @@ class Bot {
       }
     });
 
-    rtm.on('member_joined_channel', async (data) => {
+    this.rtm.on('member_joined_channel', async (data) => {
       const memberId = data.user;
       const channelId = data.channel;
       if (this.channels.has(channelId)) {
         // somebody joined a channel
         const channel = this.channels.get(channelId);
         channel.memberJoined(memberId);
-        rtm.sendMessage(`Welcome to the \`${channel.name}\` channel, <@${memberId}>!`, channelId);
+        this.rtm.sendMessage(`Welcome to the \`${channel.name}\` channel, <@${memberId}>!`, channelId);
       } else {
         // bot joined a channel
-        let channelData = await web.channels.info(channelId);
+        let channelData = await this.botWeb.channels.info(channelId);
         channelData = typeof channelData === 'string' ? JSON.parse(channelData) : channelData;
         this.channels.set(channelId, new Channel(channelData.channel, this.id));
       }
     });
 
-    rtm.on('member_left_channel', (data) => {
+    this.rtm.on('member_left_channel', (data) => {
       const memberId = data.user;
       const channelId = data.channel;
       if (this.channels.has(channelId)) {
@@ -182,12 +198,4 @@ class Bot {
   }
 }
 
-rtm.on(EVENTS.RTM.AUTHENTICATED, async (data) => {
-  if (!botInstance) {
-    botInstance = new Bot(data.self, data.channels.filter((channel => channel.is_channel && channel.is_member)));
-    botInstance.init();
-  }
-});
-
 module.exports.Bot = Bot;
-module.exports.getInstance = () => botInstance;

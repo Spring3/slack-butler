@@ -1,4 +1,4 @@
-const mongo = require('../mongo.js');
+const mongo = require('../modules/mongo.js');
 const Command = require('./command.js');
 
 class PrintCommand extends Command {
