@@ -1,15 +1,13 @@
 const assert = require('assert');
-const { userWeb } = require('../utils/slack.js');
 const ChatMessage = require('./chatMessage.js');
 
 /**
  * Representation of a slack channel
  */
 class Channel {
-  constructor(data, botId) {
+  constructor(data, team) {
     assert(data, 'Channel data is undefined');
-    assert(botId, 'Channel botId is undefined');
-    this.botId = botId;
+    this.team = team;
     this.id = data.id;
     this.name = data.name || 'DM';
     // Array of channel member's ids
@@ -28,13 +26,13 @@ class Channel {
     let next;
     do {
       const options = next ? { cursor: next, inclusive: true } : { inclusive: true };
-      response = await userWeb.conversations.history(this.id, options); // eslint-disable-line no-await-in-loop
+      response = await this.team.web.user.conversations.history(this.id, options); // eslint-disable-line no-await-in-loop
       response = typeof response === 'string' ? JSON.parse(response) : response;
       const chatMessages = response.messages.map(message => new ChatMessage(message, this));
       next = response.response_metadata && response.response_metadata.next_cursor;
       messages = messages.concat(filter.all ? chatMessages :
         chatMessages.filter(chatMessage =>
-          chatMessage.isTextMessage() && chatMessage.author !== this.botId && chatMessage.containsLink()));
+          chatMessage.isTextMessage() && chatMessage.author !== this.team.bot.id && chatMessage.containsLink()));
     } while (response.has_more);
     return messages;
   }
@@ -45,7 +43,7 @@ class Channel {
    * @return {Promise(ChatMessage)}           [description]
    */
   async fetchMessage(timestamp) {
-    let response = await userWeb.conversations.history(this.id, { latest: timestamp, limit: 1, inclusive: true });
+    let response = await this.team.web.user.conversations.history(this.id, { latest: timestamp, limit: 1, inclusive: true });
     response = typeof response === 'string' ? JSON.parse(response) : response;
     return this.getMessage(response.messages[0]);
   }

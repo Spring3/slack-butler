@@ -6,9 +6,9 @@ const Command = require('../../src/modules/command.js');
 const Channel = require('../../src/modules/channel.js');
 const blacklist = require('../../src/modules/blacklist.js');
 
-const totalCommand = rewire('../../src/modules/commands/totalCommand.js');
-const scanCommand = rewire('../../src/modules/commands/scanCommand.js');
-const printCommand = rewire('../../src/modules/commands/printCommand.js');
+const totalCommand = rewire('../../src/commands/totalCommand.js');
+const scanCommand = rewire('../../src/commands/scanCommand.js');
+const printCommand = rewire('../../src/commands/printCommand.js');
 
 let toArrayStub = sinon.stub().resolves([]);
 let limitStub = sinon.stub().returns({

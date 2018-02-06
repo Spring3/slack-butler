@@ -8,7 +8,7 @@ class Command {
    */
   constructor(chatMessage) {
     this.chatMessage = chatMessage;
-    this.rtm = rtm;
+    this.rtm = this.chatMessage.channel.team.rtm;
   }
 
   /**

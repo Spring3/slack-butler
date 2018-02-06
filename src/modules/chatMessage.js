@@ -2,7 +2,6 @@ const assert = require('assert');
 const url = require('url');
 const { reactionEmoji } = require('./configuration.js');
 const blacklist = require('../modules/blacklist.js');
-const Bot = require('./bot.js');
 const Command = require('./command.js');
 const { getTitles } = require('../utils/url.js');
 
@@ -15,13 +14,14 @@ class ChatMessage {
   constructor(message, channel) {
     assert(message, 'ChatMessage message is undefined');
     const payload = typeof message === 'string' ? JSON.parse(message) : message;
-    this.bot = Bot.getInstance();
     this.type = payload.type;
     this.subtype = payload.subtype;
     this.author = payload.user;
     this.text = payload.text;
     this.timestamp = payload.ts;
-    this.channel = channel || payload.channel;
+    // used by commands
+    this.channel = channel;
+    this.botId = this.channel.team.bot.id;
     this.reactions = payload.reactions || [];
     this.hasLink = this.containsLink() || false;
     this.isDirect = this.isDirectMessage() || false;
@@ -41,7 +41,7 @@ class ChatMessage {
    */
   isMarked() {
     const found = this.reactions.filter(reaction =>
-      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.bot.id))[0];
+      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.botId))[0];
     return found !== undefined;
   }
 
@@ -55,10 +55,10 @@ class ChatMessage {
     if (existingReaction === undefined) {
       this.reactions.push({
         name: lowReactionEmoji,
-        users: [this.bot.id],
+        users: [this.botId],
       });
-    } else if (!existingReaction.users.includes(this.bot.id)) {
-      existingReaction.users.push(this.bot.id);
+    } else if (!existingReaction.users.includes(this.botId)) {
+      existingReaction.users.push(this.botId);
     }
   }
 
@@ -79,7 +79,7 @@ class ChatMessage {
    */
   isDirectMessage() {
     if (this.isDirect === undefined && this.text) {
-      return this.text.includes(`<@${this.bot.id}>`);
+      return this.text.includes(`<@${this.botId}>`);
     }
     return this.isDirect;
   }
@@ -122,7 +122,7 @@ class ChatMessage {
    * @return {string}
    */
   getDirectMessage() {
-    return this.text.replace(`<@${this.bot.id}>`, '').toLowerCase().trim();
+    return this.text.replace(`<@${this.botId}>`, '').toLowerCase().trim();
   }
 
   /**

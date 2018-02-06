@@ -1,4 +1,4 @@
-const { WebClient, RtmClient, CLIENT_EVENTS } = require('@slack/client');
+const { WebClient, RTMClient } = require('@slack/client');
 const {
   autoScanInterval,
   scanTriggerEmoji,
@@ -6,6 +6,8 @@ const {
   favoritesReactionEmoji
 } = require('./configuration.js');
 const mongo = require('./mongo');
+const Team = require('./team.js');
+const TeamEntity = require('../entities/team.js');
 const Links = require('../entities/links.js');
 const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
@@ -15,23 +17,14 @@ const blacklist = require('./blacklist');
  * A class of a slack bot
  */
 class Bot {
-  constructor(team) {
-    this.team = team;
-    this.id = team.bot.id;
-    this.channels = new Map();
+  constructor(data) {
+    const { bot } = data;
+    this.team = null;
+    this.token = bot.bot_access_token;
+    this.id = bot.bot_user_id;
     this.blacklist = blacklist;
-    this.tokens = {
-      bot: team.bot.token,
-      user: team.accessToken
-    };
-    this.rtm = new RtmClient(this.tokens.bot, {
-      useRtmConnect: true,
-      dataStore: false
-    });
-    this.web = {
-      bot: new WebClient(this.tokens.bot),
-      user: new WebClient(this.tokens.user)
-    };
+    this.rtm = new RTMClient(this.token);
+    this.webClient = new WebClient(this.token);
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
     }
@@ -46,7 +39,7 @@ class Bot {
   async react(message, emoji = reactionEmoji.toLowerCase()) {
     if (!message.isMarked()) {
       try {
-        await this.botWeb.reactions.add(emoji, {
+        await this.web.bot.reactions.add(emoji, {
           channel: message.channel.id || message.channel,
           timestamp: message.timestamp,
         });
@@ -96,19 +89,25 @@ class Bot {
    * @return {undefined}
    */
   init() {
-    this.rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, async (data) => {
-      console.log(data);
-      if (data.channels) {
-        this.channels = new Map(data.channels
-          .filter((channel => channel.is_channel && channel.is_member))
-          .map(channelData => [channelData.id, new Channel(channelData, this.id)]));
+    this.rtm.once('authenticated', async (data) => {
+      if (data.ok) {
+        const team = new Team(data.team);
+        await team.getChannels();
+        await TeamEntity.upsert(team);
+        this.team = team;
       }
+      console.error(data);
+      // if (data.channels) {
+      //   this.channels = new Map(data.channels
+      //     .filter((channel => channel.is_channel && channel.is_member))
+      //     .map(channelData => [channelData.id, new Channel(channelData, this.team)]));
+      // }
     });
 
-    this.rtm.on(CLIENT_EVENTS.RTM.RAW_MESSAGE, async (msg) => {
+    this.rtm.on('slack_event', async (type, msg) => {
       const jsonMessage = JSON.parse(msg);
       if (jsonMessage.channel) {
-        const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.id);
+        const channel = this.channels.get(jsonMessage.channel) || new Channel({ id: jsonMessage.channel }, this.team);
         const message = channel.getMessage(msg);
         if (message.isTextMessage() && message.author !== this.id) {
           if (message.hasLink && message.isMarkedAsFavorite()) {
@@ -138,7 +137,7 @@ class Bot {
         && jsonMessage.user !== this.id
         && payload.type === 'message'
       ) {
-        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.id);
+        const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.team);
         const message = await channel.fetchMessage(payload.ts);
         if (message.isTextMessage() && message.hasLink) {
           Links.save(message)
@@ -176,9 +175,9 @@ class Bot {
         this.rtm.sendMessage(`Welcome to the \`${channel.name}\` channel, <@${memberId}>!`, channelId);
       } else {
         // bot joined a channel
-        let channelData = await this.botWeb.channels.info(channelId);
+        let channelData = await this.web.bot.channels.info(channelId);
         channelData = typeof channelData === 'string' ? JSON.parse(channelData) : channelData;
-        this.channels.set(channelId, new Channel(channelData.channel, this.id));
+        this.channels.set(channelId, new Channel(channelData.channel, this.team));
       }
     });
 
@@ -198,4 +197,4 @@ class Bot {
   }
 }
 
-module.exports.Bot = Bot;
+module.exports = Bot;
