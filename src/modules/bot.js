@@ -19,7 +19,6 @@ const blacklist = require('./blacklist');
 class Bot {
   constructor(data) {
     const { bot } = data;
-    this.team = null;
     this.token = bot.bot_access_token;
     this.id = bot.bot_user_id;
     this.blacklist = blacklist;
@@ -85,23 +84,17 @@ class Bot {
   }
 
   /**
-   * Initialize the bot
+   * Set up bot's event handlers
    * @return {undefined}
    */
   init() {
     this.rtm.once('authenticated', async (data) => {
       if (data.ok) {
         const team = new Team(data.team);
-        await team.getChannels();
+        await team.getBotChannels();
         await TeamEntity.upsert(team);
         this.team = team;
       }
-      console.error(data);
-      // if (data.channels) {
-      //   this.channels = new Map(data.channels
-      //     .filter((channel => channel.is_channel && channel.is_member))
-      //     .map(channelData => [channelData.id, new Channel(channelData, this.team)]));
-      // }
     });
 
     this.rtm.on('slack_event', async (type, msg) => {

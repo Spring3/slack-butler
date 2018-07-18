@@ -3,6 +3,7 @@ const { parse } = require('url');
 const assert = require('assert');
 
 let client = null;
+let dbName;
 
 assert(process.env.MONGODB_URI, 'MONGODB_URI is undefined');
 
@@ -13,12 +14,12 @@ assert(process.env.MONGODB_URI, 'MONGODB_URI is undefined');
 async function connect(url = process.env.MONGODB_URI) {
   if (client === null) {
     client = await MongoClient.connect(url);
-    let dbName = parse(url);
+    dbName = parse(url);
     if (!dbName || !dbName.pathname) return Promise.reject(new Error('Malformed connection url'));
     dbName = dbName.pathname.substring(1); // to remove a slash
     return client.db(dbName);
   }
-  return Promise.resolve(db);
+  return Promise.resolve(client.db(dbName));
 }
 
 /**
