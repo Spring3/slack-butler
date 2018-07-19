@@ -1,4 +1,3 @@
-const assert = require('assert');
 const url = require('url');
 const { reactionEmoji } = require('./configuration.js');
 const blacklist = require('../modules/blacklist.js');
@@ -10,21 +9,26 @@ const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[
 /**
  * Representation of a slack message
  */
-class ChatMessage {
-  constructor(message, channel) {
-    assert(message, 'ChatMessage message is undefined');
-    const payload = typeof message === 'string' ? JSON.parse(message) : message;
-    this.type = payload.type;
-    this.subtype = payload.subtype;
-    this.author = payload.user;
-    this.text = payload.text;
-    this.timestamp = payload.ts;
-    // used by commands
-    this.channel = channel;
-    this.botId = this.channel.team.bot.id;
-    this.reactions = payload.reactions || [];
-    this.hasLink = this.containsLink() || false;
-    this.isDirect = this.isDirectMessage() || false;
+class Message {
+  /**
+    {
+      type: 'message',
+      user: 'U8S5U2V0R',
+      text: 'hello',
+      client_msg_id: 'd9412146-155b-438c-ab61-48b2d69b4796',
+      team: 'T8S5U2UTT',
+      channel: 'C8S5U2Z97',
+      event_ts: '1531955105.000250',
+      ts: '1531955105.000250'
+    }
+  */
+  constructor(data) {
+    this.type = data.type;
+    this.author = data.user;
+    this.text = data.text;
+    this.teamId = data.team;
+    this.channelId = data.channel;
+    this.time = data.ts;
   }
 
   /**
@@ -139,4 +143,4 @@ class ChatMessage {
   }
 }
 
-module.exports = ChatMessage;
+module.exports = Message;

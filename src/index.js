@@ -4,6 +4,8 @@ const app = require('express')();
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
+const BotEntity = require('./entities/bot.js');
+
 const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
 const rootHandler = require('./routes/root.js');
@@ -20,12 +22,24 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.get('/', generateState, rootHandler);
+/**
+  { ok: true,
+  access_token: 'xoxp-',
+  scope: 'identify,bot,channels:history,groups:history,im:history,mpim:history,reactions:read,reactions:write',
+  user_id: '',
+  team_name: '',
+  team_id: '',
+  bot:
+   { bot_user_id: '',
+     bot_access_token: 'xoxb-' } }
+ */
 app.get('/auth/slack', authorize, async (req, res, next) => {
   if (!req.auth) return next();
   validation.auth.validate(req.auth);
   const { team_id } = req.auth; // eslint-disable-line
   if (!botStorage.has(team_id)) {
     const bot = new Bot(req.auth);
+    BotEntity.save(bot);
     botStorage.set(team_id, bot);
     bot.start();
   }
@@ -34,10 +48,19 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
 
 app.use(errorHandler);
 
+async function startExistingBots(db) {
+  const existingBots = await db.collection('Bot').find({}).toArray();
+  for (const botData of existingBots) {
+    const bot = new Bot(botData);
+    bot.start();
+    botStorage.set(botData.teamId, bot);
+  }
+}
+
 app.listen(process.env.PORT || 3000, async () => {
   console.log(`Server is up on port ${process.env.PORT || 3000}`);
   try {
-    await mongo.connect();
+    await mongo.connect().then(startExistingBots);
     console.log('Connected to the database');
   } catch (e) {
     console.error('Failed to connect to the database', e);

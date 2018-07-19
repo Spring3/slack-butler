@@ -4,10 +4,9 @@ const Channel = require('./channel.js');
 
 class Team {
   constructor(data) { // eslint-disable-line
-    this.name = data.name || data.team_name; // eslint-disable-line
-    this.id = data.id || data.team_id; // eslint-disable-line
-    this.domain = data.domain;
-    this.createdAt = data.createdAt;
+    this.name = data.name; // eslint-disable-line
+    this.id = data.id; // eslint-disable-line
+    this.createdAt = data.createdAt || new Date();
     this.channels = new Map();
   }
 
@@ -74,6 +73,16 @@ class Team {
     //     console.error(result.error);
     //   }
     // } while (cursor);
+  }
+
+
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      createdAt: this.createdAt,
+      channels: Array.from(this.channels.keys())
+    };
   }
 }
 

@@ -1,6 +1,6 @@
 const botStorage = require('./botStorage.js');
 const requestHelper = require('../utils/requests.js');
-const ChatMessage = require('./chatMessage.js');
+const Message = require('./message.js');
 
 /**
  *  Slack channel response
@@ -35,13 +35,30 @@ class Channel {
   constructor(data, teamId) {
     this.teamId = teamId;
     this.id = data.id;
-    this.name = data.name || 'DM';
     this.isPrivate = data.is_private;
     this.isDM = data.is_im;
     this.isGroupDM = data.is_mpim;
     this.isArchived = data.is_archived;
     // Array of channel member's ids
     this.members = [];
+  }
+
+
+  /**
+    {
+      type: 'message',
+      user: 'U8S5U2V0R',
+      text: 'hello',
+      client_msg_id: 'd9412146-155b-438c-ab61-48b2d69b4796',
+      team: 'T8S5U2UTT',
+      channel: 'C8S5U2Z97',
+      event_ts: '1531955105.000250',
+      ts: '1531955105.000250'
+    }
+  */
+  processMessage(msg) {
+    const message = new Message(msg);
+    console.log(message);
   }
 
   async fetchMembers() {
@@ -119,7 +136,7 @@ class Channel {
    * @return {undefined|ChatMessage} - undefined if message param was not proivded
    */
   getMessage(message) {
-    return new ChatMessage(message, this);
+    return new Message(message, this);
   }
 }
 
