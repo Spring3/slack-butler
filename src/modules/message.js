@@ -32,14 +32,6 @@ class Message {
   }
 
   /**
-   * Check if a message is a plain text type
-   * @return {Boolean}
-   */
-  isTextMessage() {
-    return (this.type === 'message' && !this.subtype);
-  }
-
-  /**
    * Check if the message was already marked as processed by the bot
    * @return {Boolean}
    */
@@ -70,11 +62,8 @@ class Message {
    * Check if the message contains a link
    * @return {Boolean}
    */
-  containsLink() {
-    if (this.hasLink === undefined && this.text) {
-      return /(https?|ftp):\/\//gm.test(this.text);
-    }
-    return this.hasLink;
+  hasLink() {
+    return /(https?|ftp):\/\//gm.test(this.text);
   }
 
   /**

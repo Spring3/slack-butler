@@ -39,9 +39,9 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
   const { team_id } = req.auth; // eslint-disable-line
   if (!botStorage.has(team_id)) {
     const bot = new Bot(req.auth);
-    BotEntity.save(bot);
-    botStorage.set(team_id, bot);
     bot.start();
+    botStorage.set(team_id, bot);
+    BotEntity.save(bot);
   }
   return res.redirect('/');
 });

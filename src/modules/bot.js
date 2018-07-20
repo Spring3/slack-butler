@@ -7,10 +7,11 @@ const {
 } = require('./configuration.js');
 // const mongo = require('./mongo');
 const Team = require('./team.js');
+const Message = require('./message.js');
 const TeamEntity = require('../entities/team.js');
 // const Links = require('../entities/links.js');
 // const Highlights = require('../entities/highlights.js');
-// const Channel = require('./channel');
+const Channel = require('./channel');
 const blacklist = require('./blacklist');
 
 const ignoredEvents = ['hello', 'ping', 'pong'];
@@ -28,9 +29,30 @@ class Bot {
     this.webClient = new WebClient(this.token);
     this.scopes = data.scopes || (scope || '').split(',');
     this.team = { id: data.teamId || team_id };
+    this.channels = new Map();
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
     }
+  }
+
+  async getChannels() {
+    const requestBody = {
+      types: 'public_channel,private_channel,mpim,im',
+      user: this.id
+    };
+    let cursor;
+    do {
+      const nextRequsetBody = cursor ? Object.assign({ cursor }, requestBody) : requestBody;
+      const response = await this.webClient.users.conversations(nextRequsetBody); // eslint-disable-line
+      if (response.ok) {
+        cursor = response.response_metadata.next_cursor;
+        for (const channelData of response.channels) {
+          this.channels.set(channelData.id, new Channel(channelData));
+        }
+      } else {
+        console.error('Error when fetching channels', response.error);
+      }
+    } while (cursor);
   }
 
   /**
@@ -85,6 +107,7 @@ class Bot {
   start() {
     this.init();
     this.rtm.start();
+    this.getChannels();
   }
 
   /**
@@ -104,10 +127,8 @@ class Bot {
     */
     this.rtm.once('authenticated', async (data) => {
       if (data.ok) {
-        const team = new Team(data.team);
-        await team.getBotChannels();
-        TeamEntity.upsert(Object.assign(team.toJSON(), { bot: this.id }));
-        this.team = team;
+        this.team = new Team(data.team);
+        TeamEntity.upsert(Object.assign(this.team.toJSON(), { bot: this.id }));
       } else {
         console.error(`Error trying to authenticate: ${data.error}`);
       }
@@ -115,12 +136,39 @@ class Bot {
 
     this.rtm.on('slack_event', async (type, msg) => {
       console.log(type);
-      console.log(msg);
-      if (ignoredEvents.includes(type) || !this.team.channels.has(msg.channel)) {
+      if (ignoredEvents.includes(type) || !this.channels.has(msg.channel)) {
         return;
       }
+
+      console.log(msg);
       
-      const channel = this.team.channels.get(msg.channel);
+      const channel = this.channels.get(msg.channel);
+
+      /*
+      { type: 'reaction_added',
+  user: 'U8S5U2V0R',
+  item:
+   { type: 'message',
+     channel: 'C8SK1H90B',
+     ts: '1532036693.000077' },
+  reaction: 'rolling_on_the_floor_laughing',
+  item_user: 'U8S5U2V0R',
+  event_ts: '1532036781.000033',
+  ts: '1532036781.000033' }
+       */
+      
+      /*
+      { type: 'reaction_removed',
+  user: 'U8S5U2V0R',
+  item:
+   { type: 'message',
+     channel: 'C8SK1H90B',
+     ts: '1532036693.000077' },
+  reaction: 'rolling_on_the_floor_laughing',
+  item_user: 'U8S5U2V0R',
+  event_ts: '1532036810.000182',
+  ts: '1532036810.000182' }
+       */
 
       /*
         { type: 'channel_joined',
@@ -218,7 +266,19 @@ class Bot {
        */
       switch (type) {
         case 'message': {
-          channel.processMessage(msg);
+          /**
+            {
+              type: 'message',
+              user: 'U8S5U2V0R',
+              text: 'hello',
+              client_msg_id: 'd9412146-155b-438c-ab61-48b2d69b4796',
+              team: 'T8S5U2UTT',
+              channel: 'C8S5U2Z97',
+              event_ts: '1531955105.000250',
+              ts: '1531955105.000250'
+            }
+          */
+          const message = new Message(msg);
           // if (msg.channel) {
           //   const channel = this.channels.get(msg.channel);
           // const message = channel.getMessage(msg);
