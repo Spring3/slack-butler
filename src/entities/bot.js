@@ -11,7 +11,7 @@ function save(bot) {
         },
         $setOnInsert: {
           _id: bot.id,
-          teamId: bot.team.id,
+          teamId: bot.team,
           enabled: true,
           token: bot.token,
           createdAt: new Date()

@@ -6,13 +6,12 @@ const {
   // favoritesReactionEmoji
 } = require('./configuration.js');
 // const mongo = require('./mongo');
-const Team = require('./team.js');
 const Message = require('./message.js');
 const TeamEntity = require('../entities/team.js');
-// const Links = require('../entities/links.js');
+const urlUtils = require('../utils/url.js');
+const Links = require('../entities/links.js');
 // const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
-const blacklist = require('./blacklist');
 
 const ignoredEvents = ['hello', 'ping', 'pong'];
 
@@ -24,22 +23,48 @@ class Bot {
     const { bot = {}, scope, team_id } = data;
     this.token = data.token || bot.bot_access_token;
     this.id = data._id || bot.bot_user_id;
-    this.blacklist = blacklist;
     this.rtm = new RTMClient(this.token);
     this.webClient = new WebClient(this.token);
     this.scopes = data.scopes || (scope || '').split(',');
-    this.team = { id: data.teamId || team_id };
+    this.team = data.teamId || team_id;
+    this.blacklist = new Set();
     this.channels = new Map();
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
     }
   }
 
+  /*
+    { ok: true,
+  channels:
+   [ { id: 'C8S5U2Z97',
+       name: 'general',
+       is_channel: true,
+       is_group: false,
+       is_im: false,
+       created: 1515975558,
+       is_archived: false,
+       is_general: true,
+       unlinked: 0,
+       name_normalized: 'general',
+       is_shared: false,
+       creator: 'U8S5U2V0R',
+       is_ext_shared: false,
+       is_org_shared: false,
+       shared_team_ids: [Array],
+       pending_shared: [],
+       is_pending_ext_shared: false,
+       is_private: false,
+       is_mpim: false,
+       topic: [Object],
+       purpose: [Object],
+       previous_names: [] } ],
+  response_metadata: { next_cursor: '' },
+  scopes: [ 'identify', 'bot:basic' ],
+  acceptedScopes: [ 'channels:read', 'groups:read', 'mpim:read', 'im:read', 'read' ] }
+     */
   async getChannels() {
-    const requestBody = {
-      types: 'public_channel,private_channel,mpim,im',
-      user: this.id
-    };
+    const requestBody = { types: 'public_channel,private_channel,mpim,im', user: this.id };
     let cursor;
     do {
       const nextRequsetBody = cursor ? Object.assign({ cursor }, requestBody) : requestBody;
@@ -107,7 +132,6 @@ class Bot {
   start() {
     this.init();
     this.rtm.start();
-    this.getChannels();
   }
 
   /**
@@ -127,8 +151,8 @@ class Bot {
     */
     this.rtm.once('authenticated', async (data) => {
       if (data.ok) {
-        this.team = new Team(data.team);
-        TeamEntity.upsert(Object.assign(this.team.toJSON(), { bot: this.id }));
+        TeamEntity.upsert(Object.assign({}, data.team, { bot: this.id }));
+        this.getChannels();
       } else {
         console.error(`Error trying to authenticate: ${data.error}`);
       }
@@ -141,78 +165,77 @@ class Bot {
       }
 
       console.log(msg);
-      
       const channel = this.channels.get(msg.channel);
 
       /*
       { type: 'reaction_added',
-  user: 'U8S5U2V0R',
-  item:
-   { type: 'message',
-     channel: 'C8SK1H90B',
-     ts: '1532036693.000077' },
-  reaction: 'rolling_on_the_floor_laughing',
-  item_user: 'U8S5U2V0R',
-  event_ts: '1532036781.000033',
-  ts: '1532036781.000033' }
+        user: 'U8S5U2V0R',
+        item:
+         { type: 'message',
+           channel: 'C8SK1H90B',
+           ts: '1532036693.000077' },
+        reaction: 'rolling_on_the_floor_laughing',
+        item_user: 'U8S5U2V0R',
+        event_ts: '1532036781.000033',
+        ts: '1532036781.000033' }
        */
       
       /*
       { type: 'reaction_removed',
-  user: 'U8S5U2V0R',
-  item:
-   { type: 'message',
-     channel: 'C8SK1H90B',
-     ts: '1532036693.000077' },
-  reaction: 'rolling_on_the_floor_laughing',
-  item_user: 'U8S5U2V0R',
-  event_ts: '1532036810.000182',
-  ts: '1532036810.000182' }
+        user: 'U8S5U2V0R',
+        item:
+         { type: 'message',
+           channel: 'C8SK1H90B',
+           ts: '1532036693.000077' },
+        reaction: 'rolling_on_the_floor_laughing',
+        item_user: 'U8S5U2V0R',
+        event_ts: '1532036810.000182',
+        ts: '1532036810.000182' }
        */
 
       /*
         { type: 'channel_joined',
-  channel:
-   { id: 'C8SK1H90B',
-     name: 'random',
-     is_channel: true,
-     is_group: false,
-     is_im: false,
-     created: 1515975558,
-     is_archived: false,
-     is_general: false,
-     unlinked: 0,
-     name_normalized: 'random',
-     is_shared: false,
-     creator: 'U8S5U2V0R',
-     is_ext_shared: false,
-     is_org_shared: false,
-     shared_team_ids: [ 'T8S5U2UTT' ],
-     pending_shared: [],
-     is_pending_ext_shared: false,
-     is_member: true,
-     is_private: false,
-     is_mpim: false,
-     last_read: '1532036696.000315',
-     latest:
-      { type: 'message',
-        user: 'U8S5U2V0R',
-        text: '<@U8TPTJAET> hey',
-        client_msg_id: '2d9a52f3-8c9a-401a-9b1e-55eca8bf5b72',
-        ts: '1532036696.000315' },
-     unread_count: 0,
-     unread_count_display: 0,
-     members: [ 'U8S5U2V0R', 'U8TPTJAET', 'U8V0CM6K1' ],
-     topic:
-      { value: 'Non-work banter and water cooler conversation',
-        creator: 'U8S5U2V0R',
-        last_set: 1515975558 },
-     purpose:
-      { value: 'A place for non-work-related flimflam, faffing, hodge-podge or jibber-jabber you\'d prefer to keep out of more focused work-related channels.',
-        creator: 'U8S5U2V0R',
-        last_set: 1515975558 },
-     previous_names: [],
-     priority: 0 } }
+        channel:
+         { id: 'C8SK1H90B',
+           name: 'random',
+           is_channel: true,
+           is_group: false,
+           is_im: false,
+           created: 1515975558,
+           is_archived: false,
+           is_general: false,
+           unlinked: 0,
+           name_normalized: 'random',
+           is_shared: false,
+           creator: 'U8S5U2V0R',
+           is_ext_shared: false,
+           is_org_shared: false,
+           shared_team_ids: [ 'T8S5U2UTT' ],
+           pending_shared: [],
+           is_pending_ext_shared: false,
+           is_member: true,
+           is_private: false,
+           is_mpim: false,
+           last_read: '1532036696.000315',
+           latest:
+            { type: 'message',
+              user: 'U8S5U2V0R',
+              text: '<@U8TPTJAET> hey',
+              client_msg_id: '2d9a52f3-8c9a-401a-9b1e-55eca8bf5b72',
+              ts: '1532036696.000315' },
+           unread_count: 0,
+           unread_count_display: 0,
+           members: [ 'U8S5U2V0R', 'U8TPTJAET', 'U8V0CM6K1' ],
+           topic:
+            { value: 'Non-work banter and water cooler conversation',
+              creator: 'U8S5U2V0R',
+              last_set: 1515975558 },
+           purpose:
+            { value: 'A place for non-work-related flimflam, faffing, hodge-podge or jibber-jabber you\'d prefer to keep out of more focused work-related channels.',
+              creator: 'U8S5U2V0R',
+              last_set: 1515975558 },
+           previous_names: [],
+           priority: 0 } }
        */
       
       /**
@@ -228,41 +251,41 @@ class Bot {
       
       /*
       { type: 'group_joined',
-  channel:
-   { id: 'GBTTY9WDB',
-     name: 'private',
-     is_channel: false,
-     is_group: true,
-     is_im: false,
-     created: 1532036276,
-     is_archived: false,
-     is_general: false,
-     unlinked: 0,
-     name_normalized: 'private',
-     is_shared: false,
-     creator: 'U8S5U2V0R',
-     is_ext_shared: false,
-     is_org_shared: false,
-     shared_team_ids: [ 'T8S5U2UTT' ],
-     pending_shared: [],
-     is_pending_ext_shared: false,
-     is_member: true,
-     is_private: true,
-     is_mpim: false,
-     last_read: '1532036284.000160',
-     latest:
-      { type: 'message',
-        user: 'U8S5U2V0R',
-        text: '<@U8TPTJAET> hello',
-        client_msg_id: 'b02e00f5-840f-449a-b792-17bf4a9e6134',
-        ts: '1532036284.000160' },
-     unread_count: 0,
-     unread_count_display: 0,
-     is_open: true,
-     members: [ 'U8S5U2V0R', 'U8TPTJAET' ],
-     topic: { value: '', creator: '', last_set: 0 },
-     purpose: { value: '', creator: '', last_set: 0 },
-     priority: 0 } }
+        channel:
+         { id: 'GBTTY9WDB',
+           name: 'private',
+           is_channel: false,
+           is_group: true,
+           is_im: false,
+           created: 1532036276,
+           is_archived: false,
+           is_general: false,
+           unlinked: 0,
+           name_normalized: 'private',
+           is_shared: false,
+           creator: 'U8S5U2V0R',
+           is_ext_shared: false,
+           is_org_shared: false,
+           shared_team_ids: [ 'T8S5U2UTT' ],
+           pending_shared: [],
+           is_pending_ext_shared: false,
+           is_member: true,
+           is_private: true,
+           is_mpim: false,
+           last_read: '1532036284.000160',
+           latest:
+            { type: 'message',
+              user: 'U8S5U2V0R',
+              text: '<@U8TPTJAET> hello',
+              client_msg_id: 'b02e00f5-840f-449a-b792-17bf4a9e6134',
+              ts: '1532036284.000160' },
+           unread_count: 0,
+           unread_count_display: 0,
+           is_open: true,
+           members: [ 'U8S5U2V0R', 'U8TPTJAET' ],
+           topic: { value: '', creator: '', last_set: 0 },
+           purpose: { value: '', creator: '', last_set: 0 },
+           priority: 0 } }
        */
       switch (type) {
         case 'message': {
@@ -278,7 +301,31 @@ class Bot {
               ts: '1531955105.000250'
             }
           */
-          const message = new Message(msg);
+
+          /*
+            subtype usually means that this is some sort of a reply to an existing message.
+            before an event with subtype gets send, a reply itself is sent as a message event without a subtype
+            so, meathing that the message event with subtype would be a duplicate
+          */
+          if (!msg.subtype) {
+            const message = new Message(msg);
+            if (message.hasLinks() && !message.isMarked()) {
+              const captionedLinks = urlUtils.getCaption(message.getLinks());
+              for (const link of captionedLinks) {
+                console.log(link);
+                Links.save(Object.assign(link, {
+                  author: message.author,
+                  channel: channel.name,
+                  team: this.team
+                })).then(() => {
+
+                }).catch(e => console.error('Error when trying to save a link and react', e));
+              }
+            }
+            if (message.isDirect()) {
+              // Command.get(message.getPlot());
+            }
+          }
           // if (msg.channel) {
           //   const channel = this.channels.get(msg.channel);
           // const message = channel.getMessage(msg);

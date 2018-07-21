@@ -7,11 +7,11 @@ async function upsert(team) {
       { _id: team.id },
       {
         $set: {
-          updatedAt: new Date()
+          updatedAt: new Date(),
+          name: team.name
         },
         $setOnInsert: {
           _id: team.id,
-          name: team.name,
           bot: team.bot,
           createdAt: team.createdAt
         }

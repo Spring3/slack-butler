@@ -1,10 +1,7 @@
-const url = require('url');
 const { reactionEmoji } = require('./configuration.js');
-const blacklist = require('../modules/blacklist.js');
-const Command = require('./command.js');
-const { getTitles } = require('../utils/url.js');
+const botStorage = require('./botStorage.js');
 
-const urlPattern = /(https?|ftp):\/\/[\w-]+(\.[\w-]+)+([\w.,@?^=%&amp;:\/~+#-]*[\w@?^=%&amp;\/~+#-])?/g;
+const urlRegex = /(https?|ftp):\/\/.*/g;
 
 /**
  * Representation of a slack message
@@ -29,6 +26,8 @@ class Message {
     this.teamId = data.team;
     this.channelId = data.channel;
     this.time = data.ts;
+    this.reactions = [];
+    this.botId = botStorage.has(this.teamId) ? botStorage.get(this.teamId).id : undefined;
   }
 
   /**
@@ -62,74 +61,51 @@ class Message {
    * Check if the message contains a link
    * @return {Boolean}
    */
-  hasLink() {
-    return /(https?|ftp):\/\//gm.test(this.text);
+  hasLinks() {
+    return urlRegex.test(this.text);
+  }
+
+  /**
+   * Get links from the message
+   * @return {[string]}
+   */
+  getLinks() {
+    const matches = this.text.match(urlRegex);
+    if (matches === null) {
+      return [];
+    }
+
+    return matches.filter(link => !!link).map(link => link.slice(0, -1));
   }
 
   /**
    * Check if the message is a direct message to the bot
    * @return {Boolean}
    */
-  isDirectMessage() {
-    if (this.isDirect === undefined && this.text) {
-      return this.text.includes(`<@${this.botId}>`);
-    }
-    return this.isDirect;
-  }
-
-  /**
-   * Get links from the message
-   * @return {[object]}
-   */
-  getLinks() {
-    const matches = this.text.match(urlPattern);
-    if (matches === null) {
-      return [];
-    }
-
-    const links = new Set();
-
-    // filtering links from regex results
-    for (const link of matches) {
-      if (!link) continue; // eslint-disable-line
-      const urlObj = url.parse(link);
-      if (urlObj.protocol && urlObj.pathname) {
-        let isValid = true;
-        for (const bannedKeyword of blacklist.getValues()) {
-          if (isValid) {
-            isValid = !link.includes(bannedKeyword);
-          }
-        }
-        if (isValid) {
-          for (const title of getTitles(link)) {
-            links.add(title);
-          }
-        }
-      }
-    }
-    return [...links];
+  isDirect() {
+    return typeof this.botId === 'string' && this.text.includes(`<@${this.botId}>`);
   }
 
   /**
    * Get the content of a direct message
    * @return {string}
    */
-  getDirectMessage() {
+  getPlot() {
     return this.text.replace(`<@${this.botId}>`, '').toLowerCase().trim();
   }
 
-  /**
-   * Convert the message to a command if possible
-   * @return {undefined|Command}
-   */
-  getCommand() {
-    if (this.isDirectMessage()) {
-      const mention = this.getDirectMessage();
-      const commandType = mention.split(' ')[0].toLowerCase();
-      return new Command(commandType, this);
-    }
-    return undefined;
-  }
+  // /**
+  //  * Convert the message to a command if possible
+  //  * @return {undefined|Command}
+  //  */
+  // getCommand() {
+  //   if (this.isDirectMessage()) {
+  //     const mention = this.getDirectMessage();
+  //     const commandType = mention.split(' ')[0].toLowerCase();
+  //     return new Command(commandType, this);
+  //   }
+  //   return undefined;
+  // }
 }
 
 module.exports = Message;

@@ -32,6 +32,7 @@ const Message = require('./message.js');
 class Channel {
   constructor(data) {
     this.id = data.id;
+    this.name = data.name;
     this.isPrivate = data.is_private;
     this.isDM = data.is_im;
     this.isGroupDM = data.is_mpim;
