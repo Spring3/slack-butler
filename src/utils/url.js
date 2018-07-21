@@ -6,7 +6,6 @@ const url = require('url');
  * @return {[object]]}
  */
 function getCaption(links) {
-  console.log(links);
   const payload = [];
   // setting up link title
   for (const link of links) {
@@ -14,14 +13,12 @@ function getCaption(links) {
     const linkParts = pathname.charAt(pathname.length - 1) === '/'
       ? pathname.slice(0, -1).split('/')
       : pathname.split('/');
-    console.log(linkParts);
     let linkTitle = linkParts[linkParts.length - 1].replace(/-/g, ' ');
     // if name was not set or it is a number
     if (!linkTitle || /^\d+$/.test(linkTitle)) {
       // just taking the website name as a caption for the link
       linkTitle = linkParts[0]; // eslint-disable-line
     }
-    console.log(linkTitle);
     payload.push({
       caption: `${linkTitle.charAt(0).toUpperCase()}${linkTitle.slice(1)}`,
       domain: hostname,

@@ -5,12 +5,11 @@ const {
   reactionEmoji,
   // favoritesReactionEmoji
 } = require('./configuration.js');
-// const mongo = require('./mongo');
+const mongo = require('./mongo');
 const Message = require('./message.js');
 const TeamEntity = require('../entities/team.js');
-const urlUtils = require('../utils/url.js');
 const Links = require('../entities/links.js');
-// const Highlights = require('../entities/highlights.js');
+const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
 
 const ignoredEvents = ['hello', 'ping', 'pong'];
@@ -87,16 +86,18 @@ class Bot {
    * @return {Promise}
    */
   async react(message, emoji = reactionEmoji.toLowerCase()) {
-    if (!message.isMarked()) {
-      try {
-        await this.web.bot.reactions.add(emoji, {
-          channel: message.channel.id || message.channel,
-          timestamp: message.timestamp,
-        });
-        message.mark();
-      } catch (e) {
-        console.error(e);
+    try {
+      const res = await this.webClient.reactions.add({
+        name: emoji,
+        channel: message.channelId,
+        timestamp: message.timestamp
+      });
+      if (!res.ok) {
+        console.log(res);
       }
+      message.mark();
+    } catch (e) {
+      console.error(e);
     }
   }
 
@@ -149,7 +150,7 @@ class Bot {
         acceptedScopes: [ 'rtm:stream', 'client' ]
       }
     */
-    this.rtm.once('authenticated', async (data) => {
+    this.rtm.once('authenticated', (data) => {
       if (data.ok) {
         TeamEntity.upsert(Object.assign({}, data.team, { bot: this.id }));
         this.getChannels();
@@ -160,25 +161,12 @@ class Bot {
 
     this.rtm.on('slack_event', async (type, msg) => {
       console.log(type);
-      if (ignoredEvents.includes(type) || !this.channels.has(msg.channel)) {
+      if (ignoredEvents.includes(type)) {
         return;
       }
 
       console.log(msg);
-      const channel = this.channels.get(msg.channel);
-
-      /*
-      { type: 'reaction_added',
-        user: 'U8S5U2V0R',
-        item:
-         { type: 'message',
-           channel: 'C8SK1H90B',
-           ts: '1532036693.000077' },
-        reaction: 'rolling_on_the_floor_laughing',
-        item_user: 'U8S5U2V0R',
-        event_ts: '1532036781.000033',
-        ts: '1532036781.000033' }
-       */
+      const channel = this.channels.get(msg.channel || msg.item.channel);
       
       /*
       { type: 'reaction_removed',
@@ -288,7 +276,7 @@ class Bot {
            priority: 0 } }
        */
       switch (type) {
-        case 'message': {
+        case 'message':
           /**
             {
               type: 'message',
@@ -310,15 +298,14 @@ class Bot {
           if (!msg.subtype) {
             const message = new Message(msg);
             if (message.hasLinks() && !message.isMarked()) {
-              const captionedLinks = urlUtils.getCaption(message.getLinks());
+              const captionedLinks = message.getLinksData();
               for (const link of captionedLinks) {
-                console.log(link);
                 Links.save(Object.assign(link, {
                   author: message.author,
                   channel: channel.name,
                   team: this.team
                 })).then(() => {
-
+                  this.react(message, reactionEmoji);
                 }).catch(e => console.error('Error when trying to save a link and react', e));
               }
             }
@@ -347,7 +334,41 @@ class Bot {
           // }
           // }
           break;
-        }
+        case 'reaction_added':
+          /*
+          { type: 'reaction_added',
+            user: 'U8S5U2V0R',
+            item:
+             { type: 'message',
+               channel: 'C8SK1H90B',
+               ts: '1532036693.000077' },
+            reaction: 'rolling_on_the_floor_laughing',
+            item_user: 'U8S5U2V0R',
+            event_ts: '1532036781.000033',
+            ts: '1532036781.000033' }
+         */
+          if (msg.user !== this.id && msg.reaction === reactionEmoji) {
+            const reactionsDetails = await this.webClient.reactions.get({
+              channel: msg.item.channel,
+              full: true,
+              timestamp: msg.item.ts
+            });
+            if (reactionsDetails.ok) {
+              const message = new Message(reactionsDetails.message);
+              if (message.hasLinks()) {
+                const db = await mongo.connect();
+                const matchedLinks = await db.collection('Links').find({ href: { $in: message.getLinks() } }).toArray();
+                const highlights = matchedLinks
+                  .map(entry => ({
+                    _id: entry._id,
+                    user: msg.user,
+                    createdAt: new Date()
+                  }));
+                Highlights.saveAll(highlights);
+              }
+            }
+          }
+          break;
         default: {
           break;
         }

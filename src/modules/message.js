@@ -1,5 +1,6 @@
 const { reactionEmoji } = require('./configuration.js');
 const botStorage = require('./botStorage.js');
+const urlUtils = require('../utils/url.js');
 
 const urlRegex = /(https?|ftp):\/\/.*/g;
 
@@ -25,8 +26,9 @@ class Message {
     this.text = data.text;
     this.teamId = data.team;
     this.channelId = data.channel;
-    this.time = data.ts;
-    this.reactions = [];
+    this.timestamp = data.ts;
+    this.reactions = new Set(Array.isArray(data.reactions) ? data.reactions : [data.reactions]);
+    console.log(this.reactions);
     this.botId = botStorage.has(this.teamId) ? botStorage.get(this.teamId).id : undefined;
   }
 
@@ -35,7 +37,7 @@ class Message {
    * @return {Boolean}
    */
   isMarked() {
-    const found = this.reactions.filter(reaction =>
+    const found = Array.from(this.reactions.values()).filter(reaction =>
       reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.botId))[0];
     return found !== undefined;
   }
@@ -46,9 +48,9 @@ class Message {
    */
   mark() {
     const lowReactionEmoji = reactionEmoji.toLowerCase();
-    const existingReaction = this.reactions.filter(reaction => reaction.name === lowReactionEmoji)[0];
+    const existingReaction = Array.from(this.reactions.values()).filter(reaction => reaction.name === lowReactionEmoji)[0];
     if (existingReaction === undefined) {
-      this.reactions.push({
+      this.reactions.add({
         name: lowReactionEmoji,
         users: [this.botId],
       });
@@ -76,6 +78,10 @@ class Message {
     }
 
     return matches.filter(link => !!link).map(link => link.slice(0, -1));
+  }
+
+  getLinksData() {
+    return urlUtils.getCaption(this.getLinks());
   }
 
   /**
