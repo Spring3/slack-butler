@@ -6,12 +6,11 @@ const helmet = require('helmet');
 
 const BotEntity = require('./entities/bot.js');
 
-const botStorage = require('./modules/botStorage.js');
+const botFactory = require('./modules/botFactory.js');
 const validation = require('./modules/validation.js');
 const rootHandler = require('./routes/root.js');
 const { generateState, authorize } = require('./middleware/auth.js');
 const errorHandler = require('./middleware/error-handler.js');
-const Bot = require('./modules/bot.js');
 const mongo = require('./modules/mongo');
 
 assert(process.env.CLIENT_ID, 'CLIENT_ID is undefined');
@@ -37,10 +36,9 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
   if (!req.auth) return next();
   validation.auth.validate(req.auth);
   const { team_id } = req.auth; // eslint-disable-line
-  if (!botStorage.has(team_id)) {
-    const bot = new Bot(req.auth);
+  if (!botFactory.activeBots.has(team_id)) {
+    const bot = botFactory.create(req.auth);
     bot.start();
-    botStorage.set(team_id, bot);
     BotEntity.save(bot);
   }
   return res.redirect('/');
@@ -51,11 +49,10 @@ app.use(errorHandler);
 async function startExistingBots(db) {
   const existingBots = await db.collection('Bot').find({}).toArray();
   for (const botData of existingBots) {
-    const bot = new Bot(botData);
+    const bot = botFactory.create(botData);
     bot.start();
-    botStorage.set(botData.teamId, bot);
   }
-}
+};
 
 app.listen(process.env.PORT || 3000, async () => {
   console.log(`Server is up on port ${process.env.PORT || 3000}`);

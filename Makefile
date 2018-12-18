@@ -5,9 +5,9 @@ deps:
 lint:
 	./node_modules/.bin/eslint .
 test:
-	make lint
 	NODE_ENV=test make cover
 cover:
-	./node_modules/.bin/istanbul cover ./node_modules/.bin/_mocha -- test --recursive --timeout=3000 --exit
+	make lint
+	./node_modules/.bin/nyc cover --timeout=3000
 run:
 	node server.js

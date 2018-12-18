@@ -39,6 +39,7 @@
   "devDependencies": {
     "eslint": "^5.10.0",
     "mocha": "^4.1.0",
+    "nyc": "^13.1.0",
     "rewire": "^3.0.2",
     "sinon": "^4.1.3"
   }

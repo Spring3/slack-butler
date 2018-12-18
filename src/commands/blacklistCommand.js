@@ -1,18 +1,10 @@
-const Command = require('./command');
-const blacklist = require('../modules/blacklist.js');
+const assert = require('assert');
+const { activeBots } = require('../modules/botFactory');
 
-/**
- * A command to display the current blacklist of urls
- */
-class BlacklistCommand extends Command {
-  constructor(chatMessage) {
-    super(chatMessage);
+module.exports = {
+  handle({ channelId, teamId }) {
+    const bot = activeBots.get(teamId);
+    assert(bot);
+    bot.rtm.sendMessage('[Not implemented] Blacklist values will be printed here', channelId);
   }
-
-  handle(message, channel) {
-    super.handle(message, channel);
-    this.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channel);
-  }
-}
-
-module.exports = BlacklistCommand;
+};

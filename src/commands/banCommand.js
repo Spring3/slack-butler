@@ -1,22 +1,17 @@
-const Command = require('./command');
-const blacklist = require('../modules/blacklist.js');
+const assert = require('assert');
+const { activeBots } = require('../modules/botFactory');
 
-/**
- * BanCommand - a command to exclude the links that contain a mentioned word
- */
-class BanCommand extends Command {
-  constructor(chatMessage) {
-    super(chatMessage);
-  }
-
-  handle(message, channel) {
-    super.handle(message, channel);
-    const messageParts = message.split(' ');
+module.exports = {
+  handle({ text, channelId, teamId }) {
+    const messageParts = text.split(' ');
     if (messageParts.length > 1) {
-      blacklist.ban(messageParts[1].toLowerCase().trim());
+      console.log("Add the phrase to the blacklist");
+      // blacklist.ban(messageParts[1].toLowerCase().trim());
     }
-    this.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channel);
+    // move this out to the base class (prototype)
+    const bot = activeBots.get(teamId);
+    assert(bot);
+    bot.rtm.sendMessage('[Not implemented] A given value will be added to the blacklist', channelId);
+    // this.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channel);
   }
-}
-
-module.exports = BanCommand;
+};

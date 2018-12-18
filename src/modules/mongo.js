@@ -15,11 +15,11 @@ async function connect(url = process.env.MONGODB_URI) {
   if (client === null) {
     client = await MongoClient.connect(url);
     dbName = parse(url);
-    if (!dbName || !dbName.pathname) return Promise.reject(new Error('Malformed connection url'));
+    if (!dbName || !dbName.pathname) throw new Error('Malformed connection url');
     dbName = dbName.pathname.substring(1); // to remove a slash
     return client.db(dbName);
   }
-  return Promise.resolve(client.db(dbName));
+  return client.db(dbName);
 }
 
 /**

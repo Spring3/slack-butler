@@ -1,19 +1,13 @@
-const Command = require('./command');
-const blacklist = require('../modules/blacklist.js');
+const assert = require('assert');
+const { activeBots } = require('../modules/botFactory');
 
-/**
- * Command to remove the url from the blacklist
- */
-class UnBanCommand extends Command {
-  constructor(chatMessage) {
-    super(chatMessage);
+module.exports = {
+  handle({ text, channelId }) {
+    // move this out to the base class (prototype)
+    const bot = activeBots.get(teamId);
+    assert(bot);
+    blacklist.unban(text.split(' ')[1].toLowerCase().trim());
+    // bot.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channelId);
+    bot.rtm.sendMessage('[Not implemented] Blacklist value will be removed here', channelId);
   }
-
-  handle(message, channel) {
-    super.handle(message, channel);
-    blacklist.unban(message.split(' ')[1].toLowerCase().trim());
-    this.rtm.sendMessage(`Blacklist: ${blacklist.getValues()}`, channel);
-  }
-}
-
-module.exports = UnBanCommand;
+};

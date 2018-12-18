@@ -4,25 +4,27 @@ module.exports = {
   save: async (data = []) => {
     const links = Array.isArray(data) ? data : [data];
     const db = await mongo.connect();
-    for (const link of links) {
-      db.collection('Links').update({
-        href: link.href,
-        team: link.team
-      }, {
-        $set: { updatedAt: new Date() },
-        $inc: { mentioned: 1 },
-        $setOnInsert: {
+    if (links.length > 0) {
+      const bulk = db.collection('Links').initializeUnorderedBulkOp();
+      for (const link of links) {
+        buk.find({
           href: link.href,
-          caption: link.caption,
-          domain: link.domain,
-          channel: link.channel,
-          team: link.team,
-          author: link.author,
-          createdAt: new Date()
-        },
-      }, {
-        upsert: true
-      });
+          team: link.team
+        }).updateOne({
+          $set: { updatedAt: new Date() },
+          $inc: { mentioned: 1 },
+          $setOnInsert: {
+            href: link.href,
+            caption: link.caption,
+            domain: link.domain,
+            channel: link.channel,
+            team: link.team,
+            author: link.author,
+            createdAt: new Date()
+          },
+        }, { upsert: true });
+      }
+      return bulk.execute();
     }
   }
 };

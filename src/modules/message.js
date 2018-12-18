@@ -1,5 +1,5 @@
 const { reactionEmoji } = require('./configuration.js');
-const botStorage = require('./botStorage.js');
+const botFactory = require('./botFactory.js');
 const urlUtils = require('../utils/url.js');
 
 const urlRegex = /(https?|ftp):\/\/.*/g;
@@ -29,7 +29,9 @@ class Message {
     this.timestamp = data.ts;
     this.reactions = new Set(Array.isArray(data.reactions) ? data.reactions : [data.reactions]);
     console.log(this.reactions);
-    this.botId = botStorage.has(this.teamId) ? botStorage.get(this.teamId).id : undefined;
+    this.botId = botFactory.activeBots.has(this.teamId)
+      ? botFactory.activeBots.get(this.teamId).id
+      : undefined;
   }
 
   /**
@@ -37,8 +39,8 @@ class Message {
    * @return {Boolean}
    */
   isMarked() {
-    const found = Array.from(this.reactions.values()).filter(reaction =>
-      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.botId))[0];
+    const found = Array.from(this.reactions.values()).find(reaction =>
+      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.botId));
     return found !== undefined;
   }
 
@@ -48,8 +50,8 @@ class Message {
    */
   mark() {
     const lowReactionEmoji = reactionEmoji.toLowerCase();
-    const existingReaction = Array.from(this.reactions.values()).filter(reaction => reaction.name === lowReactionEmoji)[0];
-    if (existingReaction === undefined) {
+    const existingReaction = Array.from(this.reactions.values()).find(reaction => reaction.name === lowReactionEmoji);
+    if (!existingReaction) {
       this.reactions.add({
         name: lowReactionEmoji,
         users: [this.botId],
@@ -77,7 +79,12 @@ class Message {
       return [];
     }
 
-    return matches.filter(link => !!link).map(link => link.slice(0, -1));
+    return matches.reduce((acc, link) => {
+      if (link) {
+        acc.push(link.slice(0, -1));
+      }
+      return acc;
+    },[]);
   }
 
   getLinksData() {
@@ -96,22 +103,9 @@ class Message {
    * Get the content of a direct message
    * @return {string}
    */
-  getPlot() {
+  getContent() {
     return this.text.replace(`<@${this.botId}>`, '').toLowerCase().trim();
   }
-
-  // /**
-  //  * Convert the message to a command if possible
-  //  * @return {undefined|Command}
-  //  */
-  // getCommand() {
-  //   if (this.isDirectMessage()) {
-  //     const mention = this.getDirectMessage();
-  //     const commandType = mention.split(' ')[0].toLowerCase();
-  //     return new Command(commandType, this);
-  //   }
-  //   return undefined;
-  // }
 }
 
 module.exports = Message;

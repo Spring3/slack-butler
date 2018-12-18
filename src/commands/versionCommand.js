@@ -1,17 +1,12 @@
-const Command = require('./command.js');
+const assert = require('assert');
+const { activeBots } = require('../modules/botFactory');
+const { version } = require('../../package.json');
 
-/**
- * Command to display the verion of the bot
- */
-class VersionCommand extends Command {
-  constructor(chatMessage) {
-    super(chatMessage);
+module.exports = {
+  handle({ teamId, channelId }) {
+    // move to the prototype
+    const bot = activeBots.get(teamId);
+    assert(bot);
+    bot.rtm.sendMessage(version, channelId);
   }
-
-  handle(message, channel) {
-    super.handle(message, channel);
-    this.rtm.sendMessage('v2.0-alpha', channel);
-  }
-}
-
-module.exports = VersionCommand;
+};

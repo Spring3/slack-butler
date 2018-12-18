@@ -1,21 +1,17 @@
-const Command = require('./command');
+const assert = require('assert');
+const { activeBots } = require('../modules/botFactory');
 const mongo = require('./../modules/mongo');
 
-/**
- * Command to display the total amount of links in the database
- */
-class TotalCommand extends Command {
-  constructor(chatMessage) {
-    super(chatMessage);
-  }
-
-  async handle(message, channel) {
-    super.handle(message, channel);
+module.exports = {
+  handle({ channelId, teamId }) {
+    // move this out to the base class (prototype)
+    const bot = activeBots.get(teamId);
+    assert(bot);
     const db = await mongo.connect();
-    const count = await db.collection('Links').count();
-    const inChannel = await db.collection('Links').find({ 'channel.id': channel }).count();
-    this.rtm.sendMessage(`Total links: ${count}\nFrom this channel: ${inChannel}`, channel);
+    const [count, countInChannel] = await Promise.all([
+      db.collection('Links').count(),
+      db.collection('Links').find({ 'channel.id': channel }).count()
+    ]);
+    bot.rtm.sendMessage(`Total links: ${count}\nFrom this channel: ${countInChannel}`, channelId);
   }
-}
-
-module.exports = TotalCommand;
+};

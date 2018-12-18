@@ -19,27 +19,13 @@ const botCommands = {
   print: PrintCommand
 };
 
-/**
- * Command based on the direct message to the bot
- */
-class Command {
-  constructor(type, chatMessage) {
-    assert(type, 'Command type is undefined');
-    assert(chatMessage, 'Command chatMessage is undefined');
-    this.type = type;
-    this.chatMessage = chatMessage;
-  }
-
-  /**
-   * Get comamnd handler based on it's type if possible
-   * @return {undefined|Command} - undefined if a command is not supported
-   */
-  getHandler() {
-    if (botCommands[this.type]) {
-      return new botCommands[this.type](this.chatMessage);
+module.exports = {
+  from(chatMessage) {
+    assert(chatMessage, 'chatMessage is undefined');
+    if (chatMessage.isDirect()) {
+      const messageContent = chatMessage.getContent();
+      const commandType = messageContent.split(' ')[0];
+      return botCommands[commandType];
     }
-    return undefined;
   }
-}
-
-module.exports = Command;
+};

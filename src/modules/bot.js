@@ -11,6 +11,7 @@ const TeamEntity = require('../entities/team.js');
 const Links = require('../entities/links.js');
 const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
+const Command = require('./command');
 
 const ignoredEvents = ['hello', 'ping', 'pong'];
 
@@ -113,7 +114,10 @@ class Bot {
           type: 'message',
           text: command
         });
-        chatMessage.getCommand().getHandler().handle(chatMessage.getDirectMessage(), channel.id);
+        const botCommand = Command.from(chatMessage);
+        if (botCommand) {
+          botCommand.handle(chatMessage);
+        }
       }
     }, parseInt(autoScanInterval, 10));
   }
