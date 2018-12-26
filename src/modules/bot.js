@@ -13,7 +13,7 @@ const Highlights = require('../entities/highlights.js');
 const Channel = require('./channel');
 const Command = require('./command');
 
-const ignoredEvents = ['hello', 'ping', 'pong'];
+const ignoredEventTypes = ['desktop_notification', 'hello', 'ping', 'pong', undefined];
 
 /**
  * A class of a slack bot
@@ -94,7 +94,7 @@ class Bot {
         timestamp: message.timestamp
       });
       if (!res.ok) {
-        console.log(res);
+        console.log('Reaction:', res);
       }
       message.mark();
     } catch (e) {
@@ -164,12 +164,12 @@ class Bot {
     });
 
     this.rtm.on('slack_event', async (type, msg) => {
-      console.log(type);
-      if (ignoredEvents.includes(type)) {
+      if (ignoredEventTypes.includes(type)) {
         return;
       }
 
-      console.log(msg);
+      console.log('Type:', type);
+      console.log('Message:', msg);
       const channel = this.channels.get(msg.channel || msg.item.channel);
       
       /*
@@ -297,7 +297,7 @@ class Bot {
           /*
             subtype usually means that this is some sort of a reply to an existing message.
             before an event with subtype gets send, a reply itself is sent as a message event without a subtype
-            so, meathing that the message event with subtype would be a duplicate
+            as the message event with subtype would be a duplicate
           */
           if (!msg.subtype) {
             const message = new Message(msg);
@@ -314,7 +314,10 @@ class Bot {
               }
             }
             if (message.isDirect()) {
-              // Command.get(message.getPlot());
+              const command = Command.from(message);
+              if (command) {
+                command.handle(message, { replyOnFinish: true });
+              }
             }
           }
           // if (msg.channel) {

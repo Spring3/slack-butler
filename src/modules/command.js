@@ -6,7 +6,7 @@ const BlacklistCommand = require('../commands/blacklistCommand');
 const BanCommand = require('../commands/banCommand');
 const UnBanCommand = require('../commands/unbanCommand');
 const VersionCommand = require('../commands/versionCommand');
-const PrintCommand = require('../commands/printCommand');
+const SearchCommand = require('../commands/searchCommand');
 
 const botCommands = {
   scan: ScanCommand,
@@ -16,7 +16,7 @@ const botCommands = {
   ban: BanCommand,
   unban: UnBanCommand,
   version: VersionCommand,
-  print: PrintCommand
+  search: SearchCommand
 };
 
 module.exports = {
