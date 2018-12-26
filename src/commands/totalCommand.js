@@ -1,9 +1,9 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botFactory');
+const { activeBots } = require('../modules/botStorage');
 const mongo = require('./../modules/mongo');
 
 module.exports = {
-  handle({ channelId, teamId }) {
+  async handle({ channelId, teamId }) {
     // move this out to the base class (prototype)
     const bot = activeBots.get(teamId);
     assert(bot);

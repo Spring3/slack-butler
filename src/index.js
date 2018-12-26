@@ -5,8 +5,9 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
 const BotEntity = require('./entities/bot.js');
+const Bot = require('./modules/bot.js');
 
-const botFactory = require('./modules/botFactory.js');
+const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
 const rootHandler = require('./routes/root.js');
 const { generateState, authorize } = require('./middleware/auth.js');
@@ -36,8 +37,11 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
   if (!req.auth) return next();
   validation.auth.validate(req.auth);
   const { team_id } = req.auth; // eslint-disable-line
-  if (!botFactory.activeBots.has(team_id)) {
-    const bot = botFactory.create(req.auth);
+  if (!botStorage.activeBots.has(team_id)) {
+    const bot = new Bot(botData);
+    const { team_id } = botData;
+    assert(team_id, 'botData must have team_id');
+    botStorage.activeBots.set(team_id, bot);
     bot.start();
     BotEntity.save(bot);
   }
@@ -49,7 +53,10 @@ app.use(errorHandler);
 async function startExistingBots(db) {
   const existingBots = await db.collection('Bot').find({}).toArray();
   for (const botData of existingBots) {
-    const bot = botFactory.create(botData);
+    const bot = new Bot(botData);
+    const { team_id } = botData;
+    assert(team_id, 'botData must have team_id');
+    botStorage.activeBots.set(team_id, bot);
     bot.start();
   }
 };

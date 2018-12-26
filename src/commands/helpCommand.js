@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botFactory.js');
+const { activeBots } = require('../modules/botStorage.js');
 
 module.exports = {
   handle({ channelId, teamId, author }) {

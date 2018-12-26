@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botFactory');
+const { activeBots } = require('../modules/botStorage');
 const { version } = require('../../package.json');
 
 module.exports = {

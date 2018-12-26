@@ -11,7 +11,7 @@ async function save(bot) {
       },
       $setOnInsert: {
         _id: bot.id,
-        teamId: bot.team,
+        team_id: bot.team,
         enabled: true,
         token: bot.token,
         createdAt: new Date()

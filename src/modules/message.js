@@ -1,5 +1,5 @@
 const { reactionEmoji } = require('./configuration.js');
-const botFactory = require('./botFactory.js');
+const botStorage = require('./botStorage.js');
 const urlUtils = require('../utils/url.js');
 
 const urlRegex = /(https?|ftp):\/\/.*/g;
@@ -28,9 +28,8 @@ class Message {
     this.channelId = data.channel;
     this.timestamp = data.ts;
     this.reactions = new Set(Array.isArray(data.reactions) ? data.reactions : [data.reactions]);
-    console.log(this.reactions);
-    this.botId = botFactory.activeBots.has(this.teamId)
-      ? botFactory.activeBots.get(this.teamId).id
+    this.botId = botStorage.activeBots.has(this.teamId)
+      ? botStorage.activeBots.get(this.teamId).id
       : undefined;
   }
 
