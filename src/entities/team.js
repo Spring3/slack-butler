@@ -3,7 +3,7 @@ const mongo = require('../modules/mongo.js');
 async function upsert(team) {
   try {
     const db = await mongo.connect();
-    return db.collection('Team').update(
+    return db.collection('Team').updateOne(
       { _id: team.id },
       {
         $set: {

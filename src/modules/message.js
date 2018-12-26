@@ -27,7 +27,11 @@ class Message {
     this.teamId = data.team;
     this.channelId = data.channel;
     this.timestamp = data.ts;
-    this.reactions = new Set(Array.isArray(data.reactions) ? data.reactions : [data.reactions]);
+    this.reactions = data.reactions
+      ? new Set(Array.isArray(data.reactions)
+        ? data.reactions
+        : [data.reactions])
+      : new Set();
     this.botId = botStorage.activeBots.has(this.teamId)
       ? botStorage.activeBots.get(this.teamId).id
       : undefined;
@@ -103,7 +107,7 @@ class Message {
    * @return {string}
    */
   getContent() {
-    return this.text.replace(`<@${this.botId}>`, '').toLowerCase().trim();
+    return this.text.replace(`<@${this.botId}>`, '').trim();
   }
 }
 

@@ -5,46 +5,34 @@ const mongo = require('../modules/mongo.js');
 function isValidRegex(str) {
   if (!str) return false;
   try {
-    new RegExp(str.trim().toLowerCase()); // eslint-disable-line no-new
+    new RegExp(str); // eslint-disable-line no-new
     return true;
   } catch (e) {
     return false;
   }
 }
 
-async function handle({ teamId, channelId, author, text }) {
+async function handle(message) {
   // move this out to the base class (prototype)
+  const { teamId, channelId } = message;
   const bot = activeBots.get(teamId);
   assert(bot);
-  const db = await mongo.connect();
-  const lowerCaseMessage = text.trim().toLowerCase();
-  const amongFavorite = lowerCaseMessage.includes('favorite');
-  const collection = amongFavorite ? 'Highlights' : 'Links';
+  const lowerCaseMessage = message.getContent().toLowerCase();
   const messageParts = lowerCaseMessage.split(' ');
-  let limit = parseInt(messageParts[2], 10);
-  limit = Number.isNaN(limit) ? 5 : limit;
-  let results = [];
-  if (['top', 'last', 'latest', 'newest'].includes(messageParts[1])) {
-    const filter = amongFavorite ? { author } : {};
-    results = await db.collection(collection)
-      .find(filter, { href: 1 })
-      .sort({ createdAt: -1 })
-      .limit(limit)
+  // 0 is the command name itself. eg. "search <value>"
+  if (isValidRegex(messageParts[1])) {
+    const regexp = new RegExp(messageParts[1], 'gi');
+    const db = await mongo.connect();
+    const results = await db.collection('Links')
+      .find({ href: regexp, teamId }, { href: 1 })
       .toArray();
-  } else if (isValidRegex(messageParts[1])) {
-    const regex = new RegExp(messageParts[1], 'g');
-    const filter = Object.assign({ href: regex }, amongFavorite ? { author } : {});
-    results = await db.collection(collection)
-      .find(filter, { href: 1 })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .toArray();
+    const resultString = results.reduce((sum, cur, i) => `${sum}${i + 1}. ${cur.href}\n`, '');
+    bot.rtm.sendMessage(`${resultString || 'Not found'}`, channelId);
+    return;
   } else {
     bot.rtm.sendMessage('Unable to process such command', channelId);
     return;
   }
-  const resultString = results.reduce((sum, cur, i) => `${sum}${i + 1}. ${cur.href}\n`, '');
-  bot.rtm.sendMessage(`${resultString}`, channelId);
 };
 
 

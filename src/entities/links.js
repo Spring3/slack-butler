@@ -7,10 +7,12 @@ module.exports = {
     if (links.length > 0) {
       const bulk = db.collection('Links').initializeUnorderedBulkOp();
       for (const link of links) {
-        buk.find({
+        bulk.find({
           href: link.href,
-          team: link.team
-        }).updateOne({
+          teamId: link.teamId
+        })
+        .upsert()
+        .updateOne({
           $set: { updatedAt: new Date() },
           $inc: { mentioned: 1 },
           $setOnInsert: {
@@ -18,11 +20,11 @@ module.exports = {
             caption: link.caption,
             domain: link.domain,
             channel: link.channel,
-            team: link.team,
+            teamId: link.teamId,
             author: link.author,
             createdAt: new Date()
           },
-        }, { upsert: true });
+        });
       }
       return bulk.execute();
     }

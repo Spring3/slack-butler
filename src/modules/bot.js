@@ -26,7 +26,7 @@ class Bot {
     this.rtm = new RTMClient(this.token);
     this.webClient = new WebClient(this.token);
     this.scopes = data.scopes || (scope || '').split(',');
-    this.team = data.teamId || team_id;
+    this.team = team_id;
     this.blacklist = new Set();
     this.channels = new Map();
     if (autoScanInterval) {
@@ -170,7 +170,7 @@ class Bot {
 
       console.log('Type:', type);
       console.log('Message:', msg);
-      const channel = this.channels.get(msg.channel || msg.item.channel);
+      const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
       
       /*
       { type: 'reaction_removed',
@@ -303,14 +303,17 @@ class Bot {
             const message = new Message(msg);
             if (message.hasLinks() && !message.isMarked()) {
               const captionedLinks = message.getLinksData();
-              for (const link of captionedLinks) {
-                Links.save(Object.assign(link, {
-                  author: message.author,
-                  channel: channel.name,
-                  team: this.team
-                })).then(() => {
-                  this.react(message, reactionEmoji);
-                }).catch(e => console.error('Error when trying to save a link and react', e));
+              try {
+                await Promise.all(captionedLinks.map((link) => {
+                  const linkData = Object.assign(link, {
+                    author: message.author,
+                    channel: channel.name,
+                    teamId: this.team
+                  });
+                  return Links.save(linkData).then(res => this.react(message, reactionEmoji));
+                }))
+              } catch(e) {
+                console.error('Error when trying to save a link and react', e);
               }
             }
             if (message.isDirect()) {
@@ -320,26 +323,6 @@ class Bot {
               }
             }
           }
-          // if (msg.channel) {
-          //   const channel = this.channels.get(msg.channel);
-          // const message = channel.getMessage(msg);
-          // if (message.isTextMessage() && message.author !== this.id) {
-          //   if (message.hasLink && message.isMarkedAsFavorite()) {
-          //     Links.save(message);
-          //     if (!message.isMarked()) {
-          //       this.react(message);
-          //     }
-          //   } else {
-          //     const command = message.getCommand();
-          //     if (command) {
-          //       const handler = command.getHandler();
-          //       if (handler) {
-          //         handler.handle(message.getDirectMessage(), message.channel.id, { replyOnFinish: true });
-          //       }
-          //     }
-          //   }
-          // }
-          // }
           break;
         case 'reaction_added':
           /*
@@ -364,7 +347,7 @@ class Bot {
               const message = new Message(reactionsDetails.message);
               if (message.hasLinks()) {
                 const db = await mongo.connect();
-                const matchedLinks = await db.collection('Links').find({ href: { $in: message.getLinks() } }).toArray();
+                const matchedLinks = await db.collection('Links').find({ href: { $in: message.getLinks() }, teamId: this.team }).toArray();
                 const highlights = matchedLinks
                   .map(entry => ({
                     _id: entry._id,

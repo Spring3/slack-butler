@@ -9,8 +9,8 @@ module.exports = {
     assert(bot);
     const db = await mongo.connect();
     const [count, countInChannel] = await Promise.all([
-      db.collection('Links').count(),
-      db.collection('Links').find({ 'channel.id': channel }).count()
+      db.collection('Links').find({ team: teamId }).count(),
+      db.collection('Links').find({ 'channel.id': channelId }).count()
     ]);
     bot.rtm.sendMessage(`Total links: ${count}\nFrom this channel: ${countInChannel}`, channelId);
   }

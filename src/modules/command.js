@@ -1,22 +1,18 @@
 const assert = require('assert');
-const ScanCommand = require('../commands/scanCommand');
-const TotalCommand = require('../commands/totalCommand');
-const HelpCommand = require('../commands/helpCommand');
-const BlacklistCommand = require('../commands/blacklistCommand');
-const BanCommand = require('../commands/banCommand');
-const UnBanCommand = require('../commands/unbanCommand');
-const VersionCommand = require('../commands/versionCommand');
-const SearchCommand = require('../commands/searchCommand');
+const scanCommand = require('../commands/scanCommand');
+const totalCommand = require('../commands/totalCommand');
+const helpCommand = require('../commands/helpCommand');
+const versionCommand = require('../commands/versionCommand');
+const printCommand = require('../commands/printCommand');
+const searchCommand = require('../commands/searchCommand');
 
 const botCommands = {
-  scan: ScanCommand,
-  total: TotalCommand,
-  help: HelpCommand,
-  blacklist: BlacklistCommand,
-  ban: BanCommand,
-  unban: UnBanCommand,
-  version: VersionCommand,
-  search: SearchCommand
+  scan: scanCommand,
+  total: totalCommand,
+  help: helpCommand,
+  version: versionCommand,
+  print: printCommand,
+  search: searchCommand
 };
 
 module.exports = {

@@ -12,8 +12,10 @@ module.exports = {
       '[TODO] *link* - print out the link to the website.\n' +
       '*total* - print the amount of links saved.\n' +
       '*scan* - to scan this channel for links and attachments.\n' +
-      '*search* - perform a search and print the requested amount of links\n' +
-      'Example: `print top 10`, `print top 3 favorites`, `print /github.com/ 2`\n' +
+      '*print* - print the requested amount of links.\n' +
+      'Example: `print top 10`, `print first 3`\n' +
+      '*search* - perform a search by a given substring\n' +
+      'Example: `search weather`\n' +
       '*version* - to print the version of the bot\n', channelId);
   }
 }

@@ -2,7 +2,7 @@ const mongodb = require('../modules/mongo.js');
 
 async function save(bot) {
   const db = await mongodb.connect();
-  return db.collection('Bot').update(
+  return db.collection('Bot').updateOne(
     { _id: bot.id },
     {
       $set: {
