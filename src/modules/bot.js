@@ -5,11 +5,13 @@ const {
   reactionEmoji,
   // favoritesReactionEmoji
 } = require('./configuration.js');
+const _ = require('lodash');
 const mongo = require('./mongo');
 const Message = require('./message.js');
 const TeamEntity = require('../entities/team.js');
 const Links = require('../entities/links.js');
 const Highlights = require('../entities/highlights.js');
+const botStorage = require('./botStorage');
 const Channel = require('./channel');
 const Command = require('./command');
 
@@ -27,7 +29,6 @@ class Bot {
     this.webClient = new WebClient(this.token);
     this.scopes = data.scopes || (scope || '').split(',');
     this.team = team_id;
-    this.blacklist = new Set();
     this.channels = new Map();
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
@@ -168,7 +169,9 @@ class Bot {
       console.log('Type:', type);
       console.log('Message:', msg);
       const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
-      /*
+      
+      switch (type) {
+        /*
         { type: 'channel_joined',
         channel:
          { id: 'C8SK1H90B',
@@ -212,18 +215,6 @@ class Bot {
            previous_names: [],
            priority: 0 } }
        */
-      
-      /**
-       { type: 'member_joined_channel',
-        user: 'U8TPTJAET',
-        channel: 'GBTTY9WDB',
-        channel_type: 'G',
-        team: 'T8S5U2UTT',
-        inviter: 'U8S5U2V0R',
-        event_ts: '1532036290.000320',
-        ts: '1532036290.000320' }
-       */
-      
       /*
       { type: 'group_joined',
         channel:
@@ -262,9 +253,19 @@ class Bot {
            purpose: { value: '', creator: '', last_set: 0 },
            priority: 0 } }
        */
-      switch (type) {
-        case 'message':
-          /**
+        case 'channel_joined':
+        case 'group_joined':
+          const teamIds = _.get(msg, 'channel.shared_team_ids', []);
+          for (const teamId of teamIds) {
+            if (botStorage.activeBots.has(teamId)) {
+              const bot = botStorage.activeBots.get(teamId);
+              if (!bot.channels.has(msg.channel.id)) {
+                bot.channels.set(msg.channel.id, new Channel(msg.channel));
+              }
+            }
+          }
+          break;
+        /**
             {
               type: 'message',
               user: 'U8S5U2V0R',
@@ -275,8 +276,8 @@ class Bot {
               event_ts: '1531955105.000250',
               ts: '1531955105.000250'
             }
-          */
-
+        */
+        case 'message':
           /*
             subtype usually means that this is some sort of a reply to an existing message.
             before an event with subtype gets send, a reply itself is sent as a message event without a subtype
@@ -310,8 +311,7 @@ class Bot {
             }
           }
           break;
-        case 'reaction_added':
-          /*
+        /*
           { type: 'reaction_added',
             user: 'U8S5U2V0R',
             item:
@@ -323,6 +323,7 @@ class Bot {
             event_ts: '1532036781.000033',
             ts: '1532036781.000033' }
          */
+        case 'reaction_added':
           if (msg.user !== this.id && msg.reaction === reactionEmoji) {
             const reactionsDetails = await this.webClient.reactions.get({
               channel: msg.item.channel,
@@ -404,36 +405,6 @@ class Bot {
         );
       }
     });
-
-    // this.rtm.on('member_joined_channel', async (data) => {
-    //   const memberId = data.user;
-    //   const channelId = data.channel;
-    //   if (this.channels.has(channelId)) {
-    //     // somebody joined a channel
-    //     const channel = this.channels.get(channelId);
-    //     channel.memberJoined(memberId);
-    //     this.rtm.sendMessage(`Welcome to the \`${channel.name}\` channel, <@${memberId}>!`, channelId);
-    //   } else {
-    //     // bot joined a channel
-    //     let channelData = await this.web.bot.channels.info(channelId);
-    //     channelData = typeof channelData === 'string' ? JSON.parse(channelData) : channelData;
-    //     this.channels.set(channelId, new Channel(channelData.channel, this.team));
-    //   }
-    // });
-
-    // this.rtm.on('member_left_channel', (data) => {
-    //   const memberId = data.user;
-    //   const channelId = data.channel;
-    //   if (this.channels.has(channelId)) {
-    //     if (memberId === this.id) {
-    //       // bot left a channel
-    //       this.channels.delete(channelId);
-    //     } else {
-    //       // somebody left a channel
-    //       this.channels.get(channelId).memberLeft(memberId);
-    //     }
-    //   }
-    // });
   }
 }
 
