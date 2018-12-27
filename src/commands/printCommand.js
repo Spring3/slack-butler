@@ -4,12 +4,13 @@ const mongo = require('../modules/mongo');
 
 async function getData(teamId, amount, isLatest) {
   const db = await mongo.connect();
-  const results = await db.collection('Links')
+  const hrefs = await db.collection('Links')
     .find({ teamId })
+    .project({ href: 1, _id: 0 })
     .sort({ createdAt: isLatest ? -1 : 1 })
     .limit(amount)
     .toArray();
-  return results.reduce((acc, current, i) => `${acc}${i+1}. ${current.href}\n`, '');
+  return hrefs.reduce((acc, curr, i) => `${acc}${i+1}. ${curr.href}\n`, '');
 }
 
 const oldestIndicatorsRegExp = /oldest|first/;
@@ -28,4 +29,4 @@ module.exports = {
       return getData(teamId, amount, true).then(results => bot.rtm.sendMessage(results || 'Not found', channelId));
     }
   }
-}
+};

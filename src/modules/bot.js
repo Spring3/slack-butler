@@ -88,14 +88,11 @@ class Bot {
    */
   async react(message, emoji = reactionEmoji.toLowerCase()) {
     try {
-      const res = await this.webClient.reactions.add({
+      await this.webClient.reactions.add({
         name: emoji,
         channel: message.channelId,
         timestamp: message.timestamp
       });
-      if (!res.ok) {
-        console.log('Reaction:', res);
-      }
       message.mark();
     } catch (e) {
       console.error(e);
@@ -171,20 +168,6 @@ class Bot {
       console.log('Type:', type);
       console.log('Message:', msg);
       const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
-      
-      /*
-      { type: 'reaction_removed',
-        user: 'U8S5U2V0R',
-        item:
-         { type: 'message',
-           channel: 'C8SK1H90B',
-           ts: '1532036693.000077' },
-        reaction: 'rolling_on_the_floor_laughing',
-        item_user: 'U8S5U2V0R',
-        event_ts: '1532036810.000182',
-        ts: '1532036810.000182' }
-       */
-
       /*
         { type: 'channel_joined',
         channel:
@@ -307,7 +290,10 @@ class Bot {
                 await Promise.all(captionedLinks.map((link) => {
                   const linkData = Object.assign(link, {
                     author: message.author,
-                    channel: channel.name,
+                    channel: {
+                      id: channel.id,
+                      name: channel.name
+                    },
                     teamId: this.team
                   });
                   return Links.save(linkData).then(res => this.react(message, reactionEmoji));
@@ -345,16 +331,54 @@ class Bot {
             });
             if (reactionsDetails.ok) {
               const message = new Message(reactionsDetails.message);
-              if (message.hasLinks()) {
+              if (message.hasLinks() && message.author !== this.id) {
                 const db = await mongo.connect();
-                const matchedLinks = await db.collection('Links').find({ href: { $in: message.getLinks() }, teamId: this.team }).toArray();
+                const matchedLinks = await db.collection('Links')
+                  .find({ href: { $in: message.getLinks() }, teamId: this.team })
+                  .project({ _id: 1 })
+                  .toArray();
                 const highlights = matchedLinks
                   .map(entry => ({
                     _id: entry._id,
                     user: msg.user,
                     createdAt: new Date()
                   }));
-                Highlights.saveAll(highlights);
+                await Highlights.save(highlights);
+              }
+            }
+          }
+          break;
+        /*
+        { type: 'reaction_removed',
+          user: 'U8S5U2V0R',
+          item:
+          { type: 'message',
+            channel: 'C8SK1H90B',
+            ts: '1532036693.000077' },
+          reaction: 'rolling_on_the_floor_laughing',
+          item_user: 'U8S5U2V0R',
+          event_ts: '1532036810.000182',
+          ts: '1532036810.000182' }
+       */
+        case 'reaction_removed':
+          if (msg.user !== this.id && msg.reaction === reactionEmoji) {
+            const reactionsDetails = await this.webClient.reactions.get({
+              channel: msg.item.channel,
+              full: true,
+              timestamp: msg.item.ts
+            });
+            if (reactionsDetails.ok) {
+              const message = new Message(reactionsDetails.message);
+              if (message.hasLinks() && message.author !== this.id) {
+                const db = await mongo.connect();
+                const matchedLinks = await db.collection('Links')
+                  .find({ href: { $in: message.getLinks() }, teamId: this.team })
+                  .project({ _id: 1 })
+                  .toArray();
+                console.log(matchedLinks);
+                if (matchedLinks.length) {
+                  await Highlights.remove(matchedLinks.map(entry => entry._id));
+                }
               }
             }
           }
@@ -384,23 +408,22 @@ class Bot {
     //   }
     // });
 
-    // this.rtm.on('channels_rename', async (msg) => {
-    //   const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
-    //   const channelId = jsonMessage.channel.id;
-    //   if (this.channels.has(channelId)) {
-    //     this.channels.get(channelId).name = jsonMessage.channel.name;
-    //     const db = await mongo.connect();
-    //     await db.collection('Links').update(
-    //       { 'channel.id': channelId },
-    //       {
-    //         $set: {
-    //           'channel.name': jsonMessage.channel.name
-    //         }
-    //       },
-    //       { multi: true }
-    //     );
-    //   }
-    // });
+    this.rtm.on('channel_rename', async (msg) => {
+      console.log(msg);
+      const { id, name } = msg.channel;
+      if (this.channels.has(channelId)) {
+        this.channels.get(channelId).name = name;
+        const db = await mongo.connect();
+        await db.collection('Links').updateMany(
+          { 'channel.id': id },
+          {
+            $set: {
+              'channel.name': name
+            }
+          }
+        );
+      }
+    });
 
     // this.rtm.on('member_joined_channel', async (data) => {
     //   const memberId = data.user;

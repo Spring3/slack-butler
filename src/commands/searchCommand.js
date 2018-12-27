@@ -23,10 +23,11 @@ async function handle(message) {
   if (isValidRegex(messageParts[1])) {
     const regexp = new RegExp(messageParts[1], 'gi');
     const db = await mongo.connect();
-    const results = await db.collection('Links')
-      .find({ href: regexp, teamId }, { href: 1 })
+    const hrefs = await db.collection('Links')
+      .find({ href: regexp, teamId })
+      .project({ href: 1, _id: 0 })
       .toArray();
-    const resultString = results.reduce((sum, cur, i) => `${sum}${i + 1}. ${cur.href}\n`, '');
+    const resultString = hrefs.reduce((sum, curr, i) => `${sum}${i + 1}. ${curr.href}\n`, '');
     bot.rtm.sendMessage(`${resultString || 'Not found'}`, channelId);
     return;
   } else {
