@@ -375,7 +375,6 @@ class Bot {
                   .find({ href: { $in: message.getLinks() }, teamId: this.team })
                   .project({ _id: 1 })
                   .toArray();
-                console.log(matchedLinks);
                 if (matchedLinks.length) {
                   await Highlights.remove(matchedLinks.map(entry => entry._id));
                 }
@@ -389,30 +388,11 @@ class Bot {
       }
     });
 
-    // this.rtm.on('reaction_added', async (msg) => {
-    //   const jsonMessage = typeof msg === 'string' ? JSON.parse(msg) : msg;
-    //   if (!scanTriggerEmoji) return;
-    //   const payload = jsonMessage.item;
-    //   if (
-    //     jsonMessage.reaction === scanTriggerEmoji.toLowerCase()
-    //     && jsonMessage.user !== this.id
-    //     && payload.type === 'message'
-    //   ) {
-    //     const channel = this.channels.get(payload.channel) || new Channel({ id: payload.channel, name: 'DM' }, this.team);
-    //     const message = await channel.fetchMessage(payload.ts);
-    //     if (message.isTextMessage() && message.hasLink) {
-    //       Links.save(message)
-    //         .then(() => Highlights.save(message, jsonMessage.user))
-    //         .then(() => this.react(message, favoritesReactionEmoji.toLowerCase()));
-    //     }
-    //   }
-    // });
-
     this.rtm.on('channel_rename', async (msg) => {
-      console.log(msg);
+      console.log('Event', msg);
       const { id, name } = msg.channel;
-      if (this.channels.has(channelId)) {
-        this.channels.get(channelId).name = name;
+      if (this.channels.has(id)) {
+        this.channels.get(id).name = name;
         const db = await mongo.connect();
         await db.collection('Links').updateMany(
           { 'channel.id': id },
