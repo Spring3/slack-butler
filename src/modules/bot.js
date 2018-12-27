@@ -255,14 +255,27 @@ class Bot {
        */
         case 'channel_joined':
         case 'group_joined':
-          const teamIds = _.get(msg, 'channel.shared_team_ids', []);
-          for (const teamId of teamIds) {
-            if (botStorage.activeBots.has(teamId)) {
-              const bot = botStorage.activeBots.get(teamId);
-              if (!bot.channels.has(msg.channel.id)) {
-                bot.channels.set(msg.channel.id, new Channel(msg.channel));
-              }
-            }
+          if (!this.channels.has(msg.channel.id)) {
+            this.channels.set(msg.channel.id, new Channel(msg.channel));
+          }
+          break;
+        /**
+         * { type: 'channel_left',
+            channel: 'CF22KMXKK',
+            actor_id: 'U8S5U2V0R',
+            event_ts: '1545942621.000700' }
+        */
+
+        /**
+         * { type: 'group_left',
+            channel: 'CF22KMXKK',
+            actor_id: 'U8S5U2V0R',
+            event_ts: '1545942621.000700' }
+        */
+        case 'channel_left':
+        case 'group_left':
+          if (this.channels.has(msg.channel)) {
+            this.channels.delete(msg.channel);
           }
           break;
         /**
