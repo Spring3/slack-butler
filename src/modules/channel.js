@@ -1,4 +1,5 @@
 const Message = require('./message.js');
+const botStorage = require('./botStorage.js');
 
 /**
  *  Slack channel response
@@ -45,19 +46,27 @@ class Channel {
    * if not provided, then only the messages with links will be returned
    * @return {Promise([ChatMessage])}
    */
-  async fetchMessages(filter = {}) {
+  async fetchMessages(bot) {
     let messages = [];
     let response;
     let next;
+    
     do {
-      const options = next ? { cursor: next, inclusive: true } : { inclusive: true };
-      response = await this.team.web.user.conversations.history(this.id, options); // eslint-disable-line no-await-in-loop
-      response = typeof response === 'string' ? JSON.parse(response) : response;
-      const chatMessages = response.messages.map(message => new ChatMessage(message, this));
+      const options = next
+      ? {
+        cursor: next,
+        channel: this.id,
+        inclusive: true
+      }
+      : {
+        channel: this.id,
+        inclusive: true
+      };
+      response = await bot.userWebClient.conversations.history(options); // eslint-disable-line no-await-in-loop
+      const chatMessages = response.messages.map(message => new Message({ team: bot.teamId, channel: this.id, ...message }));
       next = response.response_metadata && response.response_metadata.next_cursor;
-      messages = messages.concat(filter.all ? chatMessages :
-        chatMessages.filter(chatMessage =>
-          chatMessage.isTextMessage() && chatMessage.author !== this.team.bot.id && chatMessage.containsLink()));
+      messages = messages.concat(chatMessages.filter(chatMessage =>
+        chatMessage.author !== bot.id && chatMessage.hasLinks() && !chatMessage.isMarked()));
     } while (response.has_more);
     return messages;
   }
@@ -67,19 +76,14 @@ class Channel {
    * @param  {Number} timestamp - the moment when a message was posted
    * @return {Promise(ChatMessage)}           [description]
    */
-  async fetchMessage(timestamp) {
-    let response = await this.team.web.user.conversations.history(this.id, { latest: timestamp, limit: 1, inclusive: true });
-    response = typeof response === 'string' ? JSON.parse(response) : response;
-    return this.getMessage(response.messages[0]);
-  }
-
-  /**
-   * Convert the json to the ChatMessage and bind it to current channel
-   * @param  {object|string} message - payload of the message
-   * @return {undefined|ChatMessage} - undefined if message param was not proivded
-   */
-  getMessage(message) {
-    return new Message(message, this);
+  async fetchMessage(bot, timestamp) {
+    const response = await bot.userWebClient.conversations.history({
+      channel: this.id,
+      latest: timestamp,
+      limit: 1,
+      inclusive: true
+    });
+    return new Message({ team: bot.teamId, channel: this.id, ...response.messages[0] });
   }
 }
 

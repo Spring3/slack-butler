@@ -14,7 +14,7 @@ async function handle({ channelId, teamId }, options = {}) {
   // getting only messages with links from the channel
   let chatMessagesWithLinks;
   try {
-    chatMessagesWithLinks = await slackChannel.fetchMessages();
+    chatMessagesWithLinks = await slackChannel.fetchMessages(bot);
   } catch (e) {
     console.error(e);
     return bot.rtm.sendMessage('I am unable to scan this channel.', channelId);
@@ -41,7 +41,7 @@ async function handle({ channelId, teamId }, options = {}) {
         }
       }
     }
-    batch.execute();
+    await batch.execute();
     const endTime = process.hrtime(startTime);
     if (options.replyOnFinish) {
       bot.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channelId);

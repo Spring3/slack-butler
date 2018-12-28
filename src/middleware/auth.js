@@ -11,6 +11,7 @@ function generateState(req, res, next) {
   // kind of for security check that it was authorized via our server
   setTimeout(() => { delete cache[state]; }, TEN_MINUTES_MS);
   req.state = state;
+  req.client_id = process.env.CLIENT_ID;
   return next();
 }
 

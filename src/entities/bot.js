@@ -3,17 +3,19 @@ const mongodb = require('../modules/mongo.js');
 async function save(bot) {
   const db = await mongodb.connect();
   return db.collection('Bot').updateOne(
-    { _id: bot.id },
+    {
+      slackId: bot.id
+    },
     {
       $set: {
+        userToken: bot.userToken,
+        teamId: bot.teamId,
         scopes: bot.scopes,
+        token: bot.token,
         updatedAt: new Date()
       },
       $setOnInsert: {
-        _id: bot.id,
-        team_id: bot.team,
-        enabled: true,
-        token: bot.token,
+        slackId: bot.id,
         createdAt: new Date()
       }
     },

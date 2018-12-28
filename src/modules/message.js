@@ -1,4 +1,4 @@
-const { reactionEmoji } = require('./configuration.js');
+const { botReactionEmoji } = require('./configuration.js');
 const botStorage = require('./botStorage.js');
 const urlUtils = require('../utils/url.js');
 
@@ -43,7 +43,7 @@ class Message {
    */
   isMarked() {
     const found = Array.from(this.reactions.values()).find(reaction =>
-      reaction.name === reactionEmoji.toLowerCase() && reaction.users.includes(this.botId));
+      reaction.name === botReactionEmoji.toLowerCase() && reaction.users.includes(this.botId));
     return found !== undefined;
   }
 
@@ -52,7 +52,7 @@ class Message {
    * @return {undefined}
    */
   mark() {
-    const lowReactionEmoji = reactionEmoji.toLowerCase();
+    const lowReactionEmoji = botReactionEmoji.toLowerCase();
     const existingReaction = Array.from(this.reactions.values()).find(reaction => reaction.name === lowReactionEmoji);
     if (!existingReaction) {
       this.reactions.add({

@@ -1,9 +1,8 @@
 const { WebClient, RTMClient } = require('@slack/client');
 const {
   autoScanInterval,
-  // scanTriggerEmoji,
-  reactionEmoji,
-  // favoritesReactionEmoji
+  botReactionEmoji,
+  favoritesTriggerEmoji
 } = require('./configuration.js');
 const _ = require('lodash');
 const mongo = require('./mongo');
@@ -11,7 +10,6 @@ const Message = require('./message.js');
 const TeamEntity = require('../entities/team.js');
 const Links = require('../entities/links.js');
 const Highlights = require('../entities/highlights.js');
-const botStorage = require('./botStorage');
 const Channel = require('./channel');
 const Command = require('./command');
 
@@ -22,13 +20,15 @@ const ignoredEventTypes = ['desktop_notification', 'hello', 'ping', 'pong', unde
  */
 class Bot {
   constructor(data) {
-    const { bot = {}, scope, team_id } = data;
+    const { bot = {}, scope, team_id, access_token } = data;
+    this.userToken = data.userToken || access_token;
     this.token = data.token || bot.bot_access_token;
-    this.id = data._id || bot.bot_user_id;
+    this.id = data.slackId || bot.bot_user_id;
     this.rtm = new RTMClient(this.token);
     this.webClient = new WebClient(this.token);
+    this.userWebClient = new WebClient(this.userToken);
     this.scopes = data.scopes || (scope || '').split(',');
-    this.team = team_id;
+    this.teamId = data.teamId || team_id;
     this.channels = new Map();
     if (autoScanInterval) {
       this.scanningInterval = this.beginScanningInterval();
@@ -87,8 +87,10 @@ class Bot {
    * @param  {string} emoji   - code for the emoji without colon sign (:)
    * @return {Promise}
    */
-  async react(message, emoji = reactionEmoji.toLowerCase()) {
+  async react(message, emoji = botReactionEmoji.toLowerCase()) {
     try {
+      console.log(emoji);
+      console.log(message);
       await this.webClient.reactions.add({
         name: emoji,
         channel: message.channelId,
@@ -96,6 +98,7 @@ class Bot {
       });
       message.mark();
     } catch (e) {
+      console.log("React error");
       console.error(e);
     }
   }
@@ -107,10 +110,11 @@ class Bot {
   beginScanningInterval() {
     return setInterval(() => {
       const command = `<@${this.id}> scan`;
-      for (const [id, channel] of this.channels.entries()) { // eslint-disable-line no-unused-vars
-        const chatMessage = channel.getMessage({
+      for (const channel of this.channels.values()) { // eslint-disable-line no-unused-vars
+        const chatMessage = new Message({
           type: 'message',
-          text: command
+          text: command,
+          channel: channel.id
         });
         const botCommand = Command.from(chatMessage);
         if (botCommand) {
@@ -308,9 +312,9 @@ class Bot {
                       id: channel.id,
                       name: channel.name
                     },
-                    teamId: this.team
+                    teamId: this.teamId
                   });
-                  return Links.save(linkData).then(res => this.react(message, reactionEmoji));
+                  return Links.save(linkData).then(res => this.react(message, botReactionEmoji));
                 }))
               } catch(e) {
                 console.error('Error when trying to save a link and react', e);
@@ -337,7 +341,7 @@ class Bot {
             ts: '1532036781.000033' }
          */
         case 'reaction_added':
-          if (msg.user !== this.id && msg.reaction === reactionEmoji) {
+          if (msg.user !== this.id && msg.reaction === favoritesTriggerEmoji) {
             const reactionsDetails = await this.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,
@@ -348,7 +352,7 @@ class Bot {
               if (message.hasLinks() && message.author !== this.id) {
                 const db = await mongo.connect();
                 const matchedLinks = await db.collection('Links')
-                  .find({ href: { $in: message.getLinks() }, teamId: this.team })
+                  .find({ href: { $in: message.getLinks() }, teamId: this.teamId })
                   .project({ _id: 1 })
                   .toArray();
                 const highlights = matchedLinks
@@ -375,7 +379,7 @@ class Bot {
           ts: '1532036810.000182' }
        */
         case 'reaction_removed':
-          if (msg.user !== this.id && msg.reaction === reactionEmoji) {
+          if (msg.user !== this.id && msg.reaction === botReactionEmoji) {
             const reactionsDetails = await this.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,
@@ -386,7 +390,7 @@ class Bot {
               if (message.hasLinks() && message.author !== this.id) {
                 const db = await mongo.connect();
                 const matchedLinks = await db.collection('Links')
-                  .find({ href: { $in: message.getLinks() }, teamId: this.team })
+                  .find({ href: { $in: message.getLinks() }, teamId: this.teamId })
                   .project({ _id: 1 })
                   .toArray();
                 if (matchedLinks.length) {
@@ -403,7 +407,6 @@ class Bot {
     });
 
     this.rtm.on('channel_rename', async (msg) => {
-      console.log('Event', msg);
       const { id, name } = msg.channel;
       if (this.channels.has(id)) {
         this.channels.get(id).name = name;

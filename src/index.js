@@ -37,14 +37,15 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
   if (!req.auth) return next();
   validation.auth.validate(req.auth);
   const { team_id } = req.auth; // eslint-disable-line
-  if (!botStorage.activeBots.has(team_id)) {
-    const bot = new Bot(botData);
-    const { team_id } = botData;
-    assert(team_id, 'botData must have team_id');
-    botStorage.activeBots.set(team_id, bot);
-    bot.start();
-    BotEntity.save(bot);
+  if (botStorage.activeBots.has(team_id)) {
+    botStorage.activeBots.get(team_id).shutdown();
+    botStorage.activeBots.delete(team_id);
   }
+  const bot = new Bot(req.auth);
+  assert(team_id, 'botData must have team_id');
+  botStorage.activeBots.set(team_id, bot);
+  bot.start();
+  await BotEntity.save(bot);
   return res.redirect('/');
 });
 
@@ -54,9 +55,9 @@ async function startExistingBots(db) {
   const existingBots = await db.collection('Bot').find({}).toArray();
   for (const botData of existingBots) {
     const bot = new Bot(botData);
-    const { team_id } = botData;
-    assert(team_id, 'botData must have team_id');
-    botStorage.activeBots.set(team_id, bot);
+    const { teamId } = botData;
+    assert(teamId, 'botData must have teamId');
+    botStorage.activeBots.set(teamId, bot);
     bot.start();
   }
 };
