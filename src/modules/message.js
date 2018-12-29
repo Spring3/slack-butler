@@ -2,7 +2,7 @@ const { botReactionEmoji } = require('./configuration.js');
 const botStorage = require('./botStorage.js');
 const urlUtils = require('../utils/url.js');
 
-const urlRegex = /(https?|ftp):\/\/.*/g;
+const urlRegexp = /(https?|ftp):\/\/.*/;
 
 /**
  * Representation of a slack message
@@ -44,7 +44,7 @@ class Message {
   isMarked() {
     const found = Array.from(this.reactions.values()).find(reaction =>
       reaction.name === botReactionEmoji.toLowerCase() && reaction.users.includes(this.botId));
-    return found !== undefined;
+    return !!found;
   }
 
   /**
@@ -57,7 +57,7 @@ class Message {
     if (!existingReaction) {
       this.reactions.add({
         name: lowReactionEmoji,
-        users: [this.botId],
+        users: [this.botId]
       });
     } else if (!existingReaction.users.includes(this.botId)) {
       existingReaction.users.push(this.botId);
@@ -69,7 +69,7 @@ class Message {
    * @return {Boolean}
    */
   hasLinks() {
-    return urlRegex.test(this.text);
+    return urlRegexp.test(this.text);
   }
 
   /**
@@ -77,7 +77,9 @@ class Message {
    * @return {[string]}
    */
   getLinks() {
-    const matches = this.text.match(urlRegex);
+    const regexp = new RegExp(urlRegexp, 'g');
+    const matches = this.text.match(regexp);
+    regexp.lastIndex = 0;
     if (matches === null) {
       return [];
     }

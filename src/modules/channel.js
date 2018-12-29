@@ -1,5 +1,4 @@
 const Message = require('./message.js');
-const botStorage = require('./botStorage.js');
 
 /**
  *  Slack channel response
@@ -63,10 +62,10 @@ class Channel {
         inclusive: true
       };
       response = await bot.userWebClient.conversations.history(options); // eslint-disable-line no-await-in-loop
-      const chatMessages = response.messages.map(message => new Message({ team: bot.teamId, channel: this.id, ...message }));
+      let chatMessages = response.messages.map(message => new Message({ team: bot.teamId, channel: this.id, ...message }));
       next = response.response_metadata && response.response_metadata.next_cursor;
-      messages = messages.concat(chatMessages.filter(chatMessage =>
-        chatMessage.author !== bot.id && chatMessage.hasLinks() && !chatMessage.isMarked()));
+      chatMessages = chatMessages.filter(chatMessage =>  (chatMessage.author !== bot.id && chatMessage.hasLinks() && !chatMessage.isMarked()));
+      messages = [...messages, ...chatMessages];
     } while (response.has_more);
     return messages;
   }

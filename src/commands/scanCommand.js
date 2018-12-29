@@ -23,7 +23,8 @@ async function handle({ channelId, teamId }, options = {}) {
   if (chatMessagesWithLinks.length) {
     const batch = db.collection('Links').initializeOrderedBulkOp();
     for (const chatMessage of chatMessagesWithLinks) {
-      for (const link of chatMessage.getLinks()) {
+      const linksData = chatMessage.getLinksData();
+      for (const link of linksData) {
         batch.find({ href: link.href, 'channel.id': channelId }).upsert().updateOne({
           $setOnInsert: {
             href: link.href,
@@ -42,10 +43,10 @@ async function handle({ channelId, teamId }, options = {}) {
       }
     }
     await batch.execute();
-    const endTime = process.hrtime(startTime);
-    if (options.replyOnFinish) {
-      bot.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channelId);
-    }
+  }
+  const endTime = process.hrtime(startTime);
+  if (options.replyOnFinish) {
+    bot.rtm.sendMessage(`Scanning complete in ${endTime[0]}s`, channelId);
   }
   return undefined;
 }

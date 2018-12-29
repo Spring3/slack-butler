@@ -88,18 +88,17 @@ class Bot {
    * @return {Promise}
    */
   async react(message, emoji = botReactionEmoji.toLowerCase()) {
-    try {
-      console.log(emoji);
-      console.log(message);
-      await this.webClient.reactions.add({
-        name: emoji,
-        channel: message.channelId,
-        timestamp: message.timestamp
-      });
-      message.mark();
-    } catch (e) {
-      console.log("React error");
-      console.error(e);
+    if (!message.isMarked()) {
+      try {
+        message.mark();
+        await this.webClient.reactions.add({
+          name: emoji,
+          channel: message.channelId,
+          timestamp: message.timestamp
+        });
+      } catch (e) {
+        console.error(e);
+      }
     }
   }
 
@@ -171,7 +170,6 @@ class Bot {
       }
 
       console.log('Type:', type);
-      console.log('Message:', msg);
       const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
       
       switch (type) {
