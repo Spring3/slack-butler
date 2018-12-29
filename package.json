@@ -1,6 +1,6 @@
 {
   "name": "starbot",
-  "version": "2.0.0-alpha",
+  "version": "2.0.0-alpha-2",
   "description": "Channel bot for slack. Collects links and attachments from the channel and provides a user-friendly api to use them later",
   "main": "src/index.js",
   "scripts": {
