@@ -5,19 +5,14 @@ const url = require('url');
  * @param  {Array|string} links - array of links or a single link
  * @return {[object]]}
  */
-function getTitles(links) {
-  const data = [null, undefined].includes(links) ? [] : links;
-  const refs = Array.isArray(data) ? data : [data];
+function getCaption(links) {
   const payload = [];
   // setting up link title
-  for (const link of refs) {
-    const { pathname } = url.parse(link);
-    let linkParts;
-    if (pathname.charAt(pathname.length - 1) === '/') {
-      linkParts = pathname.substring(0, pathname.length - 1).split('/');
-    } else {
-      linkParts = pathname.split('/');
-    }
+  for (const link of links) {
+    const { pathname, hostname } = url.parse(link);
+    const linkParts = pathname.charAt(pathname.length - 1) === '/'
+      ? pathname.slice(0, -1).split('/')
+      : pathname.split('/');
     let linkTitle = linkParts[linkParts.length - 1].replace(/-/g, ' ');
     // if name was not set or it is a number
     if (!linkTitle || /^\d+$/.test(linkTitle)) {
@@ -25,7 +20,8 @@ function getTitles(links) {
       linkTitle = linkParts[0]; // eslint-disable-line
     }
     payload.push({
-      caption: linkTitle.replace(linkTitle.charAt(0), linkTitle.charAt(0).toUpperCase()),
+      caption: `${linkTitle.charAt(0).toUpperCase()}${linkTitle.slice(1)}`,
+      domain: hostname,
       href: link,
     });
   }
@@ -33,5 +29,5 @@ function getTitles(links) {
 }
 
 module.exports = {
-  getTitles
+  getCaption
 };
