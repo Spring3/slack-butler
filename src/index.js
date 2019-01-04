@@ -1,15 +1,20 @@
 require('dotenv').load({ silent: true });
 const assert = require('assert');
 const app = require('express')();
+const React = require('react');
+const { renderToString } = require('react-dom/server');
+
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
 const BotEntity = require('./entities/bot.js');
 const Bot = require('./modules/bot.js');
 
+import RootPage from './web/views/RootPage.jsx';
+const template = require('./web/template.js');
+
 const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
-const rootHandler = require('./routes/root.js');
 const { generateState, authorize } = require('./middleware/auth.js');
 const errorHandler = require('./middleware/error-handler.js');
 const mongo = require('./modules/mongo');
@@ -21,7 +26,24 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.get('/', generateState, rootHandler);
+app.get('/', (req, res) => {
+  const state = generateState();
+  const initialState = {
+    state,
+    clientId: process.env.CLIENT_ID
+  };
+  console.log(initialState);
+  const appString = renderToString(<RootPage {...initialState} />);
+  console.log(appString);
+  const response = template({
+    body: appString,
+    title: 'Starbot Dashboard',
+    initialState: JSON.stringify(initialState)
+  });
+  console.log('response', response);
+  res.send(response);
+});
+
 /**
   { ok: true,
   access_token: 'xoxp-',

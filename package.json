@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "make test",
-    "start": "node src/index.js",
+    "build": "webpack",
+    "start": "node dist/server.js",
     "dev": "make run"
   },
   "repository": {
@@ -33,14 +34,25 @@
     "joi": "^14.3.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.10",
+    "prop-types": "^15.6.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-async-to-promises": "^1.0.5",
     "eslint": "^5.10.0",
     "mocha": "^4.1.0",
     "nyc": "^13.1.0",
     "rewire": "^3.0.2",
-    "sinon": "^4.1.3"
+    "sinon": "^4.1.3",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0",
+    "webpack-node-externals": "^1.7.2"
   }
 }

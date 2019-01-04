@@ -1,0 +1,18 @@
+{
+  "presets": [
+    "@babel/react",
+    [
+      "@babel/env", {
+        "targets": {
+          "node": "10.7",
+          "browsers": "> 1%, not dead"
+        },
+        "exclude": ["transform-regenerator", "transform-async-to-generator"],
+        "debug": true
+      }
+    ]
+  ],
+  "plugins": [
+    "async-to-promises"
+  ]
+}
