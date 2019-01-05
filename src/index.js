@@ -1,6 +1,7 @@
 require('dotenv').load({ silent: true });
 const assert = require('assert');
-const app = require('express')();
+const express = require('express');
+const path = require('path');
 const React = require('react');
 const { renderToString } = require('react-dom/server');
 
@@ -22,9 +23,13 @@ const mongo = require('./modules/mongo');
 assert(process.env.CLIENT_ID, 'CLIENT_ID is undefined');
 assert(process.env.CLIENT_SECRET, 'CLIENT_SECRET is undefined');
 
+const app = express();
+
 app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use('/assets', express.static(path.join(__dirname, '../dist/assets/')));
 
 app.get('/', (req, res) => {
   const state = generateState();
@@ -32,15 +37,12 @@ app.get('/', (req, res) => {
     state,
     clientId: process.env.CLIENT_ID
   };
-  console.log(initialState);
   const appString = renderToString(<RootPage {...initialState} />);
-  console.log(appString);
   const response = template({
     body: appString,
     title: 'Starbot Dashboard',
     initialState: JSON.stringify(initialState)
   });
-  console.log('response', response);
   res.send(response);
 });
 
