@@ -5,8 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "make test",
-    "build": "webpack",
-    "start": "node dist/server.js",
+    "build": "webpack --progress",
+    "start": "node src/index.js",
     "dev": "make run"
   },
   "repository": {
@@ -42,8 +42,11 @@
   },
   "devDependencies": {
     "@babel/core": "^7.2.2",
+    "@babel/plugin-transform-modules-commonjs": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
     "@babel/preset-env": "^7.2.3",
     "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
     "babel-loader": "^8.0.4",
     "babel-plugin-async-to-promises": "^1.0.5",
     "eslint": "^5.10.0",

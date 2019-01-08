@@ -1,8 +1,8 @@
-import { render } from 'react-dom';
+import { hydrate } from 'react-dom';
 import React from 'react';
 import RootPage from './views/RootPage.jsx';
 
-render(
+hydrate(
   <RootPage {...window.__APP_INITIAL_STATE__} />,
   document.getElementById('root')
 );

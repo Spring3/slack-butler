@@ -25,7 +25,6 @@ class Bot {
     this.token = data.token || bot.bot_access_token;
     this.id = data.slackId || bot.bot_user_id;
     this.rtm = new RTMClient(this.token);
-    this.webClient = new WebClient(this.token);
     this.userWebClient = new WebClient(this.userToken);
     this.scopes = data.scopes || (scope || '').split(',');
     this.teamId = data.teamId || team_id;
@@ -67,9 +66,10 @@ class Bot {
   async getChannels() {
     const requestBody = { types: 'public_channel,private_channel,mpim,im', user: this.id };
     let cursor;
+
     do {
       const nextRequsetBody = cursor ? Object.assign({ cursor }, requestBody) : requestBody;
-      const response = await this.webClient.users.conversations(nextRequsetBody); // eslint-disable-line
+      const response = await this.rtm.webClient.users.conversations(nextRequsetBody); // eslint-disable-line
       if (response.ok) {
         cursor = response.response_metadata.next_cursor;
         for (const channelData of response.channels) {
@@ -91,7 +91,7 @@ class Bot {
     if (!message.isMarked()) {
       try {
         message.mark();
-        await this.webClient.reactions.add({
+        await this.rtm.webClient.reactions.add({
           name: emoji,
           channel: message.channelId,
           timestamp: message.timestamp
@@ -340,7 +340,7 @@ class Bot {
          */
         case 'reaction_added':
           if (msg.user !== this.id && msg.reaction === favoritesTriggerEmoji) {
-            const reactionsDetails = await this.webClient.reactions.get({
+            const reactionsDetails = await this.rtm.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,
               timestamp: msg.item.ts
@@ -378,7 +378,7 @@ class Bot {
        */
         case 'reaction_removed':
           if (msg.user !== this.id && msg.reaction === botReactionEmoji) {
-            const reactionsDetails = await this.webClient.reactions.get({
+            const reactionsDetails = await this.rtm.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,
               timestamp: msg.item.ts
