@@ -35,7 +35,8 @@ app.get('/', (req, res) => {
   const state = generateState();
   const initialState = {
     state,
-    clientId: process.env.CLIENT_ID
+    clientId: process.env.CLIENT_ID,
+    NODE_ENV: process.env.NODE_ENV
   };
   const appString = renderToString(<RootPage {...initialState} />);
   const response = template({
@@ -89,7 +90,7 @@ async function startExistingBots(db) {
 app.listen(process.env.PORT || 3000, async () => {
   console.log(`Server is up on port ${process.env.PORT || 3000}`);
   try {
-    await mongo.connect().then(startExistingBots);
+    await mongo.connect(); // .then(startExistingBots);
     console.log('Connected to the database');
   } catch (e) {
     console.error('Failed to connect to the database', e);

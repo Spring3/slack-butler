@@ -1,8 +1,12 @@
-import { hydrate } from 'react-dom';
+import { render, hydrate } from 'react-dom';
 import React from 'react';
 import RootPage from './views/RootPage.jsx';
 
-hydrate(
+const { NODE_ENV } = window.__APP_INITIAL_STATE__;
+
+const mountFn = NODE_ENV === 'production' ? hydrate : render;
+
+mountFn(
   <RootPage {...window.__APP_INITIAL_STATE__} />,
   document.getElementById('root')
 );

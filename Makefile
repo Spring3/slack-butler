@@ -10,4 +10,4 @@ cover:
 	make lint
 	./node_modules/.bin/nyc cover --timeout=3000
 run:
-	node server.js
+	npm start

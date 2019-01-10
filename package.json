@@ -6,8 +6,8 @@
   "scripts": {
     "test": "make test",
     "build": "webpack --progress",
-    "start": "node src/index.js",
-    "dev": "make run"
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=development nodemon src/index.js"
   },
   "repository": {
     "type": "git",
