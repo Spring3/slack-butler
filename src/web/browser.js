@@ -10,3 +10,7 @@ mountFn(
   <RootPage {...window.__APP_INITIAL_STATE__} />,
   document.getElementById('root')
 );
+
+if (NODE_ENV === 'development' && module.hot) {
+  module.hot.accept();
+}

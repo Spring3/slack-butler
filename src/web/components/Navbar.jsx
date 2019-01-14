@@ -17,7 +17,8 @@ const ListItem = styled.li`
   margin-right: 40px;
   padding: 20px 0px;
   &:hover {
-    
+    cursor: pointer;
+    color: teal;
   }
 `;
 

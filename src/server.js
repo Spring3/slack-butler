@@ -29,7 +29,29 @@ app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use('/assets', express.static(path.join(__dirname, '../dist/')));
+// hot reload
+if (process.env.NODE_ENV === 'development') {
+  const config = require('../webpack.config.dev.js');
+  const webpack = require('webpack');
+  const compiler = webpack(config);
+  app.use(require('webpack-dev-middleware')(compiler, {
+    noInfo: true,
+    publicPath: config.output.publicPath,
+    stats: {
+      assets: false,
+			colors: true,
+			version: false,
+			hash: false,
+			timings: false,
+			chunks: false,
+			chunkModules: false
+    }
+  }));
+  app.use(require('webpack-hot-middleware')(compiler));
+	app.use(express.static(path.resolve(__dirname, 'web')));
+} else if (process.env.NODE_ENV === 'production') {
+  app.use('/assets', express.static(path.join(__dirname, '../dist/')));
+}
 
 app.get('/', (req, res) => {
   const state = generateState();

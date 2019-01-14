@@ -1,8 +1,14 @@
 import React, { Fragment, Component } from 'react';
+import styled from 'styled-components';
 
 import SlackButton from '../components/SlackButton.jsx';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+
+const TopSection = styled.section`
+  background: grey;
+  height: 100vh
+`;
 
 export default class RootPage extends Component {
   render () {
@@ -10,7 +16,7 @@ export default class RootPage extends Component {
     return (
       <Fragment>
         <Navbar/>
-        <section>
+        <TopSection>
           <h1>Getting Started</h1>
           <p>Click the button and add the bot to your slack workspace</p>
           <SlackButton
@@ -18,7 +24,7 @@ export default class RootPage extends Component {
             clientId={clientId}
           />
           <p>Then see the updates on the dashboard.</p>
-        </section>
+        </TopSection>
         <section>
           <h1>Commands</h1>
           <p>The bot supports the following list of commands:</p>

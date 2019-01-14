@@ -19,9 +19,17 @@ module.exports = ({ body, title, initialState }) => `
         </style>
       </head>
       <body>
-        <div id="root">${body}</div>
+        ${
+          initialState.NODE_ENV === 'production'
+          ? (
+            `<div id="root">${body}</div>`
+          )
+          : (
+            `<div id="root"></div>`
+          )
+        }
       </body>
-      <script src="/assets/bundle.js"></script>
+      <script src="/browser.js"></script>
       
     </html>
 `;

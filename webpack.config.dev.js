@@ -1,14 +1,18 @@
 const isProduction = process.env.NODE_ENV === 'production';
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
   target: 'web',
-  entry: path.join(__dirname, './src/web/browser.js'),
+  entry: [
+    'webpack-hot-middleware/client',
+    path.join(__dirname, './src/web/browser.js')
+  ],
   output: {
     path: path.join(__dirname, './dist'),
     publicPath: '/',
-    filename: 'bundle.js'
+    filename: 'browser.js'
   },
   module: {
     rules: [
@@ -20,5 +24,8 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.jsx']
-  }
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ]
 };
