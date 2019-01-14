@@ -1,19 +1,34 @@
-import React, { Component } from 'react';
+import React from 'react';
+import styled from 'styled-components';
 
-class Navbar extends Component {
-  render() {
-    return (
-      <nav>
-        <ul>
-          <li>Get Started</li>
-          <li>Commands</li>
-          <li>Dashboard</li>
-          <li>About</li>
-          <li>Sign in</li>
-        </ul>
-      </nav>
-    );
+const Navbar = styled.nav`
+`;
+
+const List = styled.ul`
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const ListItem = styled.li`
+  float: right;
+  margin-right: 40px;
+  padding: 20px 0px;
+  &:hover {
+    
   }
-}
+`;
 
-export default Navbar;
+export default () => (
+  <Navbar>
+    <List>
+      <ListItem>Get Started</ListItem>
+      <ListItem>Commands</ListItem>
+      <ListItem>Dashboard</ListItem>
+      <ListItem>About</ListItem>
+      <ListItem>Sign in</ListItem>
+    </List>
+  </Navbar>
+);
