@@ -1,5 +1,6 @@
 const isProduction = process.env.NODE_ENV === 'production';
 const path = require('path');
+const IsomorphicLoaderPlugin = require('isomorphic-loader/lib/webpack-plugin');
 
 module.exports = {
   mode: isProduction ? 'production' : 'development',
@@ -15,10 +16,17 @@ module.exports = {
       {
         test: /\.jsx?$/,
         use: ['babel-loader']
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: 'file-loader!isomorphic-loader'
       }
     ]
   },
   resolve: {
-    extensions: ['.js', '.jsx']
-  }
+    extensions: ['.js', '.jsx', '.png']
+  },
+  plugins: [
+    new IsomorphicLoaderPlugin()
+  ]
 };

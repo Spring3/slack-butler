@@ -11,9 +11,6 @@ const helmet = require('helmet');
 const BotEntity = require('./entities/bot.js');
 const Bot = require('./modules/bot.js');
 
-import RootPage from './web/views/RootPage.jsx';
-const template = require('./web/template.js');
-
 const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
 const { generateState, authorize } = require('./middleware/auth.js');
@@ -52,6 +49,9 @@ if (process.env.NODE_ENV === 'development') {
 } else if (process.env.NODE_ENV === 'production') {
   app.use('/assets', express.static(path.join(__dirname, '../dist/')));
 }
+
+import RootPage from './web/views/RootPage.jsx';
+const template = require('./web/template.js');
 
 app.get('/', (req, res) => {
   const state = generateState();

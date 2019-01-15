@@ -5,9 +5,27 @@ import SlackButton from '../components/SlackButton.jsx';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+import logoImage from '../img/night_sky.png';
+
 const TopSection = styled.section`
-  background: grey;
-  height: 100vh
+  height: 100vh;
+  background: #29324f;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to bottom, #2d3b62, #29324f);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to bottom, #2d3b62, #29324f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  position: relative;
+`;
+
+const Logo = styled.div`
+  background-image: url(${logoImage});
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 `;
 
 export default class RootPage extends Component {
@@ -17,13 +35,16 @@ export default class RootPage extends Component {
       <Fragment>
         <Navbar/>
         <TopSection>
-          <h1>Getting Started</h1>
-          <p>Click the button and add the bot to your slack workspace</p>
-          <SlackButton
-            state={state}
-            clientId={clientId}
-          />
-          <p>Then see the updates on the dashboard.</p>
+          <Logo>
+            
+            <h1>Getting Started</h1>
+            <p>Click the button and add the bot to your slack workspace</p>
+            <SlackButton
+              state={state}
+              clientId={clientId}
+            />
+            <p>Then see the updates on the dashboard.</p>
+          </Logo>
         </TopSection>
         <section>
           <h1>Commands</h1>

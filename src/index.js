@@ -6,4 +6,6 @@ require('@babel/register')({
     }]
   ]
 });
-require('./server.js');
+const extendRequire = require('isomorphic-loader/lib/extend-require');
+
+extendRequire({ startDelay: 0 }).then(() => require('./server.js')).catch(console.error);

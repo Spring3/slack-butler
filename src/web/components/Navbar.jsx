@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Navbar = styled.nav`
+  background: #2d3b62;
 `;
 
 const List = styled.ul`
@@ -13,12 +14,12 @@ const List = styled.ul`
 `;
 
 const ListItem = styled.li`
+  color: white;
   float: right;
   margin-right: 40px;
   padding: 20px 0px;
   &:hover {
     cursor: pointer;
-    color: teal;
   }
 `;
 
