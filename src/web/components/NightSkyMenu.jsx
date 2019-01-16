@@ -1,7 +1,7 @@
 import React from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
-import times from 'lodash.times';
+import _ from 'lodash';
 import StarIcon from 'mdi-react/StarIcon';
 import StarFourPointsIcon from 'mdi-react/StarFourPointsIcon';
 import StarFourPointsOutlineIcon from 'mdi-react/StarFourPointsOutlineIcon';
@@ -47,12 +47,15 @@ const AbsoluteMenuItem = styled.div`
     border-bottom: 2px solid white;
     position: relative;
     font-size: 20px;
-    bottom: 30px;
-    left: 10px;
+    bottom: 10px;
 
     &:hover {
       cursor: pointer;
     }
+  }
+
+  div {
+    text-align: center;
   }
 `;
 
@@ -68,11 +71,12 @@ AbsoluteMenuItem.propTypes = {
   animationTime: PropTypes.oneOfType([
     PropTypes.number,
     PropTypes.string
-  ])
+  ]),
+  adaptive: PropTypes.bool
 };
 
 const Sky = ({ component, amount }) => {
-  return times(amount, (i) => {
+  return _.times(amount, (i) => {
     const x = getRandomNumber(-50, 101);
     const y = getRandomNumber(-50, 101);
     const size = getRandomNumber(10, 31);
@@ -116,25 +120,49 @@ const MenuContainer = styled.div`
   height: 100vh;
   width: 100%;
   z-index: 2;
+  overflow: hidden;
+
+  @media (max-width: 550px) {
+    div:first-child {
+      left: 10%;
+      top: 15%;
+    }
+
+    div:nth-child(2) {
+      left: 40%;
+      top: 15%;
+    }
+        
+    div:nth-child(3) {
+      left: 70%;
+      top: 15%;
+    }
+  }
+`;
+
+const BlockContainer = styled.div`
+  margin: 0 auto;
 `;
 
 export default () => (
   <MenuContainer>
     <AbsoluteMenuItem x={20} y={15}>
-      <StarIcon color="white"/>
       <span>&nbsp;Commands</span>
+      <BlockContainer>
+        <StarIcon color="white"/>
+      </BlockContainer>
     </AbsoluteMenuItem>
-    <AbsoluteMenuItem x={65} y={7}>
-      <StarFourPointsIcon color="white"/>
+    <AbsoluteMenuItem x={75} y={10}>
       <span>&nbsp;Dashboard</span>
+      <BlockContainer>
+        <StarFourPointsIcon color="white"/>
+      </BlockContainer>
     </AbsoluteMenuItem>
     <AbsoluteMenuItem x={15} y={90}>
-      <StarFourPointsOutlineIcon color="white"/>
       <span>&nbsp;About</span>
-    </AbsoluteMenuItem>
-    <AbsoluteMenuItem x={75} y={85}>
-      <CircleSmallIcon color="white"/>
-      <span>&nbsp;Sign in</span>
+      <BlockContainer>
+        <StarFourPointsOutlineIcon color="white"/>
+      </BlockContainer>
     </AbsoluteMenuItem>
     <RotatingContainer animationTime={130}>
       <Sky
