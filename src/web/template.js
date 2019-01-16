@@ -9,11 +9,11 @@ module.exports = ({ body, title, initialState }) => `
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>${title}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link href="https://fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
         <style>
           body {
             margin: 0;
-            font-family: 'Lato', sans-serif;
+            font-family: 'Roboto', sans-serif;
             font-size: 18px;
           }
         </style>

@@ -1,32 +1,8 @@
 import React, { Fragment, Component } from 'react';
-import styled from 'styled-components';
 
-import SlackButton from '../components/SlackButton.jsx';
 import Navbar from '../components/Navbar';
+import GettingStartedSection from '../components/GettingStarted';
 import Footer from '../components/Footer';
-
-import logoImage from '../img/night_sky.png';
-
-const TopSection = styled.section`
-  height: 100vh;
-  background: #29324f;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to bottom, #2d3b62, #29324f);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to bottom, #2d3b62, #29324f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-  position: relative;
-`;
-
-const Logo = styled.div`
-  background-image: url(${logoImage});
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
 
 export default class RootPage extends Component {
   render () {
@@ -34,30 +10,22 @@ export default class RootPage extends Component {
     return (
       <Fragment>
         <Navbar/>
-        <TopSection>
-          <Logo>
-            
-            <h1>Getting Started</h1>
-            <p>Click the button and add the bot to your slack workspace</p>
-            <SlackButton
-              state={state}
-              clientId={clientId}
-            />
-            <p>Then see the updates on the dashboard.</p>
-          </Logo>
-        </TopSection>
+        <GettingStartedSection
+          state = {state}
+          clientId = {clientId}
+        />
         <section>
           <h1>Commands</h1>
           <p>The bot supports the following list of commands:</p>
           <ul>
           '[TODO] *link* - print out the link to the website.\n' +
-      '*total* - print the amount of links saved.\n' +
-      '*scan* - to scan this channel for links and attachments.\n' +
-      '*print* - print the requested amount of links.\n' +
-      'Example: `print top 10`, `print first 3`\n' +
-      '*search* - perform a search by a given substring\n' +
-      'Example: `search weather`\n' +
-      '*version* - to print the version of the bot\n', channelId);
+          '*total* - print the amount of links saved.\n' +
+          '*scan* - to scan this channel for links and attachments.\n' +
+          '*print* - print the requested amount of links.\n' +
+          'Example: `print top 10`, `print first 3`\n' +
+          '*search* - perform a search by a given substring\n' +
+          'Example: `search weather`\n' +
+          '*version* - to print the version of the bot\n', channelId);
             <li><span>link</span> - print out the link to the given website hostname</li>
             <li><span>total</span> - print out the total amount of saved links</li>
             <li><span>scan</span> - perform search for links in the current channel</li>

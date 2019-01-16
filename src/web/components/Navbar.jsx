@@ -3,6 +3,7 @@ import styled from 'styled-components';
 
 const Navbar = styled.nav`
   background: #2d3b62;
+  display: none;
 `;
 
 const List = styled.ul`
@@ -34,3 +35,5 @@ export default () => (
     </List>
   </Navbar>
 );
+
+
