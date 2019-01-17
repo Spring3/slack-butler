@@ -34,6 +34,7 @@ async function handle({ channelId, teamId }, options = {}) {
               id: channelId,
               name: slackChannel.name
             },
+            teamId: teamId,
             createdAt: new Date()
           }
         });

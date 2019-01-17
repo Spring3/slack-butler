@@ -101,7 +101,6 @@ const Sky = ({ component, amount }) => {
 const RotatingContainer = styled.div`
   position: absolute;
   width: 100%;
-  z-index: -1;
   height: 100vh;
   ${props => css`
     animation: ${rotationAnimation} ${props.animationTime}s linear infinite;
@@ -119,51 +118,11 @@ const MenuContainer = styled.div`
   position: absolute;
   height: 100vh;
   width: 100%;
-  z-index: 2;
   overflow: hidden;
-
-  @media (max-width: 550px) {
-    div:first-child {
-      left: 10%;
-      top: 15%;
-    }
-
-    div:nth-child(2) {
-      left: 40%;
-      top: 15%;
-    }
-        
-    div:nth-child(3) {
-      left: 70%;
-      top: 15%;
-    }
-  }
-`;
-
-const BlockContainer = styled.div`
-  margin: 0 auto;
 `;
 
 export default () => (
   <MenuContainer>
-    <AbsoluteMenuItem x={20} y={15}>
-      <span>&nbsp;Commands</span>
-      <BlockContainer>
-        <StarIcon color="white"/>
-      </BlockContainer>
-    </AbsoluteMenuItem>
-    <AbsoluteMenuItem x={75} y={10}>
-      <span>&nbsp;Dashboard</span>
-      <BlockContainer>
-        <StarFourPointsIcon color="white"/>
-      </BlockContainer>
-    </AbsoluteMenuItem>
-    <AbsoluteMenuItem x={15} y={90}>
-      <span>&nbsp;About</span>
-      <BlockContainer>
-        <StarFourPointsOutlineIcon color="white"/>
-      </BlockContainer>
-    </AbsoluteMenuItem>
     <RotatingContainer animationTime={130}>
       <Sky
         component={<StarIcon color="white"/>}
@@ -185,7 +144,7 @@ export default () => (
     <RotatingContainer animationTime={115}>
       <Sky
         component={<CircleSmallIcon color="white"/>}
-        amount={30}
+        amount={20}
       />
     </RotatingContainer>
   </MenuContainer>

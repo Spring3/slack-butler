@@ -112,7 +112,11 @@ async function startExistingBots(db) {
 app.listen(process.env.PORT || 3000, async () => {
   console.log(`Server is up on port ${process.env.PORT || 3000}`);
   try {
-    await mongo.connect(); // .then(startExistingBots);
+    await mongo.connect().then((db) => {
+      if (process.env.NODE_ENV === 'production') {
+        startExistingBots(db);
+      }
+    });
     console.log('Connected to the database');
   } catch (e) {
     console.error('Failed to connect to the database', e);

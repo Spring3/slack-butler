@@ -2,6 +2,7 @@ import React, { Fragment, Component } from 'react';
 
 import Navbar from '../components/Navbar';
 import GettingStartedSection from '../components/GettingStarted';
+import CommandsSection from '../components/CommandsSection';
 import Footer from '../components/Footer';
 
 export default class RootPage extends Component {
@@ -14,26 +15,7 @@ export default class RootPage extends Component {
           state = {state}
           clientId = {clientId}
         />
-        <section>
-          <h1>Commands</h1>
-          <p>The bot supports the following list of commands:</p>
-          <ul>
-          '[TODO] *link* - print out the link to the website.\n' +
-          '*total* - print the amount of links saved.\n' +
-          '*scan* - to scan this channel for links and attachments.\n' +
-          '*print* - print the requested amount of links.\n' +
-          'Example: `print top 10`, `print first 3`\n' +
-          '*search* - perform a search by a given substring\n' +
-          'Example: `search weather`\n' +
-          '*version* - to print the version of the bot\n', channelId);
-            <li><span>link</span> - print out the link to the given website hostname</li>
-            <li><span>total</span> - print out the total amount of saved links</li>
-            <li><span>scan</span> - perform search for links in the current channel</li>
-            <li><span>print</span> - print the requested amount of saved links</li>
-            <li><span>search</span> - perform a search among saved links by a given substring</li>
-            <li><span>version</span> - print bot app version (package.json)</li>
-          </ul>
-        </section>
+        <CommandsSection/>
         <section>
           <h1>Dashboard</h1>
           <p>Use dashboard for a better view and management of saved resources</p>

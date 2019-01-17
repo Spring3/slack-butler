@@ -2,8 +2,10 @@ import React from 'react';
 import styled from 'styled-components';
 
 const Navbar = styled.nav`
-  background: #2d3b62;
-  display: none;
+  background: transparent;
+  position: fixed;
+  z-index: 3;
+  width: 100%;
 `;
 
 const List = styled.ul`
@@ -27,11 +29,9 @@ const ListItem = styled.li`
 export default () => (
   <Navbar>
     <List>
-      <ListItem>Get Started</ListItem>
       <ListItem>Commands</ListItem>
       <ListItem>Dashboard</ListItem>
       <ListItem>About</ListItem>
-      <ListItem>Sign in</ListItem>
     </List>
   </Navbar>
 );
