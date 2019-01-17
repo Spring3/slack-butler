@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { css } from 'styled-components';
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
-import Typist from 'react-typist';
+import Typing, { Cursor } from 'react-typing-animation';
 
 const Section = styled.section`
   background: #29324f;
@@ -63,7 +63,7 @@ const ImageDiv = styled.div`
 const AbsoluteItem = styled.div`
   position: absolute;
   color: black;
-  top: 92%;
+  top: 92.2%;
   left: 340px;
   font-size: 14px;
 
@@ -80,28 +80,28 @@ export default () => (
       <Header>Commands</Header>
       <ImageDiv>
         <AbsoluteItem>
-          <Typist>
+          <Typing loop={true} speed={5}>
             <span>scan</span>
-            <Typist.Backspace count={4} delay={800} />
+            <Typing.Backspace count={20} delay={300} />
             <span>total</span>
-            <Typist.Backspace count={5} delay={800} />
+            <Typing.Backspace count={20} delay={300} />
             <span>print top 10</span>
-            <Typist.Backspace count={12} delay={400} />
+            <Typing.Backspace count={20} delay={300} />
             <span>print first 10</span>
-            <Typist.Backspace count={14} delay={400} />
+            <Typing.Backspace count={20} delay={300} />
             <span>print last 10</span>
-            <Typist.Backspace count={13} delay={400} />
+            <Typing.Backspace count={20} delay={300} />
             <span>search github</span>
-            <Typist.Backspace count={13} delay={400} />
+            <Typing.Backspace count={20} delay={300} />
             <span>version</span>
-            <Typist.Backspace count={7} delay={800} />
-            <span>version</span>
-            <Typist.Backspace count={7} delay={800} />
+            <Typing.Backspace count={20} delay={300} />
+            <span>dashboard</span>
+            <Typing.Backspace count={20} delay={300} />
             <span>favorite top 10</span>
-            <Typist.Backspace count={15} delay={400} />
+            <Typing.Backspace count={20} delay={300} />
             <span>favorite last 10</span>
-            <Typist.Backspace count={16} delay={400} />
-          </Typist>
+            <Typing.Backspace count={20} delay={300} />
+          </Typing>
         </AbsoluteItem>
       </ImageDiv>
       <p>The bot supports the following list of commands:</p>
