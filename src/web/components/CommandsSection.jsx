@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import Typing from 'react-typing-animation';
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
 import iphone6 from '../img/iphone6.png';
+import Typist from './Typist';
 
 const Section = styled.section`
   background: #29324f;
@@ -146,28 +146,18 @@ export default () => (
     <IPhoneImageDiv>
       <SlackImageDiv>
         <AbsoluteItem>
-          <Typing loop={true} speed={50}>
+          <Typist loop={true} speed={100} delay={800}>
             <span>scan</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>total</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>print top 10</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>print first 10</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>print last 10</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>search github</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>version</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>dashboard</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>favorite top 10</span>
-            <Typing.Backspace count={20} delay={300} />
             <span>favorite last 10</span>
-            <Typing.Backspace count={20} delay={300} />
-          </Typing>
+          </Typist>
         </AbsoluteItem>
       </SlackImageDiv>
     </IPhoneImageDiv>

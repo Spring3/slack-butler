@@ -13,5 +13,8 @@
       }
     ]
   ],
-  "plugins": ["async-to-promises"]
+  "plugins": [
+    "async-to-promises",
+    "@babel/plugin-proposal-class-properties"
+  ]
 }
