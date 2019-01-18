@@ -1,17 +1,16 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import Header from './SectionHeader';
+
 const Section = styled.section`
   background: #29324f;
-
-  h1 {
-    margin: 0;
-  }
+  padding: 50px 20px;
 `;
 
 export default () => (
   <Section>
-    <h1>Dashboard</h1>
+    <Header>Dashboard</Header>
     <p>Use dashboard for a better view and management of saved resources</p>
     <ul>
       <li>Review and manage saved links for team or channel</li>

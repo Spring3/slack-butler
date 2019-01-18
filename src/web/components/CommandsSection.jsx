@@ -1,27 +1,19 @@
 import React from 'react';
 import styled from 'styled-components';
+
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
 import iphone6 from '../img/iphone6.png';
 import Typist from './Typist';
+import Header from './SectionHeader';
 
 const Section = styled.section`
   background: #29324f;
   display: flex;
   flex-wrap: wrap;
-  padding: 20px;
+  padding: 50px 20px;
   justify-content: center;
-`;
-
-const Header = styled.h1`
-  font-size: 40px;
-  margin: 0;
-  background: #212943;
-  padding-left: 20px;
-
-  @media (max-width: 550px) {
-    font-size: 30px;
-  }
+  align-items: center;
 `;
 
 const SlackImageDiv = styled.div`

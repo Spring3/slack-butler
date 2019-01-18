@@ -18,11 +18,11 @@ class Typist extends PureComponent {
     };
   }
 
-  componentWillMount = () => {
+  componentWillMount() {
     this.initializeInterval();
   }
 
-  componentWillUnmount = () => {
+  componentWillUnmount() {
     clearInterval(this.interval);
   }
 
@@ -66,17 +66,19 @@ class Typist extends PureComponent {
   }
 
   render() {
-    return (
-      <span>
-        {this.state.text}
-      </span>
-    );
+    const { asBlock } = this.props;
+    const { text } = this.state;
+
+    return asBlock
+      ? (<p>{text}</p>)
+      : (<span>{text}</span>);
   }
 }
 
 Typist.propTypes = {
   loop: PropTypes.bool,
   delay: PropTypes.number,
+  asBlock: PropTypes.bool, 
   speed: PropTypes.number,
   children: PropTypes.node
 };
@@ -85,7 +87,8 @@ Typist.defaultProps = {
   loop: false,
   delay: 800,
   speed: 100,
-  children: []
+  children: [],
+  asBlock: false
 };
 
 export default Typist;
