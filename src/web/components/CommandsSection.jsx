@@ -1,86 +1,152 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
+import Typing from 'react-typing-animation';
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
-import Typing, { Cursor } from 'react-typing-animation';
+import iphone6 from '../img/iphone6.png';
 
 const Section = styled.section`
   background: #29324f;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  justify-content: center;
 `;
 
 const Header = styled.h1`
-  font-size: 30px;
-`;
-
-// background: #212943;
-
-const Container = styled.div`
-  width: 55%;
-  margin: 0 auto;
-  padding: 20px;
-  color: white;
-
-  h1 {
-    margin-top: 0px;
-  }
-
-  @media (max-width: 1400px) {
-    width: 70%;
-  }
-
-  @media (max-width: 1100px) {
-    width: 90%;
-  }
-
-  @media (max-width: 860px) {
-    width: 100%;
-    padding: 0;
-  }
+  font-size: 40px;
+  margin: 0;
+  background: #212943;
+  padding-left: 20px;
 
   @media (max-width: 550px) {
-    width: 100%;
+    font-size: 30px;
   }
 `;
 
-const ImageDiv = styled.div`
+const SlackImageDiv = styled.div`
   position: relative;
-  background: url(${SlackImage});
+  background-image: url(${SlackImage});
   background-repeat: no-repeat;
-  background-position: left;
+  background-position: center;
   background-size: contain;
   width: 100%;
   min-height: 500px;
   height: 570px;
 
   @media (max-width: 800px) {
-    background: url(${SlackImageMobile});
-    background-repeat: no-repeat;
+    background-image: url(${SlackImageMobile});
     background-position: center;
+    background-size: 247px;
+    left: -0.5px;
+  }
+`;
+
+const IPhoneImageDiv = styled.div`
+  background: none;
+  flex-basis: 800px;
+  @media (max-width: 800px) {
+    background-image: url(${iphone6});
+    background-repeat: no-repeat;
     background-size: contain;
+    background-position: center;
   }
 `;
 
 const AbsoluteItem = styled.div`
   position: absolute;
   color: black;
-  top: 92.2%;
-  left: 340px;
+  top: 92.1%;
+  left: calc(50% - 45px);
   font-size: 14px;
 
   @media (max-width: 800px) {
-    top: 89.7%;
-    left: calc(50% - 110px);
+    top: 80.4%;
+    left: calc(50% - 85px);
     font-weight: bold;
+    font-size: 12px;
+  }
+`;
+
+const TextContaienr = styled.div`
+  padding: 20px;
+  line-height: 1.5;
+  color: #788F99;
+
+  div {
+    font-size: 20px;
+  }
+
+  @media (max-width: 800px) {
+    div {
+      font-size: 16px;
+    }
+  }
+
+  @media (max-width: 550px) {
+    div {
+      font-size: 14px;
+    }
+  }
+`;
+
+const CommandsList = styled.ul`
+  list-style-type: none;
+  padding-left: 0px;
+
+  li {
+    margin-bottom: 7px;
+  }
+
+  li strong {
+    background: #788F99;
+    color: #212943;
+    padding: 5px;
+  }
+
+  li span {
+    background: #212943;
+    color: #C0D6DF;
+    padding: 5px;
+  }
+
+  li p {
+    margin: 10px 0px 0px 0px;
+    padding-left: 20px;
   }
 `;
 
 export default () => (
   <Section>
-    <Container>
+    <TextContaienr>
       <Header>Commands</Header>
-      <ImageDiv>
+      <div>
+        <p>The bot supports the following list of commands:</p>
+        <CommandsList>
+          <li><strong>link</strong> - print out the link to the website</li>
+          <li><strong>total</strong> - print out the total amount of saved links</li>
+          <li><strong>scan</strong> - perform serach for links in the current channel</li>
+          <li>
+            <strong>print</strong> - print the requested amount of saved links<br/>
+            <p>&nbsp;Example: <span>print top 10</span>, <span>print first 3</span></p>
+          </li>
+          <li>
+            <strong>favorite</strong> - print the requested amount of favorite links<br/>
+            <p>&nbsp;Example: <span>favorite top 10</span>, <span>favorite first 3</span></p>
+          </li>
+          <li>
+            <strong>search</strong> - perform a search among the saved links by a given substring<br/>
+            <p>&nbsp;&nbsp;Example: <span>search weather</span></p>
+          </li>
+          <li><strong>version</strong> - print the version of the bot</li>
+          <li><strong>dashboard</strong> - print the link to the dashboard</li>
+        </CommandsList>
+      </div>
+    </TextContaienr>
+    <IPhoneImageDiv>
+      <SlackImageDiv>
         <AbsoluteItem>
-          <Typing loop={true} speed={5}>
+          <Typing loop={true} speed={50}>
             <span>scan</span>
             <Typing.Backspace count={20} delay={300} />
             <span>total</span>
@@ -103,21 +169,7 @@ export default () => (
             <Typing.Backspace count={20} delay={300} />
           </Typing>
         </AbsoluteItem>
-      </ImageDiv>
-      <p>The bot supports the following list of commands:</p>
-      <code>
-        <strong>link</strong> - print out the link to the website<br/>
-        <strong>total</strong> - print out the total amount of saved links<br/>
-        <strong>scan</strong> - perform serach for links in the current channel<br/>
-        <strong>print</strong> - print the requested amount of saved links<br/>
-        &nbsp;Example: `print top 10`, `print first 3`<br/>
-        <strong>favorite</strong> - print the requested amount of favorite links<br/>
-        &nbsp;Example: `favorite top 10`, `favorite first 3`<br/>
-        <strong>search</strong> - perform a search among the saved links by a given substring<br/>
-        &nbsp;Example: `search weather`<br/>
-        <strong>version</strong> - print the version of the bot<br/>
-        <strong>dashboard</strong> - print the link to the dashboard<br/>
-      </code>
-    </Container>
+      </SlackImageDiv>
+    </IPhoneImageDiv>
   </Section>
 )

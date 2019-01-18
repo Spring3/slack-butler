@@ -126,25 +126,25 @@ export default () => (
     <RotatingContainer animationTime={130}>
       <Sky
         component={<StarIcon color="white"/>}
-        amount={20}
+        amount={25}
       />
     </RotatingContainer>
     <RotatingContainer animationTime={100}>
       <Sky
         component={<StarFourPointsIcon color="white"/>}
-        amount={20}
+        amount={25}
       />
     </RotatingContainer>
     <RotatingContainer animationTime={80}>
       <Sky
         component={<StarFourPointsOutlineIcon color="white"/>}
-        amount={20}
+        amount={25}
       />
     </RotatingContainer>
     <RotatingContainer animationTime={115}>
       <Sky
         component={<CircleSmallIcon color="white"/>}
-        amount={20}
+        amount={25}
       />
     </RotatingContainer>
   </MenuContainer>
