@@ -11,6 +11,24 @@ const PaddedSection = styled(Section)`
 
 const Container = styled.div`
   width: 60%;
+  color: #788F99;
+  
+  a, a:visited {
+    color: #EAD9D2;
+  }
+
+  svg {
+    vertical-align: middle;
+  }
+
+  @media (max-width: 1000px) {
+    width: 80%;
+  }
+
+  @media (max-width: 650px) {
+    width: 100%;
+    font-size: 15px;
+  }
 `;
 
 export default () => (
@@ -26,7 +44,7 @@ export default () => (
         I wanted to have it organized so that every member of the team has access to it at any time and we both had the opportunity to get back to it during our free time.<br/>
         <br/>
         I decided not to register an official slack app for this bot to have each team, who decides to use this bot, to have ability to control the data on their own, set it up, configure the way they think is better for them.<br/>
-        If you are facing any problems with the configuration, please refer to the README file and a list of solved issues <a href='' target='_blank' rel='nofollow noopener'>here</a> or send me a message directly.<br/>
+        If you are facing any problems with the configuration, please refer to the README file and a list of solved issues <a href='https://github.com/Spring3/starbot' target='_blank' rel='nofollow noopener'>here</a> or send me a message directly.<br/>
       </p>
       <ul>
         <li>Keep track of links that you and your teammates share</li>

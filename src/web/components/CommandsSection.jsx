@@ -69,7 +69,7 @@ const TextContainer = styled.div`
 
   @media (max-width: 550px) {
     div {
-      font-size: 14px;
+      font-size: 15px;
     }
   }
 `;

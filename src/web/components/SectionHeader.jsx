@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 export default styled.h1`
   font-size: 40px;
-  margin: 0;
   background: #212943;
   padding: 0px 20px;
 

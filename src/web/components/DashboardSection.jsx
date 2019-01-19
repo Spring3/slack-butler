@@ -15,7 +15,6 @@ const MarginedSection = styled(Section)`
 
 const BigText = styled(Header)`
   color: #EAD9D2;
-  margin: 0px auto 50px auto;
   text-align: center;
 `;
 
@@ -25,7 +24,7 @@ const CardContainer = styled.div`
   justify-content: center;
   max-width: 80%;
 
-  @media (max-width: 1500px) {
+  @media (max-width: 1590px) {
     max-width: 100%;
   }
 `;

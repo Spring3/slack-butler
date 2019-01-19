@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import styled from 'styled-components';
 import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
 
 class Footer extends Component {
