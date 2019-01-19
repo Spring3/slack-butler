@@ -5,16 +5,8 @@ import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
 import iphone6 from '../img/iphone6.png';
 import Typist from './Typist';
+import Section from './Section';
 import Header from './SectionHeader';
-
-const Section = styled.section`
-  background: #29324f;
-  display: flex;
-  flex-wrap: wrap;
-  padding: 50px 20px;
-  justify-content: center;
-  align-items: center;
-`;
 
 const SlackImageDiv = styled.div`
   position: relative;
@@ -48,7 +40,7 @@ const IPhoneImageDiv = styled.div`
 const AbsoluteItem = styled.div`
   position: absolute;
   color: black;
-  top: 92.1%;
+  top: 92.2%;
   left: calc(50% - 45px);
   font-size: 14px;
 
@@ -60,8 +52,8 @@ const AbsoluteItem = styled.div`
   }
 `;
 
-const TextContaienr = styled.div`
-  padding: 20px;
+const TextContainer = styled.div`
+  padding: 20px 0px;
   line-height: 1.5;
   color: #788F99;
 
@@ -109,8 +101,11 @@ const CommandsList = styled.ul`
 `;
 
 export default () => (
-  <Section>
-    <TextContaienr>
+  <Section
+    justify='center'
+    align='center'
+  >
+    <TextContainer>
       <Header>Commands</Header>
       <div>
         <p>The bot supports the following list of commands:</p>
@@ -134,7 +129,7 @@ export default () => (
           <li><strong>dashboard</strong> - print the link to the dashboard</li>
         </CommandsList>
       </div>
-    </TextContaienr>
+    </TextContainer>
     <IPhoneImageDiv>
       <SlackImageDiv>
         <AbsoluteItem>
