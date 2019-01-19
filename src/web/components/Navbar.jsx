@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
+import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
 
 const Navbar = styled.nav`
   background: transparent;
@@ -16,7 +18,8 @@ const List = styled.ul`
   justify-content: flex-end;
 `;
 
-const ListItem = styled.li`
+
+const ListItem = styled.a`
   color: white;
   float: right;
   margin-right: 40px;
@@ -24,16 +27,58 @@ const ListItem = styled.li`
   &:hover {
     cursor: pointer;
   }
+  &:visited {
+    color: white;
+  }
+
+  svg {
+    vertical-align: middle;
+    position: relative;
+    bottom: 4px;
+  }
+
+  @media (max-width: 550px) {
+    margin-right: 30px;
+  }
 `;
 
-export default () => (
-  <Navbar>
-    <List>
-      <ListItem>Commands</ListItem>
-      <ListItem>Dashboard</ListItem>
-      <ListItem>About</ListItem>
-    </List>
-  </Navbar>
-);
+class NavbarComponent extends PureComponent {
+  scroll = (sectionName) => {
+    console.log(this.props.sectionsRefs[sectionName]);
+    if (this.props.sectionsRefs[sectionName]) {
+      window.scrollTo({
+        top: this.props.sectionsRefs[sectionName].current.offsetTop,
+        behavior: 'smooth'
+      })
+    }
+  }
+
+  scrollToCommands = () => this.scroll('commands')
+  scrollToDashboard = () => this.scroll('dashboard')
+  scrollToAbout = () => this.scroll('about')
+
+  render() {
+    return (
+      <Navbar>
+        <List>
+          <ListItem target='_blank' rel='nofollow noopener' href='https://github.com/Spring3/starbot'><GithubCircleIcon size={30}/></ListItem>
+          <ListItem onClick={this.scrollToCommands}>Commands</ListItem>
+          <ListItem onClick={this.scrollToDashboard}>Dashboard</ListItem>
+          <ListItem onClick={this.scrollToAbout}>About</ListItem>
+        </List>
+      </Navbar>
+    );
+  }
+};
+
+NavbarComponent.propTypes = {
+  sectionsRefs: PropTypes.shape({
+    dashboard: PropTypes.object.isRequired,
+    commands: PropTypes.object.isRequired,
+    about: PropTypes.object.isRequired
+  }).isRequired
+};
+
+export default NavbarComponent;
 
 

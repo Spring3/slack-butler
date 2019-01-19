@@ -1,26 +1,41 @@
-import React, { Fragment, Component } from 'react';
+import React, { Fragment, PureComponent } from 'react';
 
 import Navbar from '../components/Navbar';
 import GettingStartedSection from '../components/GettingStarted';
 import CommandsSection from '../components/CommandsSection';
 import DashboardSection from '../components/DashboardSection';
 import AboutSection from '../components/AboutSection';
-import Footer from '../components/Footer';
 
-export default class RootPage extends Component {
+export default class RootPage extends PureComponent {
+  constructor(props) {
+    super(props);
+    this.sectionsRefs = {
+      dashboard: React.createRef(),
+      commands: React.createRef(),
+      about: React.createRef()
+    }
+  }
+
   render () {
     const { state, clientId } = this.props;
     return (
       <Fragment>
-        <Navbar/>
-        <GettingStartedSection
-          state = {state}
-          clientId = {clientId}
+        <Navbar
+          sectionsRefs={this.sectionsRefs}
         />
-        <CommandsSection/>
-        <DashboardSection/>
-        <AboutSection/>
-        <Footer/>
+        <GettingStartedSection
+          state={state}
+          clientId={clientId}
+        />
+        <CommandsSection
+          ref={this.sectionsRefs.commands}
+        />
+        <DashboardSection
+          ref={this.sectionsRefs.dashboard}
+        />
+        <AboutSection
+          ref={this.sectionsRefs.about}
+        />
       </Fragment>
     )
   }

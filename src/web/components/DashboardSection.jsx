@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import TreasureChestIcon from 'mdi-react/TreasureChestIcon';
 import DiamondOutlineIcon from 'mdi-react/DiamondOutlineIcon';
 import ChartBarIcon from 'mdi-react/ChartBarIcon';
@@ -29,38 +30,51 @@ const CardContainer = styled.div`
   }
 `;
 
-export default () => (
-  <MarginedSection
-    justify='center'
-    align='center'
-    direction='column'
-  >
-    <BigText>Dashboard for a better resource management</BigText>
-    <CardContainer>
-      <Card
-        header='Review your finds'
-        content='Review and manage saved links in a team or channel'
+class DashboardSection extends PureComponent {
+  render() {
+    return (
+      <MarginedSection
+        justify='center'
+        align='center'
+        direction='column'
+        ref={this.props.forwardedRef}
       >
-        <TreasureChestIcon size="80px"/>
-      </Card>
-      <Card
-        header='Favorites'
-        content='Review and manage personal favorites'
-      >
-        <DiamondOutlineIcon size="80px"/>
-      </Card>
-      <Card
-        header='Usage charts'
-        content='Review the most visited links (based on dashboard usage)'
-      >
-        <ChartBarIcon size="80px"/>
-      </Card>
-      <Card
-        header='And maybe even more'
-        content='Who knows what new stuff will be added in the future'
-      >
-        <StarOutlineIcon size="80px"/>
-      </Card>
-    </CardContainer>
-  </MarginedSection>
-)
+        <BigText>Dashboard for a better resource management</BigText>
+        <CardContainer>
+          <Card
+            header='Review your finds'
+            content='Review and manage saved links in a team or channel'
+          >
+            <TreasureChestIcon size="80px"/>
+          </Card>
+          <Card
+            header='Favorites'
+            content='Review and manage personal favorites'
+          >
+            <DiamondOutlineIcon size="80px"/>
+          </Card>
+          <Card
+            header='Usage charts'
+            content='Review the most visited links (based on dashboard usage)'
+          >
+            <ChartBarIcon size="80px"/>
+          </Card>
+          <Card
+            header='And maybe even more'
+            content='Who knows what new stuff will be added in the future'
+          >
+            <StarOutlineIcon size="80px"/>
+          </Card>
+        </CardContainer>
+      </MarginedSection>
+    )
+  }
+}
+
+DashboardSection.propTypes = {
+  forwardedRef: PropTypes.object.isRequired
+};
+
+export default React.forwardRef((props, ref) => (
+  <DashboardSection {...props} forwardedRef={ref}/>
+));
