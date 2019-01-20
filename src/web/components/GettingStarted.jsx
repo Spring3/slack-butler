@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 import SlackButton from './SlackButton.jsx';
 import NightSkyMenu from './NightSkyMenu.jsx';
@@ -54,7 +55,7 @@ const CenteredContainer = styled.div`
   }
 `;
 
-export default ({ state, clientId }) => (
+const GettingStartedSection = ({ state, clientId }) => (
   <TopSection>
     <NightSkyMenu/>
     <Logo>
@@ -71,3 +72,11 @@ export default ({ state, clientId }) => (
     </Logo>
   </TopSection>
 );
+
+GettingStartedSection.propTypes = {
+  state: PropTypes.string.isRequired,
+  clientId: PropTypes.string.isRequired,
+  forwardedRef: PropTypes.object
+};
+
+export default GettingStartedSection;

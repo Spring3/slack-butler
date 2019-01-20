@@ -1,13 +1,19 @@
 import React, { PureComponent } from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
+import _ from 'lodash';
 import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
 
 const Navbar = styled.nav`
-  background: transparent;
   position: fixed;
   z-index: 3;
   width: 100%;
+
+  ${
+    ({ background }) => css`
+      background: ${background};
+    `
+  }
 `;
 
 const List = styled.ul`
@@ -43,8 +49,23 @@ const ListItem = styled.a`
 `;
 
 class NavbarComponent extends PureComponent {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      background: 'transparent'
+    };
+  }
+
+  componentDidMount() {
+    document.addEventListener('scroll', this.trackScrolling);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('scroll', this.trackScrolling);
+  }
+
   scroll = (sectionName) => {
-    console.log(this.props.sectionsRefs[sectionName]);
     if (this.props.sectionsRefs[sectionName]) {
       window.scrollTo({
         top: this.props.sectionsRefs[sectionName].current.offsetTop,
@@ -53,13 +74,29 @@ class NavbarComponent extends PureComponent {
     }
   }
 
+  trackScrolling = () => {
+    console.log('checking...');
+    if (this.state.background === 'transparent' && window.scrollY >= this.props.sectionsRefs.commands.current.offsetTop) {
+      this.setState({
+        background: '#29324f'
+      });
+      console.log('Setting blue');
+    } else if (this.state.background === '#29324f' && window.scrollY < this.props.sectionsRefs.commands.current.offsetTop) {
+      this.setState({
+        background: 'transparent'
+      });
+      console.log('Setting transparent');
+    }
+  }
+
   scrollToCommands = () => this.scroll('commands')
   scrollToDashboard = () => this.scroll('dashboard')
   scrollToAbout = () => this.scroll('about')
 
   render() {
+    const { background } = this.state;
     return (
-      <Navbar>
+      <Navbar background={background}>
         <List>
           <ListItem target='_blank' rel='nofollow noopener' href='https://github.com/Spring3/starbot'><GithubCircleIcon size={30}/></ListItem>
           <ListItem onClick={this.scrollToCommands}>Commands</ListItem>

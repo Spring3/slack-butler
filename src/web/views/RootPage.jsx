@@ -13,7 +13,7 @@ export default class RootPage extends PureComponent {
       dashboard: React.createRef(),
       commands: React.createRef(),
       about: React.createRef()
-    }
+    };
   }
 
   render () {
