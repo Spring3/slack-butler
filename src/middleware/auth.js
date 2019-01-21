@@ -20,7 +20,7 @@ async function authorize(req, res, next) {
   if (!code) return next(errors.badRequest('Undefined code'));
     // cache[state] = true when used
     if (cache[state] === true) {
-      return next(errors.badRequest('Unknown request origin'));
+      return next(errors.badRequest('State ttl expired or the state check failed.'));
     }
   
     cache[state] = true;

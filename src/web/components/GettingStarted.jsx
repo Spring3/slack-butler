@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-import SlackButton from './SlackButton.jsx';
+import { SlackBotButton, SlackAuthorizeButton } from './SlackButton.jsx';
 import NightSkyMenu from './NightSkyMenu.jsx';
 import logoImage from '../img/night_sky.png';
 
@@ -44,7 +44,7 @@ const Header = styled.h1`
 const CenteredContainer = styled.div`
   text-align: center;
   color: #282828;
-  z-index: 10;
+  z-index: 1;
 
   @media (max-width: 550px) {
     font-size: 16px;
@@ -55,19 +55,24 @@ const CenteredContainer = styled.div`
   }
 `;
 
-const GettingStartedSection = ({ state, clientId }) => (
+const GettingStartedSection = ({ state, clientId, clientSecret }) => (
   <TopSection>
     <NightSkyMenu/>
     <Logo>
       <CenteredContainer>
         <Header>Getting Started</Header>
-        <SlackButton
-          state={state}
-          clientId={clientId}
-          height={50}
-        />
         <p>Add the bot to your slack workspace.</p>
+        <SlackBotButton
+          state={state}
+          color="#212943"
+          clientId={clientId}
+        />
         <p>Then see the updates on the dashboard.</p>
+        <SlackAuthorizeButton
+          clientId={clientId}
+          color="mediumseagreen"
+          state={state}
+        />
       </CenteredContainer>
     </Logo>
   </TopSection>
