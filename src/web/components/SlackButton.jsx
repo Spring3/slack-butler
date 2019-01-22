@@ -58,7 +58,7 @@ class SlackAuthorizeButton extends PureComponent {
     const { clientId, state, color } = this.props;
     return (
       <Link 
-        href={`https://slack.com/oauth/authorize?scope=identity.basic,identity.team,identity.avatar&client_id=${clientId}&state=${state}`}
+        href={`http://localhost:3000/auth/dashboard`}
         color={color}
       >
         <SlackIcon/>

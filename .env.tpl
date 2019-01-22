@@ -1,7 +1,25 @@
+#slack
 CLIENT_ID=
 CLIENT_SECRET=
 SIGN_SECRET=
+
+#session
+USING_PROXY=false
+ENABLE_HTTPS=false
+SESSION_SECRET=
+
+#redis store
+REDIS_URL=
+REDIS_DB=
+REDIS_TTL=
+REDIS_PREFIX=
+
+#mongodb
 MONGODB_URI=
+
+#bot config
 BOT_REACTION_EMOJI=star
 USER_FAVORITES_TRIGGER_EMOJI=star
+
+#server port
 PORT=3000

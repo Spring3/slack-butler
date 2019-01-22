@@ -13,9 +13,12 @@ const Bot = require('./modules/bot.js');
 
 const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
+const mongo = require('./modules/mongo');
+const passport = require('./modules/passport.js');
+
 const { generateState, authorize } = require('./middleware/auth.js');
 const errorHandler = require('./middleware/error-handler.js');
-const mongo = require('./modules/mongo');
+const sessionMiddleware = require('./middleware/session.js');
 
 assert(process.env.CLIENT_ID, 'CLIENT_ID is undefined');
 assert(process.env.CLIENT_SECRET, 'CLIENT_SECRET is undefined');
@@ -47,11 +50,19 @@ if (process.env.NODE_ENV === 'development') {
   app.use(require('webpack-hot-middleware')(compiler));
 	app.use(express.static(path.resolve(__dirname, 'web')));
 } else if (process.env.NODE_ENV === 'production') {
+  if (process.env.USE_PROXY === 'true') {
+    app.set('trust proxy', 1);
+  }
   app.use('/assets', express.static(path.join(__dirname, '../dist/')));
 }
 
 import RootPage from './web/views/RootPage.jsx';
 const template = require('./web/template.js');
+
+app.use(sessionMiddleware);
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 app.get('/', (req, res) => {
   const state = generateState();
@@ -94,6 +105,12 @@ app.get('/auth/slack', authorize, async (req, res, next) => {
   bot.start();
   await BotEntity.save(bot);
   return res.redirect('/');
+});
+
+app.get('/auth/dashboard', passport.authorize('slack', { successRedirect: '/auth/dashboard/callback', failureRedirect: '/auth/error' }));
+app.get('/auth/dashboard/callback', passport.authorize('slack', { successRedirect: '/auth/dashboard/callback' }), async(req, res, next) => {
+  console.log('Authorized');
+  res.redirect('/dashboard');
 });
 
 app.use(errorHandler);
