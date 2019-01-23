@@ -12,10 +12,12 @@
     },
     "rules": {
       "no-restricted-syntax": "off",
+      "camelcase": ["error", { "allow": ["team_id", "access_token"] }],
       "comma-dangle": 0,
+      "no-underscore-dangle": ["error", { "allow": ["_id"] }],
       "no-plusplus": 0,
       "no-useless-escape": 1,
-      "max-len": ["error", { "code": 120 }],
+      "max-len": ["error", { "code": 160 }],
       "no-useless-constructor": 1,
       "class-methods-use-this": 0
     }

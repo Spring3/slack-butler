@@ -12,8 +12,12 @@ const passport = require('./modules/passport.js');
 
 const errorHandler = require('./middlewares/error-handler.js');
 const sessionMiddleware = require('./middlewares/session.js');
-
 const routes = require('./routes/index.route.js');
+
+import React from 'react';
+import RootPage from './web/views/RootPage.jsx';
+const { renderToString } = require('react-dom/server');
+const template = require('./web/template.js');
 
 const app = express();
 
@@ -42,25 +46,16 @@ if (NODE_ENV === 'development') {
   app.use(require('webpack-hot-middleware')(compiler));
 	app.use(express.static(path.resolve(__dirname, 'web')));
 } else if (NODE_ENV === 'production') {
-  if (USE_PROXY === true) {
-    app.set('trust proxy', 1);
-  }
+  app.set('trust proxy', USE_PROXY);
   app.use('/', express.static(path.join(__dirname, '../dist/')));
 }
-
-import React from 'react';
-import RootPage from './web/views/RootPage.jsx';
-const { renderToString } = require('react-dom/server');
-const template = require('./web/template.js');
 
 app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', (req, res) => {
-  const initialState = {
-    NODE_ENV
-  };
+  const initialState = { NODE_ENV };
   const appString = renderToString(<RootPage {...initialState} />);
   const response = template({
     body: appString,
@@ -71,7 +66,6 @@ app.get('/', (req, res) => {
 });
 
 app.use(routes);
-
 app.use(errorHandler);
 
 async function startExistingBots(db) {

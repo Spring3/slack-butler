@@ -42,8 +42,7 @@ class Message {
    * @return {Boolean}
    */
   isMarked() {
-    const found = Array.from(this.reactions.values()).find(reaction =>
-      reaction.name === BOT_REACTION_EMOJI && reaction.users.includes(this.botId));
+    const found = Array.from(this.reactions.values()).find(reaction => reaction.name === BOT_REACTION_EMOJI && reaction.users.includes(this.botId));
     return !!found;
   }
 
@@ -88,7 +87,7 @@ class Message {
         acc.push(link.slice(0, -1));
       }
       return acc;
-    },[]);
+    }, []);
   }
 
   getLinksData() {

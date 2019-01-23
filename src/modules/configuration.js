@@ -31,8 +31,7 @@ const configuration = _.pick(process.env,
   'BOT_REACTION_EMOJI',
   'USER_FAVORITES_TRIGGER_EMOJI',
   'AUTO_SCAN_INTERVAL_MS',
-  'PORT'
-);
+  'PORT');
 
 const { error, value } = Joi.validate(configuration, schema);
 

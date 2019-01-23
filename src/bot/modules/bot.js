@@ -1,5 +1,4 @@
 const { WebClient, RTMClient } = require('@slack/client');
-const _ = require('lodash');
 const {
   AUTO_SCAN_INTERVAL_MS,
   BOT_REACTION_EMOJI,
@@ -20,7 +19,12 @@ const ignoredEventTypes = ['desktop_notification', 'hello', 'ping', 'pong', unde
  */
 class Bot {
   constructor(data) {
-    const { bot = {}, scope, team_id, access_token } = data;
+    const {
+      bot = {},
+      scope,
+      team_id,
+      access_token
+    } = data;
     this.userToken = data.userToken || access_token;
     this.token = data.token || bot.bot_access_token;
     this.id = data.slackId || bot.bot_user_id;
@@ -171,7 +175,7 @@ class Bot {
 
       console.log('Type:', type);
       const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
-      
+
       switch (type) {
         /*
         { type: 'channel_joined',
@@ -211,13 +215,13 @@ class Bot {
               creator: 'U8S5U2V0R',
               last_set: 1515975558 },
            purpose:
-            { value: 'A place for non-work-related flimflam, faffing, hodge-podge or jibber-jabber you\'d prefer to keep out of more focused work-related channels.',
+            { value: 'Some description',
               creator: 'U8S5U2V0R',
               last_set: 1515975558 },
            previous_names: [],
            priority: 0 } }
        */
-      /*
+        /*
       { type: 'group_joined',
         channel:
          { id: 'GBTTY9WDB',
@@ -261,19 +265,19 @@ class Bot {
             this.channels.set(msg.channel.id, new Channel(msg.channel));
           }
           break;
-        /**
-         * { type: 'channel_left',
-            channel: 'CF22KMXKK',
-            actor_id: 'U8S5U2V0R',
-            event_ts: '1545942621.000700' }
-        */
+          /**
+           * { type: 'channel_left',
+              channel: 'CF22KMXKK',
+              actor_id: 'U8S5U2V0R',
+              event_ts: '1545942621.000700' }
+          */
 
-        /**
-         * { type: 'group_left',
-            channel: 'CF22KMXKK',
-            actor_id: 'U8S5U2V0R',
-            event_ts: '1545942621.000700' }
-        */
+          /**
+           * { type: 'group_left',
+              channel: 'CF22KMXKK',
+              actor_id: 'U8S5U2V0R',
+              event_ts: '1545942621.000700' }
+          */
         case 'channel_left':
         case 'group_left':
           if (this.channels.has(msg.channel)) {
@@ -312,9 +316,9 @@ class Bot {
                     },
                     teamId: this.teamId
                   });
-                  return Links.save(linkData).then(res => this.react(message, BOT_REACTION_EMOJI));
-                }))
-              } catch(e) {
+                  return Links.save(linkData).then(() => this.react(message, BOT_REACTION_EMOJI));
+                }));
+              } catch (e) {
                 console.error('Error when trying to save a link and react', e);
               }
             }

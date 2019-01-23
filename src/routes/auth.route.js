@@ -11,9 +11,11 @@ const validation = require('../modules/validation.js');
 
 const router = express.Router();
 
-router.get('/slack/bot', (req, res, next) => {
+router.get('/slack/bot', (req, res) => {
   const state = generateState();
-  return res.redirect(`https://slack.com/oauth/authorize?client_id=${CLIENT_ID}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`);
+  return res.redirect(
+    `https://slack.com/oauth/authorize?client_id=${CLIENT_ID}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`
+  );
 });
 
 /**
@@ -31,36 +33,34 @@ router.get('/slack/bot/callback',
   validate(validation.slackBotCallbackRaw),
   authorize,
   validate(validation.slackBotCallbackModified),
-  async (req, res, next) => {
-      const { team_id } = req.auth;
-      if (botStorage.activeBots.has(team_id)) {
-        botStorage.activeBots.get(team_id).shutdown();
-        botStorage.activeBots.delete(team_id);
-      }
-      const bot = new Bot(req.auth);
-      assert(team_id, 'botData must have team_id property');
-      botStorage.activeBots.set(team_id, bot);
-      bot.start();
-      await BotEntity.save(bot);
-      return res.redirect('/dashboard');
+  async (req, res) => {
+    const { team_id } = req.auth;
+    if (botStorage.activeBots.has(team_id)) {
+      botStorage.activeBots.get(team_id).shutdown();
+      botStorage.activeBots.delete(team_id);
     }
-  );
-
-  router.get('/dashboard', passport.authorize('slack'));
-
-  router.get('/dashboard/callback', (req, res, next) => {
-    passport.authenticate('slack', (err, user, info) => {
-      req.login(user, (err) => {
-        if (err) {
-          return res.redirect('/auth/error');
-        }
-        res.redirect('/dashboard');
-      });
-    })(req, res, next);
+    const bot = new Bot(req.auth);
+    assert(team_id, 'botData must have team_id property');
+    botStorage.activeBots.set(team_id, bot);
+    bot.start();
+    await BotEntity.save(bot);
+    return res.redirect('/dashboard');
   });
 
-  router.get('/error', (req, res) => {
-    res.send(400).json('Something went wrong');
-  });
+router.get('/dashboard', passport.authorize('slack'));
 
-  module.exports = router;
+router.get('/dashboard/callback', (req, res, next) => {
+  passport.authenticate('slack', (error, user) => {
+    if (error) return next(error);
+    return req.login(user, (err) => {
+      if (err) return next(err);
+      return res.redirect('/dashboard');
+    });
+  })(req, res, next);
+});
+
+router.get('/error', (req, res) => {
+  res.send(400).json('Something went wrong');
+});
+
+module.exports = router;

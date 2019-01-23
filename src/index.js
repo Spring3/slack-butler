@@ -6,7 +6,7 @@ require('@babel/register')({
     }]
   ],
   plugins: [
-    "@babel/plugin-proposal-class-properties"
+    '@babel/plugin-proposal-class-properties'
   ]
 });
 const extendRequire = require('isomorphic-loader/lib/extend-require');

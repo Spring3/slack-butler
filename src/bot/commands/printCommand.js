@@ -10,7 +10,7 @@ async function getData(teamId, amount, isLatest) {
     .sort({ createdAt: isLatest ? -1 : 1 })
     .limit(amount)
     .toArray();
-  return hrefs.reduce((acc, curr, i) => `${acc}${i+1}. ${curr.href}\n`, '');
+  return hrefs.reduce((acc, curr, i) => `${acc}${i + 1}. ${curr.href}\n`, '');
 }
 
 const oldestIndicatorsRegExp = /oldest|first/;
@@ -22,11 +22,10 @@ module.exports = {
     assert(bot);
     const lowerCaseMessage = message.getContent().toLowerCase();
     const amountMatch = lowerCaseMessage.match(/\s\d{1,}(\s)?/);
-    let amount = amountMatch === null ? 10 : parseInt(amountMatch[0], 10);
+    const amount = amountMatch === null ? 10 : parseInt(amountMatch[0], 10);
     if (oldestIndicatorsRegExp.test(lowerCaseMessage)) {
       return getData(teamId, amount, false).then(results => bot.rtm.sendMessage(results || 'Not found', channelId));
-    } else {
-      return getData(teamId, amount, true).then(results => bot.rtm.sendMessage(results || 'Not found', channelId));
     }
+    return getData(teamId, amount, true).then(results => bot.rtm.sendMessage(results || 'Not found', channelId));
   }
 };

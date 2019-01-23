@@ -29,13 +29,10 @@ async function handle(message) {
       .toArray();
     const resultString = hrefs.reduce((sum, curr, i) => `${sum}${i + 1}. ${curr.href}\n`, '');
     bot.rtm.sendMessage(`${resultString || 'Not found'}`, channelId);
-    return;
   } else {
     bot.rtm.sendMessage('Unable to process such command', channelId);
-    return;
   }
-};
-
+}
 
 module.exports = {
   handle

@@ -23,5 +23,6 @@ module.exports = {
       const commandType = messageContent.split(' ')[0];
       return botCommands[commandType];
     }
+    return undefined;
   }
 };
