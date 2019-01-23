@@ -34,10 +34,10 @@ const Link = styled.a`
 class SlackBotButton extends PureComponent {
 
   render() {
-    const { clientId, state, color } = this.props;
+    const { color } = this.props;
     return (
       <Link
-        href={`https://slack.com/oauth/authorize?client_id=${clientId}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`}
+        href='/auth/slack/bot'
         color={color}
       >
         <SlackIcon/>
@@ -48,14 +48,12 @@ class SlackBotButton extends PureComponent {
 }
 
 SlackBotButton.propTypes = {  
-  clientId: PropTypes.string.isRequired,
-  state: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired
 };
 
 class SlackAuthorizeButton extends PureComponent {
   render() {
-    const { clientId, state, color } = this.props;
+    const { color } = this.props;
     return (
       <Link 
         href={`http://localhost:3000/auth/dashboard`}
@@ -69,8 +67,6 @@ class SlackAuthorizeButton extends PureComponent {
 }
 
 SlackAuthorizeButton.propTypes = {
-  clientId: PropTypes.string.isRequired,
-  state: PropTypes.string.isRequired,
   color: PropTypes.string.isRequired
 }
 

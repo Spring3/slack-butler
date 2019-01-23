@@ -53,7 +53,7 @@ if (process.env.NODE_ENV === 'development') {
   if (process.env.USE_PROXY === 'true') {
     app.set('trust proxy', 1);
   }
-  app.use('/assets', express.static(path.join(__dirname, '../dist/')));
+  app.use('/', express.static(path.join(__dirname, '../dist/')));
 }
 
 import RootPage from './web/views/RootPage.jsx';
@@ -63,12 +63,8 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-
 app.get('/', (req, res) => {
-  const state = generateState();
   const initialState = {
-    state,
-    clientId: process.env.CLIENT_ID,
     NODE_ENV: process.env.NODE_ENV
   };
   const appString = renderToString(<RootPage {...initialState} />);
@@ -80,6 +76,10 @@ app.get('/', (req, res) => {
   res.send(response);
 });
 
+app.get('/auth/slack/bot', (req, res, next) => {
+  const state = generateState();
+  return res.redirect(`https://slack.com/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`);
+});
 /**
   { ok: true,
   access_token: 'xoxp-',
@@ -91,27 +91,39 @@ app.get('/', (req, res) => {
    { bot_user_id: '',
      bot_access_token: 'xoxb-' } }
  */
-app.get('/auth/slack', authorize, async (req, res, next) => {
+app.get('/auth/slack/bot/callback', authorize, async (req, res, next) => {
   if (!req.auth) return next();
-  validation.auth.validate(req.auth);
-  const { team_id } = req.auth; // eslint-disable-line
-  if (botStorage.activeBots.has(team_id)) {
-    botStorage.activeBots.get(team_id).shutdown();
-    botStorage.activeBots.delete(team_id);
+  try {
+    validation.auth.validate(req.auth);
+    const { team_id } = req.auth; // eslint-disable-line
+    if (botStorage.activeBots.has(team_id)) {
+      botStorage.activeBots.get(team_id).shutdown();
+      botStorage.activeBots.delete(team_id);
+    }
+    const bot = new Bot(req.auth);
+    assert(team_id, 'botData must have team_id');
+    botStorage.activeBots.set(team_id, bot);
+    bot.start();
+    await BotEntity.save(bot);
+    // TODO: put the user in session and redirect to the dashboard
+    return res.redirect('/dashboard');
+  } catch (e) {
+    next(e);
   }
-  const bot = new Bot(req.auth);
-  assert(team_id, 'botData must have team_id');
-  botStorage.activeBots.set(team_id, bot);
-  bot.start();
-  await BotEntity.save(bot);
-  return res.redirect('/');
 });
 
-app.get('/auth/dashboard', passport.authorize('slack', { successRedirect: '/auth/dashboard/callback', failureRedirect: '/auth/error' }));
-app.get('/auth/dashboard/callback', passport.authorize('slack', { successRedirect: '/auth/dashboard/callback' }), async(req, res, next) => {
-  console.log('Authorized');
-  res.redirect('/dashboard');
+app.get('/auth/dashboard', passport.authorize('slack'));
+app.get('/auth/dashboard/callback', (req, res, next) => {
+  passport.authenticate('slack', (err, user, info) => {
+    req.login(user, (err) => {
+      if (err) {
+        return res.redirect('/auth/error');
+      }
+      res.redirect('/dashboard');
+    });
+  })(req, res, next);
 });
+app.get('/dashboard', (req, res) => { res.status(200).json('OK'); });
 
 app.use(errorHandler);
 

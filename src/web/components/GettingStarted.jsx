@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
 
 import { SlackBotButton, SlackAuthorizeButton } from './SlackButton.jsx';
 import NightSkyMenu from './NightSkyMenu.jsx';
@@ -63,25 +62,15 @@ const GettingStartedSection = ({ state, clientId, clientSecret }) => (
         <Header>Getting Started</Header>
         <p>Add the bot to your slack workspace.</p>
         <SlackBotButton
-          state={state}
           color="#212943"
-          clientId={clientId}
         />
         <p>Then see the updates on the dashboard.</p>
         <SlackAuthorizeButton
-          clientId={clientId}
           color="mediumseagreen"
-          state={state}
         />
       </CenteredContainer>
     </Logo>
   </TopSection>
 );
-
-GettingStartedSection.propTypes = {
-  state: PropTypes.string.isRequired,
-  clientId: PropTypes.string.isRequired,
-  forwardedRef: PropTypes.object
-};
 
 export default GettingStartedSection;

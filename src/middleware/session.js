@@ -11,8 +11,9 @@ const ONE_WEEK_MS = 7 * 24 * 3600 * 1000;
 const THIRTY_DAYS_SECONDS = 30 * 24 * 3600;
 
 const sessionConfig = {
-  genId: () => uuid.v4(),
+  genid: () => uuid.v4(),
   secret: process.env.SESSION_SECRET,
+  store: new session.MemoryStore(),
   cookie: {
     httpOnly: false,
     maxAge: ONE_WEEK_MS

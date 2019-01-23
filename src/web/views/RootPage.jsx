@@ -17,15 +17,12 @@ export default class RootPage extends PureComponent {
   }
 
   render () {
-    const { state, clientId } = this.props;
     return (
       <Fragment>
         <Navbar
           sectionsRefs={this.sectionsRefs}
         />
         <GettingStartedSection
-          state={state}
-          clientId={clientId}
         />
         <CommandsSection
           ref={this.sectionsRefs.commands}
