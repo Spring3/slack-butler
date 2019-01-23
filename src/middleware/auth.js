@@ -1,5 +1,6 @@
 const request = require('request-promise-native');
 const crypto = require('crypto');
+const { CLIENT_ID, CLIENT_SECRET } = require('../modules/configuration.js');
 const errors = require('../utils/errors');
 
 const TEN_MINUTES_MS = 600000;
@@ -27,8 +28,8 @@ async function authorize(req, res, next) {
     const response = await request({
       uri: 'https://slack.com/api/oauth.access',
       qs: {
-        client_id: process.env.CLIENT_ID,
-        client_secret: process.env.CLIENT_SECRET,
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
         code
       },
       json: true

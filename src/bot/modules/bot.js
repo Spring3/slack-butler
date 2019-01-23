@@ -1,17 +1,17 @@
 const { WebClient, RTMClient } = require('@slack/client');
-const {
-  autoScanInterval,
-  botReactionEmoji,
-  favoritesTriggerEmoji
-} = require('./configuration.js');
 const _ = require('lodash');
-const mongo = require('./mongo');
+const {
+  AUTO_SCAN_INTERVAL_MS,
+  BOT_REACTION_EMOJI,
+  USER_FAVORITES_TRIGGER_EMOJI
+} = require('../../modules/configuration.js');
+const mongo = require('../../modules/mongo.js');
 const Message = require('./message.js');
-const TeamEntity = require('../entities/team.js');
-const Links = require('../entities/links.js');
-const Highlights = require('../entities/highlights.js');
-const Channel = require('./channel');
-const Command = require('./command');
+const TeamEntity = require('../../entities/team.js');
+const Links = require('../../entities/links.js');
+const Highlights = require('../../entities/highlights.js');
+const Channel = require('./channel.js');
+const Command = require('./command.js');
 
 const ignoredEventTypes = ['desktop_notification', 'hello', 'ping', 'pong', undefined];
 
@@ -29,7 +29,7 @@ class Bot {
     this.scopes = data.scopes || (scope || '').split(',');
     this.teamId = data.teamId || team_id;
     this.channels = new Map();
-    if (autoScanInterval) {
+    if (AUTO_SCAN_INTERVAL_MS) {
       this.scanningInterval = this.beginScanningInterval();
     }
   }
@@ -87,7 +87,7 @@ class Bot {
    * @param  {string} emoji   - code for the emoji without colon sign (:)
    * @return {Promise}
    */
-  async react(message, emoji = botReactionEmoji.toLowerCase()) {
+  async react(message, emoji = BOT_REACTION_EMOJI) {
     if (!message.isMarked()) {
       try {
         message.mark();
@@ -120,7 +120,7 @@ class Bot {
           botCommand.handle(chatMessage);
         }
       }
-    }, parseInt(autoScanInterval, 10));
+    }, AUTO_SCAN_INTERVAL_MS);
   }
 
   /**
@@ -312,7 +312,7 @@ class Bot {
                     },
                     teamId: this.teamId
                   });
-                  return Links.save(linkData).then(res => this.react(message, botReactionEmoji));
+                  return Links.save(linkData).then(res => this.react(message, BOT_REACTION_EMOJI));
                 }))
               } catch(e) {
                 console.error('Error when trying to save a link and react', e);
@@ -339,7 +339,7 @@ class Bot {
             ts: '1532036781.000033' }
          */
         case 'reaction_added':
-          if (msg.user !== this.id && msg.reaction === favoritesTriggerEmoji) {
+          if (msg.user !== this.id && msg.reaction === USER_FAVORITES_TRIGGER_EMOJI) {
             const reactionsDetails = await this.rtm.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,
@@ -377,7 +377,7 @@ class Bot {
           ts: '1532036810.000182' }
        */
         case 'reaction_removed':
-          if (msg.user !== this.id && msg.reaction === botReactionEmoji) {
+          if (msg.user !== this.id && msg.reaction === BOT_REACTION_EMOJI) {
             const reactionsDetails = await this.rtm.webClient.reactions.get({
               channel: msg.item.channel,
               full: true,

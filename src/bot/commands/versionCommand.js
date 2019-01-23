@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botStorage');
-const { version } = require('../../package.json');
+const { activeBots } = require('../modules/botStorage.js');
+const { version } = require('../../../package.json');
 
 module.exports = {
   handle({ teamId, channelId }) {

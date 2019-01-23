@@ -1,27 +1,21 @@
-require('dotenv').load({ silent: true });
 const assert = require('assert');
 const express = require('express');
 const path = require('path');
-const React = require('react');
-const { renderToString } = require('react-dom/server');
-
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 
+const { NODE_ENV, USE_PROXY, CLIENT_ID, PORT } = require('./modules/configuration.js');
 const BotEntity = require('./entities/bot.js');
-const Bot = require('./modules/bot.js');
+const Bot = require('./bot/modules/bot.js');
+const botStorage = require('./bot/modules/botStorage.js');
 
-const botStorage = require('./modules/botStorage.js');
 const validation = require('./modules/validation.js');
-const mongo = require('./modules/mongo');
+const mongo = require('./modules/mongo.js');
 const passport = require('./modules/passport.js');
 
 const { generateState, authorize } = require('./middleware/auth.js');
 const errorHandler = require('./middleware/error-handler.js');
 const sessionMiddleware = require('./middleware/session.js');
-
-assert(process.env.CLIENT_ID, 'CLIENT_ID is undefined');
-assert(process.env.CLIENT_SECRET, 'CLIENT_SECRET is undefined');
 
 const app = express();
 
@@ -30,7 +24,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // hot reload
-if (process.env.NODE_ENV === 'development') {
+if (NODE_ENV === 'development') {
   const config = require('../webpack.config.dev.js');
   const webpack = require('webpack');
   const compiler = webpack(config);
@@ -49,14 +43,16 @@ if (process.env.NODE_ENV === 'development') {
   }));
   app.use(require('webpack-hot-middleware')(compiler));
 	app.use(express.static(path.resolve(__dirname, 'web')));
-} else if (process.env.NODE_ENV === 'production') {
-  if (process.env.USE_PROXY === 'true') {
+} else if (NODE_ENV === 'production') {
+  if (USE_PROXY === true) {
     app.set('trust proxy', 1);
   }
   app.use('/', express.static(path.join(__dirname, '../dist/')));
 }
 
+import React from 'react';
 import RootPage from './web/views/RootPage.jsx';
+const { renderToString } = require('react-dom/server');
 const template = require('./web/template.js');
 
 app.use(sessionMiddleware);
@@ -65,7 +61,7 @@ app.use(passport.session());
 
 app.get('/', (req, res) => {
   const initialState = {
-    NODE_ENV: process.env.NODE_ENV
+    NODE_ENV
   };
   const appString = renderToString(<RootPage {...initialState} />);
   const response = template({
@@ -78,7 +74,7 @@ app.get('/', (req, res) => {
 
 app.get('/auth/slack/bot', (req, res, next) => {
   const state = generateState();
-  return res.redirect(`https://slack.com/oauth/authorize?client_id=${process.env.CLIENT_ID}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`);
+  return res.redirect(`https://slack.com/oauth/authorize?client_id=${CLIENT_ID}&scope=bot,channels:history,groups:history,im:history,mpim:history&state=${state}`);
 });
 /**
   { ok: true,
@@ -138,11 +134,11 @@ async function startExistingBots(db) {
   }
 };
 
-app.listen(process.env.PORT || 3000, async () => {
-  console.log(`Server is up on port ${process.env.PORT || 3000}`);
+app.listen(PORT, async () => {
+  console.log(`Server is up on port ${PORT}`);
   try {
     await mongo.connect().then((db) => {
-      if (process.env.NODE_ENV === 'production') {
+      if (NODE_ENV === 'production') {
         startExistingBots(db);
       }
     });

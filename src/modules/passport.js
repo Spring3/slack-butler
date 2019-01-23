@@ -1,6 +1,6 @@
-require('dotenv').load({ silent: true });
 const passport = require('passport');
 const SlackStrategy = require('passport-slack-oauth2').Strategy;
+const { CLIENT_ID, CLIENT_SECRET } = require('./configuration.js');
 
 passport.serializeUser((user, done) => done(null, {
   id: user.id,
@@ -16,8 +16,8 @@ passport.serializeUser((user, done) => done(null, {
 passport.deserializeUser((sessionUser, done) => done(null, sessionUser));
 
 passport.use('slack', new SlackStrategy({
-  clientID: process.env.CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET,
+  clientID: CLIENT_ID,
+  clientSecret: CLIENT_SECRET,
   scope: [
     'identity.basic',
     'identity.avatar',

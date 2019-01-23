@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botStorage');
-const mongo = require('../modules/mongo.js');
+const { activeBots } = require('../modules/botStorage.js');
+const mongo = require('../../modules/mongo.js');
 
 function isValidRegex(str) {
   if (!str) return false;

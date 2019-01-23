@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botStorage');
-const mongo = require('./../modules/mongo');
+const { activeBots } = require('../modules/botStorage.js');
+const mongo = require('../../modules/mongo.js');
 
 /**
  * Command to run a scan of the channel for new links
@@ -34,7 +34,7 @@ async function handle({ channelId, teamId }, options = {}) {
               id: channelId,
               name: slackChannel.name
             },
-            teamId: teamId,
+            teamId,
             createdAt: new Date()
           }
         });

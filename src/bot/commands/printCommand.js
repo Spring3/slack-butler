@@ -1,6 +1,6 @@
 const assert = require('assert');
-const { activeBots } = require('../modules/botStorage');
-const mongo = require('../modules/mongo');
+const { activeBots } = require('../modules/botStorage.js');
+const mongo = require('../../modules/mongo.js');
 
 async function getData(teamId, amount, isLatest) {
   const db = await mongo.connect();
