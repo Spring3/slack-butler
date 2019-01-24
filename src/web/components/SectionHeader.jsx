@@ -1,12 +1,15 @@
-import React from 'react';
-import styled from 'styled-components';
+import styled, { withTheme, css } from 'styled-components';
 
-export default styled.h1`
+export default withTheme(styled.h1`
   font-size: 40px;
-  background: #212943;
+  ${
+    (props) => css`
+      background: ${props.theme.darkblue};
+    `
+  }
   padding: 0px 20px;
 
   @media (max-width: 550px) {
     font-size: 30px;
   }
-`;
+`);

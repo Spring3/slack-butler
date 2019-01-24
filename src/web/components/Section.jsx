@@ -1,19 +1,17 @@
-import React from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Section = styled.section`
-  background: #29324f;
   display: flex;
   flex-wrap: wrap;
   padding: 50px 20px;
   ${
-    ({ direction, justify, align }) => css`
-      justify-content: ${justify};
-      align-items: ${align};
-      flex-direction: ${direction};
-    `
-  }
+  ({ direction, justify, align, theme }) => css`
+    background: ${theme.main};
+    justify-content: ${justify};
+    align-items: ${align};
+    flex-direction: ${direction};
+  `}
 `;
 
 Section.propTypes = {
@@ -28,4 +26,4 @@ Section.defaultProps = {
   align: 'flex-start'
 };
 
-export default Section;
+export default withTheme(Section);

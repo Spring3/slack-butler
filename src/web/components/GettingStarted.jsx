@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { withTheme, css }  from 'styled-components';
 import PropTypes from 'prop-types';
 import { SlackBotButton, SlackAuthorizeButton } from './SlackButton.jsx';
 import NightSkyMenu from './NightSkyMenu.jsx';
@@ -7,9 +7,13 @@ import logoImage from '../img/night_sky.png';
 
 const TopSection = styled.section`
   height: 100vh;
-  background: #29324f;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to bottom, #2d3b62, #29324f);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to bottom, #2d3b62, #29324f); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  ${
+    (props) => css`
+      background: ${props.theme.main};  /* fallback for old browsers */
+      background: -webkit-linear-gradient(to bottom, ${props.theme.mainlight}, ${props.theme.main});  /* Chrome 10-25, Safari 5.1-6 */
+      background: linear-gradient(to bottom, ${props.theme.mainlight}, ${props.theme.main}); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    `
+  }
   position: relative;
 `;
 
@@ -42,7 +46,11 @@ const Header = styled.h1`
 
 const CenteredContainer = styled.div`
   text-align: center;
-  color: #282828;
+  ${
+    (props) => css`
+      color: ${props.theme.normaltext};
+    `
+  }
   z-index: 1;
 
   @media (max-width: 550px) {
@@ -54,21 +62,21 @@ const CenteredContainer = styled.div`
   }
 `;
 
-const GettingStartedSection = ({ randomSeed }) => (
+const GettingStartedSection = ({ randomSeed, theme }) => (
   <TopSection>
     <NightSkyMenu
       randomSeed={randomSeed}
     />
     <Logo>
-      <CenteredContainer>
+      <CenteredContainer theme={theme}>
         <Header>Getting Started</Header>
         <p>Add the bot to your slack workspace.</p>
         <SlackBotButton
-          color="#212943"
+          color={theme.darkblue}
         />
         <p>Then see the updates on the dashboard.</p>
         <SlackAuthorizeButton
-          color="mediumseagreen"
+          color={theme.success}
         />
       </CenteredContainer>
     </Logo>
@@ -76,12 +84,12 @@ const GettingStartedSection = ({ randomSeed }) => (
 );
 
 GettingStartedSection.propTypes = {
-  randomSeed: PropTypes.string
+  randomSeed: PropTypes.string,
+  theme: PropTypes.object.isRequired
 };
-
 
 GettingStartedSection.defaultProps = {
   randomSeed: new Date().toISOString().substring(0, 10)
 };
 
-export default GettingStartedSection;
+export default withTheme(GettingStartedSection);

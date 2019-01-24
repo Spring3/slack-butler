@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled from 'styled-components';
+import styled, { withTheme, css } from 'styled-components';
 import PropTypes from 'prop-types';
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
@@ -55,7 +55,11 @@ const AbsoluteItem = styled.div`
 const TextContainer = styled.div`
   padding: 20px 0px;
   line-height: 1.5;
-  color: #788F99;
+  ${
+    (props) => css`
+      color: ${props.theme.teal};
+    `
+  }
 
   div {
     font-size: 20px;
@@ -82,16 +86,20 @@ const CommandsList = styled.ul`
     margin-bottom: 7px;
   }
 
-  li strong {
-    background: #788F99;
-    color: #212943;
-    padding: 5px;
-  }
-
-  li span {
-    background: #212943;
-    color: #C0D6DF;
-    padding: 5px;
+  ${
+    (props) => css`
+      li strong {
+        background: ${props.theme.teal};
+        color: ${props.theme.darkblue};
+        padding: 5px;
+      }
+    
+      li span {
+        background: ${props.theme.darkblue};
+        color: ${props.theme.specialtext};
+        padding: 5px;
+      }
+    `
   }
 
   li p {
@@ -102,17 +110,18 @@ const CommandsList = styled.ul`
 
 class CommandsSection extends PureComponent {
   render() {
+    const { theme } = this.props;
     return (
       <Section
         justify='center'
         align='center'
         ref={this.props.forwardedRef}
       >
-        <TextContainer>
+        <TextContainer theme={theme}>
           <Header>Commands</Header>
           <div>
             <p>The bot supports the following list of commands:</p>
-            <CommandsList>
+            <CommandsList theme={theme}>
               <li><strong>link</strong> - print out the link to the website</li>
               <li><strong>total</strong> - print out the total amount of saved links</li>
               <li><strong>scan</strong> - perform serach for links in the current channel</li>
@@ -157,9 +166,12 @@ class CommandsSection extends PureComponent {
 }
 
 CommandsSection.propTypes = {
-  forwardedRef: PropTypes.object.isRequired
+  forwardedRef: PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired
 };
 
-export default React.forwardRef((props, ref) => (
-  <CommandsSection {...props} forwardedRef={ref} />
-));
+export default withTheme(
+  React.forwardRef((props, ref) => (
+    <CommandsSection {...props} forwardedRef={ref} />
+  ))
+);

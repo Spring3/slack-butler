@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled, { css } from 'styled-components';
+import styled, { css, withTheme } from 'styled-components';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
@@ -75,17 +75,15 @@ class NavbarComponent extends PureComponent {
   }
 
   trackScrolling = () => {
-    console.log('checking...');
-    if (this.state.background === 'transparent' && window.scrollY >= this.props.sectionsRefs.commands.current.offsetTop) {
+    const { theme, sectionsRefs } = this.props;
+    if (this.state.background === 'transparent' && window.scrollY >= sectionsRefs.commands.current.offsetTop) {
       this.setState({
-        background: '#29324f'
+        background: theme.main
       });
-      console.log('Setting blue');
-    } else if (this.state.background === '#29324f' && window.scrollY < this.props.sectionsRefs.commands.current.offsetTop) {
+    } else if (this.state.background === theme.main && window.scrollY < sectionsRefs.commands.current.offsetTop) {
       this.setState({
         background: 'transparent'
       });
-      console.log('Setting transparent');
     }
   }
 
@@ -113,9 +111,10 @@ NavbarComponent.propTypes = {
     dashboard: PropTypes.object.isRequired,
     commands: PropTypes.object.isRequired,
     about: PropTypes.object.isRequired
-  }).isRequired
+  }).isRequired,
+  theme: PropTypes.object.isRequired
 };
 
-export default NavbarComponent;
+export default withTheme(NavbarComponent);
 
 
