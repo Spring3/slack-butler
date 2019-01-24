@@ -55,10 +55,13 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', (req, res) => {
-  const initialState = { NODE_ENV };
+  const initialState = {
+    NODE_ENV,
+    randomSeed: new Date().toISOString().substring(0, 10), // YYYY-MM-DD
+  };
   const appString = renderToString(<RootPage {...initialState} />);
   const response = template({
-    body: appString,
+    jsxString: appString,
     title: 'Starbot Dashboard',
     initialState: JSON.stringify(initialState)
   });

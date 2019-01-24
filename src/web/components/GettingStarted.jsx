@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-
+import PropTypes from 'prop-types';
 import { SlackBotButton, SlackAuthorizeButton } from './SlackButton.jsx';
 import NightSkyMenu from './NightSkyMenu.jsx';
 import logoImage from '../img/night_sky.png';
@@ -54,9 +54,11 @@ const CenteredContainer = styled.div`
   }
 `;
 
-const GettingStartedSection = ({ state, clientId, clientSecret }) => (
+const GettingStartedSection = ({ randomSeed }) => (
   <TopSection>
-    <NightSkyMenu/>
+    <NightSkyMenu
+      randomSeed={randomSeed}
+    />
     <Logo>
       <CenteredContainer>
         <Header>Getting Started</Header>
@@ -72,5 +74,14 @@ const GettingStartedSection = ({ state, clientId, clientSecret }) => (
     </Logo>
   </TopSection>
 );
+
+GettingStartedSection.propTypes = {
+  randomSeed: PropTypes.string
+};
+
+
+GettingStartedSection.defaultProps = {
+  randomSeed: new Date().toISOString().substring(0, 10)
+};
 
 export default GettingStartedSection;

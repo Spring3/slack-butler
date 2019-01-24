@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
@@ -6,10 +6,7 @@ import StarIcon from 'mdi-react/StarIcon';
 import StarFourPointsIcon from 'mdi-react/StarFourPointsIcon';
 import StarFourPointsOutlineIcon from 'mdi-react/StarFourPointsOutlineIcon';
 import CircleSmallIcon from 'mdi-react/CircleSmallIcon';
-
-function getRandomNumber(min, max) {
-  return Math.random() * (max - min) + min;
-}
+import seedrandom from 'seedrandom';
 
 const fadeAnimation = keyframes`
   0% {
@@ -75,29 +72,6 @@ AbsoluteMenuItem.propTypes = {
   adaptive: PropTypes.bool
 };
 
-const Sky = ({ component, amount }) => {
-  return _.times(amount, (i) => {
-    const x = getRandomNumber(-50, 101);
-    const y = getRandomNumber(-50, 101);
-    const size = getRandomNumber(10, 31);
-    const rotation = getRandomNumber(0, 361);
-    const fadeAnimation = getRandomNumber (5, 30);
-    return (
-      <AbsoluteMenuItem
-        key = {i}
-        x = {x}
-        y = {y}
-        rotation = {rotation}
-        animationTime = {fadeAnimation}
-      >
-        {
-          React.cloneElement(component, { size })
-        }
-      </AbsoluteMenuItem>
-    );
-  });
-};
-
 const RotatingContainer = styled.div`
   position: absolute;
   width: 100%;
@@ -121,31 +95,69 @@ const MenuContainer = styled.div`
   overflow: hidden;
 `;
 
-export default () => (
-  <MenuContainer>
-    <RotatingContainer animationTime={130}>
-      <Sky
-        component={<StarIcon color="white"/>}
-        amount={25}
-      />
-    </RotatingContainer>
-    <RotatingContainer animationTime={100}>
-      <Sky
-        component={<StarFourPointsIcon color="white"/>}
-        amount={25}
-      />
-    </RotatingContainer>
-    <RotatingContainer animationTime={80}>
-      <Sky
-        component={<StarFourPointsOutlineIcon color="white"/>}
-        amount={25}
-      />
-    </RotatingContainer>
-    <RotatingContainer animationTime={115}>
-      <Sky
-        component={<CircleSmallIcon color="white"/>}
-        amount={25}
-      />
-    </RotatingContainer>
-  </MenuContainer>
-);
+class NightSky extends PureComponent {
+  constructor (props) {
+    super(props);
+    this.rnd = seedrandom(props.randomSeed);
+  }
+
+  getRandomNumber = (min, max) => {
+    return this.rnd() * (max - min) + min;
+  }
+
+  spawnParticle(component, amount) {
+    return _.times(amount, (i) => {
+      const x = this.getRandomNumber(-50, 101);
+      const y = this.getRandomNumber(-50, 101);
+      const size = this.getRandomNumber(10, 31);
+      const rotation = this.getRandomNumber(0, 361);
+      const animationDuration = this.getRandomNumber (5, 30);
+      return (
+        <AbsoluteMenuItem
+          key = {i}
+          x = {x}
+          y = {y}
+          rotation = {rotation}
+          animationTime = {animationDuration}
+        >
+          {
+            React.cloneElement(component, { size })
+          }
+        </AbsoluteMenuItem>
+      );
+    });
+  }
+
+  render() {
+    return (
+      <MenuContainer>
+        <RotatingContainer animationTime={130}>
+          {
+            this.spawnParticle(<StarIcon color="white"/>, 25)
+          }
+        </RotatingContainer>
+        <RotatingContainer animationTime={100}>
+          {
+            this.spawnParticle(<StarFourPointsIcon color="white"/>, 25)
+          }
+        </RotatingContainer>
+        <RotatingContainer animationTime={80}>
+          {
+            this.spawnParticle(<StarFourPointsOutlineIcon color="white"/>, 25)
+          }
+        </RotatingContainer>
+        <RotatingContainer animationTime={115}>
+          {
+            this.spawnParticle(<CircleSmallIcon color="white"/>, 25)
+          }
+        </RotatingContainer>
+      </MenuContainer>
+    );
+  };
+};
+
+NightSky.propTypes = {
+  randomSeed: PropTypes.string.isRequired
+};
+
+export default NightSky;

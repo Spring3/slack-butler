@@ -17,12 +17,14 @@ export default class RootPage extends PureComponent {
   }
 
   render () {
+    const { randomSeed } = this.props;
     return (
       <Fragment>
         <Navbar
           sectionsRefs={this.sectionsRefs}
         />
         <GettingStartedSection
+          randomSeed={randomSeed}
         />
         <CommandsSection
           ref={this.sectionsRefs.commands}
