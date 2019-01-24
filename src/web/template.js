@@ -1,4 +1,4 @@
-module.exports = ({ jsxString, title, initialState }) => `
+module.exports = ({ jsxString, title, initialState, styles }) => `
     <!DOCTYPE html>
       <html>
         <head>
@@ -6,6 +6,7 @@ module.exports = ({ jsxString, title, initialState }) => `
           <meta http-equiv="X-UA-Compatible" content="IE=edge">
           <title>${title}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1">
+          ${styles}
           <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
           <script>
             window.__APP_INITIAL_STATE__ = ${initialState}

@@ -16,6 +16,7 @@ const routes = require('./routes/index.route.js');
 
 import React from 'react';
 import RootPage from './web/views/RootPage.jsx';
+import { ServerStyleSheet } from 'styled-components'
 const { renderToString } = require('react-dom/server');
 const template = require('./web/template.js');
 
@@ -59,11 +60,14 @@ app.get('/', (req, res) => {
     NODE_ENV,
     randomSeed: new Date().toISOString().substring(0, 10), // YYYY-MM-DD
   };
-  const appString = renderToString(<RootPage {...initialState} />);
+  const sheet = new ServerStyleSheet();
+  const appString = renderToString(sheet.collectStyles(<RootPage {...initialState} />));
+  const styleTags = sheet.getStyleTags();
   const response = template({
     jsxString: appString,
     title: 'Starbot Dashboard',
-    initialState: JSON.stringify(initialState)
+    initialState: JSON.stringify(initialState),
+    styles: styleTags
   });
   res.send(response);
 });
