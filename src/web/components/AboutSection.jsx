@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
 
@@ -38,14 +38,14 @@ const Container = styled.div`
 
 class AboutSection extends PureComponent {
   render () {
-    const { theme, forwardedRef } = this.props;
+    const { forwardedRef } = this.props;
     return (
       <PaddedSection
         direction='column'
         align='center'
         ref={forwardedRef}
       >
-        <Container theme={theme}>
+        <Container>
           <Header>About</Header>
           <p>
             This is a bot for easy and fun shared links management.<br/>
@@ -75,12 +75,9 @@ class AboutSection extends PureComponent {
 }
 
 AboutSection.propTypes = {
-  forwardedRef: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  forwardedRef: PropTypes.object.isRequired
 };
 
-export default withTheme(
-  React.forwardRef((props, ref) => (
-    <AboutSection {...props} forwardedRef={ref} />
-  ))
-);
+export default React.forwardRef((props, ref) => (
+  <AboutSection {...props} forwardedRef={ref} />
+));

@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled, { withTheme, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import SlackImage from '../img/slack.png';
 import SlackImageMobile from '../img/slack_mobile.png';
@@ -110,18 +110,18 @@ const CommandsList = styled.ul`
 
 class CommandsSection extends PureComponent {
   render() {
-    const { theme } = this.props;
+    const { forwardedRef } = this.props;
     return (
       <Section
         justify='center'
         align='center'
-        ref={this.props.forwardedRef}
+        ref={forwardedRef}
       >
-        <TextContainer theme={theme}>
+        <TextContainer>
           <Header>Commands</Header>
           <div>
             <p>The bot supports the following list of commands:</p>
-            <CommandsList theme={theme}>
+            <CommandsList>
               <li><strong>link</strong> - print out the link to the website</li>
               <li><strong>total</strong> - print out the total amount of saved links</li>
               <li><strong>scan</strong> - perform serach for links in the current channel</li>
@@ -166,12 +166,9 @@ class CommandsSection extends PureComponent {
 }
 
 CommandsSection.propTypes = {
-  forwardedRef: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  forwardedRef: PropTypes.object.isRequired
 };
 
-export default withTheme(
-  React.forwardRef((props, ref) => (
-    <CommandsSection {...props} forwardedRef={ref} />
-  ))
-);
+export default React.forwardRef((props, ref) => (
+  <CommandsSection {...props} forwardedRef={ref} />
+));

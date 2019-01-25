@@ -1,4 +1,6 @@
 import React, { Fragment, PureComponent } from 'react';
+import { ThemeProvider } from 'styled-components';
+import theme from '../utils/theme.js';
 
 import Navbar from '../components/Navbar';
 import GettingStartedSection from '../components/GettingStarted';
@@ -19,23 +21,25 @@ export default class RootPage extends PureComponent {
   render () {
     const { randomSeed } = this.props;
     return (
-      <Fragment>
-        <Navbar
-          sectionsRefs={this.sectionsRefs}
-        />
-        <GettingStartedSection
-          randomSeed={randomSeed}
-        />
-        <CommandsSection
-          ref={this.sectionsRefs.commands}
-        />
-        <DashboardSection
-          ref={this.sectionsRefs.dashboard}
-        />
-        <AboutSection
-          ref={this.sectionsRefs.about}
-        />
-      </Fragment>
+      <ThemeProvider theme={theme}>
+        <Fragment>
+          <Navbar
+            sectionsRefs={this.sectionsRefs}
+          />
+          <GettingStartedSection
+            randomSeed={randomSeed}
+          />
+          <CommandsSection
+            ref={this.sectionsRefs.commands}
+          />
+          <DashboardSection
+            ref={this.sectionsRefs.dashboard}
+          />
+          <AboutSection
+            ref={this.sectionsRefs.about}
+          />
+        </Fragment>
+      </ThemeProvider>
     )
   }
 };

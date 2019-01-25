@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled, { css, withTheme } from 'styled-components';
+import styled, { withTheme, css } from 'styled-components';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 import GithubCircleIcon from 'mdi-react/GithubCircleIcon';

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PureComponent } from 'react';
 import styled, { withTheme, css }  from 'styled-components';
 import PropTypes from 'prop-types';
 import { SlackBotButton, SlackAuthorizeButton } from './SlackButton.jsx';
@@ -62,26 +62,31 @@ const CenteredContainer = styled.div`
   }
 `;
 
-const GettingStartedSection = ({ randomSeed, theme }) => (
-  <TopSection>
-    <NightSkyMenu
-      randomSeed={randomSeed}
-    />
-    <Logo>
-      <CenteredContainer theme={theme}>
-        <Header>Getting Started</Header>
-        <p>Add the bot to your slack workspace.</p>
-        <SlackBotButton
-          color={theme.darkblue}
+class GettingStartedSection extends PureComponent {
+  render() {
+    const { randomSeed, theme } = this.props;
+    return (
+      <TopSection>
+        <NightSkyMenu
+          randomSeed={randomSeed}
         />
-        <p>Then see the updates on the dashboard.</p>
-        <SlackAuthorizeButton
-          color={theme.success}
-        />
-      </CenteredContainer>
-    </Logo>
-  </TopSection>
-);
+        <Logo>
+          <CenteredContainer>
+            <Header>Getting Started</Header>
+            <p>Add the bot to your slack workspace.</p>
+            <SlackBotButton
+              color={theme.darkblue}
+            />
+            <p>Then see the updates on the dashboard.</p>
+            <SlackAuthorizeButton
+              color={theme.success}
+            />
+          </CenteredContainer>
+        </Logo>
+      </TopSection>
+    );
+  }
+}
 
 GettingStartedSection.propTypes = {
   randomSeed: PropTypes.string,

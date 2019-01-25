@@ -1,4 +1,4 @@
-import styled, { css, withTheme } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Section = styled.section`
@@ -26,4 +26,4 @@ Section.defaultProps = {
   align: 'flex-start'
 };
 
-export default withTheme(Section);
+export default Section;

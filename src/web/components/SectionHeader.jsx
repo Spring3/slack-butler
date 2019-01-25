@@ -1,6 +1,6 @@
-import styled, { withTheme, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 
-export default withTheme(styled.h1`
+export default styled.h1`
   font-size: 40px;
   ${
     (props) => css`
@@ -12,4 +12,4 @@ export default withTheme(styled.h1`
   @media (max-width: 550px) {
     font-size: 30px;
   }
-`);
+`;

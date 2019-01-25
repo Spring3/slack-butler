@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react';
-import styled, { withTheme, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import TreasureChestIcon from 'mdi-react/TreasureChestIcon';
 import DiamondOutlineIcon from 'mdi-react/DiamondOutlineIcon';
@@ -36,7 +36,7 @@ const CardContainer = styled.div`
 
 class DashboardSection extends PureComponent {
   render() {
-    const { theme, forwardedRef } = this.props;
+    const { forwardedRef } = this.props;
     return (
       <MarginedSection
         justify='center'
@@ -44,7 +44,7 @@ class DashboardSection extends PureComponent {
         direction='column'
         ref={forwardedRef}
       >
-        <BigText theme={theme}>Dashboard for a better resource management</BigText>
+        <BigText>Dashboard for a better resource management</BigText>
         <CardContainer>
           <Card
             header='Review your finds'
@@ -77,12 +77,9 @@ class DashboardSection extends PureComponent {
 }
 
 DashboardSection.propTypes = {
-  forwardedRef: PropTypes.object.isRequired,
-  theme: PropTypes.object.isRequired
+  forwardedRef: PropTypes.object.isRequired
 };
 
-export default withTheme(
-  React.forwardRef((props, ref) => (
-    <DashboardSection {...props} forwardedRef={ref}/>
-  ))
-);
+export default React.forwardRef((props, ref) => (
+  <DashboardSection {...props} forwardedRef={ref}/>
+));

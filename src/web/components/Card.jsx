@@ -1,5 +1,5 @@
 import React from 'react';
-import styled, { withTheme, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 
 const Card = styled.div`
@@ -54,9 +54,9 @@ const Header = styled.p`
   }
 `;
 
-const CardFactory = ({ header, theme, children, content }) => (
+const CardFactory = ({ header, children, content }) => (
   <Card>
-    <IconWrapper theme={theme}>
+    <IconWrapper>
       {children}
     </IconWrapper>
     <Header>{header}</Header>
@@ -68,8 +68,7 @@ CardFactory.propTypes = {
   header: PropTypes.string,
   // it's gonna be the icon
   children: PropTypes.node,
-  content: PropTypes.string,
-  theme: PropTypes.object.isRequired
+  content: PropTypes.string
 };
 
 CardFactory.defaultProps = {
@@ -77,4 +76,4 @@ CardFactory.defaultProps = {
   content: ''
 };
 
-export default withTheme(CardFactory);
+export default CardFactory;
