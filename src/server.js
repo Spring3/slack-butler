@@ -10,15 +10,11 @@ const botStorage = require('./bot/modules/botStorage.js');
 const mongo = require('./modules/mongo.js');
 const passport = require('./modules/passport.js');
 
+const ssr = require('./modules/ssr.js');
+
 const errorHandler = require('./middlewares/error-handler.js');
 const sessionMiddleware = require('./middlewares/session.js');
 const routes = require('./routes/index.route.js');
-
-import React from 'react';
-import RootPage from './web/views/RootPage.jsx';
-import { ServerStyleSheet } from 'styled-components'
-const { renderToString } = require('react-dom/server');
-const template = require('./web/template.js');
 
 const app = express();
 
@@ -55,21 +51,9 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/', (req, res) => {
-  const initialState = {
-    NODE_ENV,
-    randomSeed: new Date().toISOString().substring(0, 10), // YYYY-MM-DD
-  };
-  const sheet = new ServerStyleSheet();
-  const appString = renderToString(sheet.collectStyles(<RootPage {...initialState} />));
-  const styleTags = sheet.getStyleTags();
-  const response = template({
-    jsxString: appString,
-    title: 'Starbot Dashboard',
-    initialState: JSON.stringify(initialState),
-    styles: styleTags
-  });
-  res.send(response);
+app.get('*', (req, res) => {
+  res.setHeader('Content-Type', 'text/html');
+  res.send(ssr(req.url));
 });
 
 app.use(routes);
