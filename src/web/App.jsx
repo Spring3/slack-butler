@@ -1,32 +1,33 @@
 import React, { Component } from 'react';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import theme from './utils/theme.js';
 
+import AuthenticatedRoute from './components/AuthenticatedRoute';
 import RootPage from './views/RootPage.jsx';
 import DashboardPage from './views/DashboardPage.jsx';
 import NotFoundPage from './views/NotFound.jsx';
 
 class App extends Component {
+  componentWillMount() {
+    console.log(this.props);
+    const { isAuthenticated, history } = this.props;
+    if (isAuthenticated) {
+      history.push('/dashboard');
+    }
+  }
+
   render() {
     return (
       <ThemeProvider theme={theme}>
-        <div>
-          <div>
-            <Link to="/">Landing</Link>
-          </div>
-          <div>
-            <Link to="/dashboard">Dashboard</Link>
-          </div>
-          <Switch>
-            <Route exact path="/" component={RootPage} />
-            <Route path="/dashboard" component={DashboardPage} />
-            <Route component={NotFoundPage} />
-          </Switch>
-        </div>
+        <Switch>
+          <Route exact path="/" component={RootPage} />
+          <AuthenticatedRoute path="/dashboard" component={DashboardPage} /> 
+          <Route path='/notfound' component={NotFoundPage} />
+        </Switch>
       </ThemeProvider>
     );
   }
 }
 
-export default App;
+export default withRouter(App);

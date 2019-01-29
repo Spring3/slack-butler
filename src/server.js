@@ -16,6 +16,9 @@ const errorHandler = require('./middlewares/error-handler.js');
 const sessionMiddleware = require('./middlewares/session.js');
 const routes = require('./routes/index.route.js');
 
+import ClientRoutes from './web/views/routes';
+import { matchPath } from 'react-router-dom';
+
 const app = express();
 
 app.use(helmet());
@@ -51,12 +54,16 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('*', (req, res) => {
+app.use(routes);
+app.get('/*', (req, res) => {
+  const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
+  if (!currentRoute) {
+    return res.status(404).redirect('/notfound');
+  }
   res.setHeader('Content-Type', 'text/html');
-  res.send(ssr(req.url));
+  res.send(ssr(req, res));
 });
 
-app.use(routes);
 app.use(errorHandler);
 
 async function startExistingBots(db) {
