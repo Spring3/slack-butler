@@ -5,6 +5,7 @@ import { Route, Redirect } from 'react-router-dom';
 const AuthenticatedRoute = (props) => {
   const { isAuthenticated, staticContext = {} } = props;
   staticContext.url = isAuthenticated ? undefined : '/';
+  console.log('ComponentProps', props);
   return isAuthenticated
     ? (
       <Route {...props} />

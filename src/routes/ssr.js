@@ -4,7 +4,8 @@ import App from '../web/App.jsx';
 import { ServerStyleSheet } from 'styled-components'
 const { renderToString } = require('react-dom/server');
 const template = require('../web/template.js');
-const { NODE_ENV } = require('./configuration.js');
+const { NODE_ENV } = require('../modules/configuration.js');
+import ClientRoutes from '../web/views/routes';
 
 module.exports = (req, res) => {
   const context = { user: req.user };
@@ -23,12 +24,12 @@ module.exports = (req, res) => {
     </StaticRouter>
   ));
   const styleTags = sheet.getStyleTags();
-  if (context.status === 404) {
-    res.status(404);
+
+  const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
+  if (!currentRoute && !context.url) {
+    return res.status(404).redirect('/notfound');
   }
-  if (context.url) {
-    return res.redirect(301, context.url);
-  }
+
   return template({
     jsxString,
     title: 'Starbot Dashboard',

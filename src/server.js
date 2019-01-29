@@ -10,14 +10,11 @@ const botStorage = require('./bot/modules/botStorage.js');
 const mongo = require('./modules/mongo.js');
 const passport = require('./modules/passport.js');
 
-const ssr = require('./modules/ssr.js');
+const ssr = require('./routes/ssr.js');
 
 const errorHandler = require('./middlewares/error-handler.js');
 const sessionMiddleware = require('./middlewares/session.js');
 const routes = require('./routes/index.route.js');
-
-import ClientRoutes from './web/views/routes';
-import { matchPath } from 'react-router-dom';
 
 const app = express();
 
@@ -56,11 +53,6 @@ app.use(passport.session());
 
 app.use(routes);
 app.get('/*', (req, res) => {
-  // MOVE TO MIDDLEWARE
-  const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
-  if (!currentRoute) {
-    return res.status(404).redirect('/notfound');
-  }
   res.setHeader('Content-Type', 'text/html');
   res.send(ssr(req, res));
 });

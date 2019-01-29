@@ -11,6 +11,7 @@ const Routes = [
   },
   {
     path: '/dashboard',
+    exact: true,
     component: Dashboard
   },
   {
