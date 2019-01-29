@@ -56,6 +56,7 @@ app.use(passport.session());
 
 app.use(routes);
 app.get('/*', (req, res) => {
+  // MOVE TO MIDDLEWARE
   const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
   if (!currentRoute) {
     return res.status(404).redirect('/notfound');

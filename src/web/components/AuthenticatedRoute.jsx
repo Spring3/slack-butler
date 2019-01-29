@@ -1,14 +1,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 
-const AuthenticatedRoute = (props) => (
-  <Route
-    shouldRedirect={!props.isAuthenticated}
-    redirectPath='/'
-    {...props}
-  />
-);
+const AuthenticatedRoute = (props) => {
+  const { isAuthenticated, staticContext = {} } = props;
+  staticContext.url = isAuthenticated ? undefined : '/';
+  return isAuthenticated
+    ? (
+      <Route {...props} />
+    )
+    : (
+      <Redirect to="/" />
+    );
+};
 
 AuthenticatedRoute.propTypes = {
   isAuthenticated: PropTypes.bool.isRequired
