@@ -1,8 +1,7 @@
 import React, { PureComponent } from 'react';
-import styled, { withTheme, css } from 'styled-components';
+import styled, { css } from 'styled-components';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import GithubCircleIcon from 'mdi-react/GithubCircleIcon';
 
 const Navbar = styled.nav`
   position: fixed;
@@ -25,7 +24,7 @@ const List = styled.ul`
 `;
 
 
-const ListItem = styled.a`
+const NavbarItem = styled.a`
   color: white;
   float: right;
   margin-right: 40px;
@@ -48,12 +47,30 @@ const ListItem = styled.a`
   }
 `;
 
-class NavbarComponent extends PureComponent {
+const NavbarComponent = ({ background, children }) => (
+  <Navbar background={background}>
+    <List>
+      { children }
+    </List>
+  </Navbar>
+);
+
+NavbarComponent.propTypes = {
+  background: PropTypes.string,
+  children: PropTypes.node
+};
+
+NavbarComponent.defaultProps = {
+  background: 'transparent'
+};
+
+class ChamellionNavbarComponent extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.defaultBackground = props.background;
     this.state = {
-      background: 'transparent'
+      background: props.background
     };
   }
 
@@ -65,56 +82,40 @@ class NavbarComponent extends PureComponent {
     document.removeEventListener('scroll', this.trackScrolling);
   }
 
-  scroll = (sectionName) => {
-    if (this.props.sectionsRefs[sectionName]) {
-      window.scrollTo({
-        top: this.props.sectionsRefs[sectionName].current.offsetTop,
-        behavior: 'smooth'
-      })
-    }
-  }
-
   trackScrolling = () => {
-    const { theme, sectionsRefs } = this.props;
-    if (this.state.background === 'transparent' && window.scrollY >= sectionsRefs.commands.current.offsetTop) {
-      this.setState({
-        background: theme.main
-      });
-    } else if (this.state.background === theme.main && window.scrollY < sectionsRefs.commands.current.offsetTop) {
-      this.setState({
-        background: 'transparent'
-      });
+    const { newBackground, offsetElementRef } = this.props;
+    if (this.state.background === this.defaultBackground && window.scrollY >= offsetElementRef.current.offsetTop) {
+      this.setState({ background: newBackground });
+    } else if (this.state.background === newBackground && window.scrollY < offsetElementRef.current.offsetTop) {
+      this.setState({ background: this.defaultBackground });
     }
   }
-
-  scrollToCommands = () => this.scroll('commands')
-  scrollToDashboard = () => this.scroll('dashboard')
-  scrollToAbout = () => this.scroll('about')
 
   render() {
-    const { background } = this.state;
+    const { children } = this.props;
     return (
-      <Navbar background={background}>
-        <List>
-          <ListItem target='_blank' rel='nofollow noopener' href='https://github.com/Spring3/starbot'><GithubCircleIcon size={30}/></ListItem>
-          <ListItem onClick={this.scrollToCommands}>Commands</ListItem>
-          <ListItem onClick={this.scrollToDashboard}>Dashboard</ListItem>
-          <ListItem onClick={this.scrollToAbout}>About</ListItem>
-        </List>
-      </Navbar>
-    );
+      <NavbarComponent background={this.state.background}>
+        {children}
+      </NavbarComponent>
+    )
   }
+}
+  
+ChamellionNavbarComponent.propTypes = {
+  offsetElementRef: PropTypes.object.isRequired,
+  background: PropTypes.string,
+  newBackground: PropTypes.string
 };
 
-NavbarComponent.propTypes = {
-  sectionsRefs: PropTypes.shape({
-    dashboard: PropTypes.object.isRequired,
-    commands: PropTypes.object.isRequired,
-    about: PropTypes.object.isRequired
-  }).isRequired,
-  theme: PropTypes.object.isRequired
+ChamellionNavbarComponent.defaultProps = {
+  background: 'transparent'
 };
 
-export default withTheme(NavbarComponent);
+export {
+  NavbarItem,
+  ChamellionNavbarComponent
+};
+
+export default NavbarComponent;
 
 
