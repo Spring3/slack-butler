@@ -12,11 +12,13 @@ const Routes = [
   {
     path: '/dashboard',
     exact: true,
+    auth: true,
     component: Dashboard
   },
   {
     path: '/dashboard/favorites',
-    component: Favorites
+    component: Favorites,
+    auth: true
   },
   {
     path: '/notfound',

@@ -8,10 +8,10 @@ const { NODE_ENV } = require('../modules/configuration.js');
 import ClientRoutes from '../web/views/routes';
 
 module.exports = (req, res) => {
-  const context = { user: req.user };
+  const context = { };
   const initialState = {
     NODE_ENV,
-    isAuthenticated: !!context.user
+    user: req.user
   };
   if (req.url === '/') {
     initialState.randomSeed = new Date().toISOString().substring(0, 10); // YYYY-MM-DD
@@ -27,7 +27,9 @@ module.exports = (req, res) => {
 
   const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
   if (!currentRoute && !context.url) {
-    return res.status(404).redirect('/notfound');
+    return res.redirect('/notfound');
+  } else if (currentRoute && currentRoute.auth && !req.user) {
+    return res.redirect('/');
   }
 
   return template({

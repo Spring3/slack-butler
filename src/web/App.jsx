@@ -1,14 +1,13 @@
-import React, { Component } from 'react';
-import { Switch, Route, Redirect, withRouter } from 'react-router-dom';
+import React, { PureComponent } from 'react';
+import { Switch, Route, withRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import theme from './utils/theme.js';
 
-import AuthenticatedRoute from './components/AuthenticatedRoute';
 import RootPage from './views/RootPage.jsx';
 import DashboardPage from './views/DashboardPage.jsx';
 import NotFoundPage from './views/NotFound.jsx';
 
-class App extends Component {
+class App extends PureComponent {
   componentWillMount() {
     console.log(this.props);
     const { isAuthenticated, history } = this.props;
@@ -18,12 +17,12 @@ class App extends Component {
   }
 
   render() {
-    const { isAuthenticated, randomSeed } = this.props;
+    const { user, randomSeed } = this.props;
     return (
       <ThemeProvider theme={theme}>
         <Switch>
-          <Route exact path="/" render={(props) => <RootPage randomSeed={randomSeed} />} />
-          <AuthenticatedRoute isAuthenticated={isAuthenticated} path="/dashboard" component={DashboardPage} /> 
+          <Route exact path="/" render={() => <RootPage randomSeed={randomSeed} />} />
+          <Route path="/dashboard" render={() => <DashboardPage user={user} />} /> 
           <Route path='/notfound' component={NotFoundPage} />
         </Switch>
       </ThemeProvider>

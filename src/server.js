@@ -51,6 +51,7 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/favicon', (req, res) => res.status(200).send());
 app.use(routes);
 app.get('/*', (req, res) => {
   res.setHeader('Content-Type', 'text/html');
