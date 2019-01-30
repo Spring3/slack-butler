@@ -18,11 +18,11 @@ class App extends Component {
   }
 
   render() {
-    const { isAuthenticated } = this.props;
+    const { isAuthenticated, randomSeed } = this.props;
     return (
       <ThemeProvider theme={theme}>
         <Switch>
-          <Route exact path="/" component={RootPage} />
+          <Route exact path="/" render={(props) => <RootPage randomSeed={randomSeed} />} />
           <AuthenticatedRoute isAuthenticated={isAuthenticated} path="/dashboard" component={DashboardPage} /> 
           <Route path='/notfound' component={NotFoundPage} />
         </Switch>
