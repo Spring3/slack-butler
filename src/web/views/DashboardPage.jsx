@@ -33,7 +33,10 @@ class DashboardPage extends PureComponent {
           </NavbarItem>
           <NavbarItem>Log out</NavbarItem>
         </Navbar>
-        <Section>
+        <Section
+          direction="column"
+          align="center"
+        >
           <div>
             <MagnifyIcon />
             <div>
