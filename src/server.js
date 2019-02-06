@@ -13,6 +13,7 @@ const passport = require('./modules/passport.js');
 const ssr = require('./routes/ssr.js');
 
 const errorHandler = require('./middlewares/error-handler.js');
+const notfoundHandler = require('./middlewares/notfound-handler.js');
 const sessionMiddleware = require('./middlewares/session.js');
 const routes = require('./routes/index.route.js');
 
@@ -51,10 +52,11 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/api', routes);
-app.get('/*', (req, res) => ssr(req, res));
+app.use(routes);
+app.get('/*', ssr);
 
 app.use(errorHandler);
+app.use(notfoundHandler);
 
 async function startExistingBots(db) {
   const existingBots = await db.collection('Bot').find({}).toArray();

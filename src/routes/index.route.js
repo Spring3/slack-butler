@@ -6,6 +6,6 @@ const router = express.Router();
 
 router.use('/auth', authRoutes);
 router.use('/dashboard', dashboardRoutes);
-router.get('/favicon', (req, res) => res.status(200).send());
+router.get('/favicon.ico', (req, res) => res.status(200).send());
 
 module.exports = router;

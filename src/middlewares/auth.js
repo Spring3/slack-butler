@@ -36,7 +36,7 @@ async function authorize(req, res, next) {
   });
 
   if (!response.ok) {
-    return next(response.error);
+    return next({ message: response.error });
   }
   req.auth = response;
   return next();

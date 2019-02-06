@@ -7,7 +7,7 @@ const template = require('../web/template.js');
 const { NODE_ENV } = require('../modules/configuration.js');
 import ClientRoutes from '../web/views/routes';
 
-module.exports = async (req, res) => {
+module.exports = async (req, res, next) => {
   const context = { };
   const initialState = {
     NODE_ENV,
@@ -18,8 +18,8 @@ module.exports = async (req, res) => {
   }
 
   const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
-  if (!currentRoute && !context.url) {
-    return res.redirect('/notfound');
+  if (!currentRoute) {
+    return next();
   } else if (currentRoute && currentRoute.auth && !req.user) {
     return res.redirect('/');
   }
@@ -40,7 +40,8 @@ module.exports = async (req, res) => {
   ));
   const styleTags = sheet.getStyleTags();
 
-  return res.status(200).send(template({
+  const status = currentRoute.path === '/notfound' ? 404 : 200;
+  return res.status(status).send(template({
     jsxString,
     title: 'Starbot Dashboard',
     initialState: JSON.stringify(initialState),
