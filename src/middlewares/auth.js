@@ -16,33 +16,41 @@ function generateState() {
 
 async function authorize(req, res, next) {
   const { code, state, error } = req.query;
-  
+
   if (error) return next(error);
   if (!code) return next(errors.badRequest('Undefined code'));
-    // cache[state] = true when used
-    if (cache[state] === true) {
-      return next(errors.badRequest('State ttl expired or the state check failed.'));
-    }
-  
-    cache[state] = true;
-    const response = await request({
-      uri: 'https://slack.com/api/oauth.access',
-      qs: {
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
-        code
-      },
-      json: true
-    });
-  
-    if (!response.ok) {
-      return next(response.error);
-    }
-    req.auth = response;
-    return next();
+  // cache[state] = true when used
+  if (cache[state] === true) {
+    return next(errors.badRequest('State ttl expired or the state check failed.'));
+  }
+
+  cache[state] = true;
+  const response = await request({
+    uri: 'https://slack.com/api/oauth.access',
+    qs: {
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+      code
+    },
+    json: true
+  });
+
+  if (!response.ok) {
+    return next(response.error);
+  }
+  req.auth = response;
+  return next();
+}
+
+function isAuthenticated(req, res, next) {
+  if (!req.isAuthenticated()) {
+    return next(errors.unAuthorized());
+  }
+  return next();
 }
 
 module.exports = {
   generateState,
-  authorize
+  authorize,
+  isAuthenticated
 };

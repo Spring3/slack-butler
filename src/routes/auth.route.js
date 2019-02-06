@@ -7,7 +7,7 @@ const BotEntity = require('../entities/bot.js');
 const Bot = require('../bot/modules/bot.js');
 const botStorage = require('../bot/modules/botStorage.js');
 const passport = require('../modules/passport.js');
-const validation = require('../modules/validation.js');
+const validation = require('../utils/validation.js');
 
 const router = express.Router();
 

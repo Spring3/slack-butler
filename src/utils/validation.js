@@ -20,5 +20,14 @@ module.exports = {
       }).required(),
       createdAt: Joi.date().default(Date.now())
     }
+  },
+  dashboardLinks: {
+    query: {
+      sort: Joi.array().items(Joi.string()),
+      batchSize: Joi.number().default(10),
+      author: Joi.string(),
+      channel: Joi.string(),
+      favorite: Joi.boolean()
+    }
   }
 };

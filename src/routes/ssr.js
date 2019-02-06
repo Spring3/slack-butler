@@ -7,7 +7,7 @@ const template = require('../web/template.js');
 const { NODE_ENV } = require('../modules/configuration.js');
 import ClientRoutes from '../web/views/routes';
 
-module.exports = (req, res) => {
+module.exports = async (req, res) => {
   const context = { };
   const initialState = {
     NODE_ENV,
@@ -15,6 +15,21 @@ module.exports = (req, res) => {
   };
   if (req.url === '/') {
     initialState.randomSeed = new Date().toISOString().substring(0, 10); // YYYY-MM-DD
+  }
+
+  const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
+  if (!currentRoute && !context.url) {
+    return res.redirect('/notfound');
+  } else if (currentRoute && currentRoute.auth && !req.user) {
+    return res.redirect('/');
+  }
+
+  res.setHeader('Content-Type', 'text/html');
+
+  let data;
+  if (currentRoute && currentRoute.loadData) {
+    data = await currentRoute.loadData();
+    context.data = data;
   }
 
   const sheet = new ServerStyleSheet();
@@ -25,17 +40,10 @@ module.exports = (req, res) => {
   ));
   const styleTags = sheet.getStyleTags();
 
-  const currentRoute = ClientRoutes.find(route => matchPath(req.url, route));
-  if (!currentRoute && !context.url) {
-    return res.redirect('/notfound');
-  } else if (currentRoute && currentRoute.auth && !req.user) {
-    return res.redirect('/');
-  }
-
-  return template({
+  return res.status(200).send(template({
     jsxString,
     title: 'Starbot Dashboard',
     initialState: JSON.stringify(initialState),
     styles: styleTags
-  });
+  }));
 }

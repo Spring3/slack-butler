@@ -51,12 +51,8 @@ app.use(sessionMiddleware);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/favicon', (req, res) => res.status(200).send());
-app.use(routes);
-app.get('/*', (req, res) => {
-  res.setHeader('Content-Type', 'text/html');
-  res.send(ssr(req, res));
-});
+app.use('/api', routes);
+app.get('/*', (req, res) => ssr(req, res));
 
 app.use(errorHandler);
 
@@ -69,7 +65,7 @@ async function startExistingBots(db) {
     botStorage.activeBots.set(teamId, bot);
     bot.start();
   }
-};
+}
 
 app.listen(PORT, async () => {
   console.log(`Server is up on port ${PORT}`);
