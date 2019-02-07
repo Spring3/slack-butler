@@ -1,7 +1,7 @@
 import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import 'isomorphic-fetch';
+import loadData from '../utils/fetch';
 import queryUtils from '../utils/query';
 import configuration from '../utils/configuration';
 import styled, { withTheme, css } from 'styled-components';
@@ -32,18 +32,28 @@ class DashboardPage extends PureComponent {
       channel: undefined,
       favorite: false,
       batchSize: 10,
-      data: []
+      data: _.get(props, 'staticContext.data', [])
     };
   }
 
-  componentWillMount() {
-    const queryParams = queryUtils.asString(_.omit(this.state, 'data'));
-    console.log(queryParams);
-    const { API } = configuration.config;
-    console.log(`${API}/dashboard/links?${queryParams}`);
-    fetch(`${API}/dashboard/links?${queryParams}`)
-      .then(res => this.setState({ data: res.json() }))
-      .then((data) => console.log(data));
+  componentDidMount() {
+    setTimeout(() => {
+      if (window.__FETCHED_DATA__) {
+        this.setState({
+          data: window.__FETCHED_DATA__
+        });
+        delete window.__FETCHED_DATA__;
+      } else {
+        const { HOST, PORT } = configuration.config;
+        loadData({
+          protocol: window.location.protocol,
+          method: 'GET',
+          host: HOST,
+          port: PORT,
+          query: queryUtils.asString(_.omit(this.state, 'data'))
+        }).then((res) => this.setState({ data: res.json() }, () => console.log(this.state)));
+      }
+    }, 0);
   }
 
   render() {

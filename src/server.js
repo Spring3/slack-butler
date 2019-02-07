@@ -10,7 +10,7 @@ const botStorage = require('./bot/modules/botStorage.js');
 const mongo = require('./modules/mongo.js');
 const passport = require('./modules/passport.js');
 
-const ssr = require('./routes/ssr.js');
+const ssr = require('./modules/ssr.js');
 
 const errorHandler = require('./middlewares/error-handler.js');
 const notfoundHandler = require('./middlewares/notfound-handler.js');
@@ -88,8 +88,6 @@ function shutdown() {
   mongo.disconnect();
   process.exit(0);
 }
-
-console.log(process.env);
 
 process.once('SIGINT', shutdown);
 process.once('SIGTERM', shutdown);
