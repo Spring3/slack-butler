@@ -4,13 +4,15 @@ import App from '../web/App.jsx';
 import { ServerStyleSheet } from 'styled-components'
 const { renderToString } = require('react-dom/server');
 const template = require('../web/template.js');
-const { NODE_ENV } = require('../modules/configuration.js');
+const { NODE_ENV, HOST, PORT } = require('../modules/configuration.js');
 import ClientRoutes from '../web/views/routes';
 
 module.exports = async (req, res, next) => {
   const context = { };
   const initialState = {
     NODE_ENV,
+    HOST,
+    PORT,
     user: req.user
   };
   if (req.url === '/') {

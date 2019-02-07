@@ -9,7 +9,6 @@ import NotFoundPage from './views/NotFound.jsx';
 
 class App extends PureComponent {
   componentWillMount() {
-    console.log(this.props);
     const { isAuthenticated, history } = this.props;
     if (isAuthenticated) {
       history.push('/dashboard');

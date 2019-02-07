@@ -15,7 +15,8 @@ const schema = Joi.object().keys({
   AUTO_SCAN_INTERVAL_MS: Joi.number().integer(),
   BOT_REACTION_EMOJI: Joi.string().lowercase().default('star'),
   USER_FAVORITES_TRIGGER_EMOJI: Joi.string().lowercase().default('star'),
-  PORT: Joi.number().integer().default(3000)
+  PORT: Joi.number().integer().default(3000),
+  HOST: Joi.string().required()
 });
 
 const configuration = _.pick(process.env,
@@ -31,7 +32,8 @@ const configuration = _.pick(process.env,
   'BOT_REACTION_EMOJI',
   'USER_FAVORITES_TRIGGER_EMOJI',
   'AUTO_SCAN_INTERVAL_MS',
-  'PORT');
+  'PORT',
+  'HOST');
 
 const { error, value } = Joi.validate(configuration, schema);
 

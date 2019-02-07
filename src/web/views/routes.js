@@ -1,6 +1,5 @@
 import Root from './RootPage';
 import Dashboard from './DashboardPage';
-import Favorites from './FavoritesPage';
 import NotFound from './NotFound';
 
 const Routes = [
@@ -14,11 +13,6 @@ const Routes = [
     exact: true,
     auth: true,
     component: Dashboard
-  },
-  {
-    path: '/dashboard/favorites',
-    component: Favorites,
-    auth: true
   },
   {
     path: '/notfound',

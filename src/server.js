@@ -89,5 +89,7 @@ function shutdown() {
   process.exit(0);
 }
 
+console.log(process.env);
+
 process.once('SIGINT', shutdown);
 process.once('SIGTERM', shutdown);
