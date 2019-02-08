@@ -7,6 +7,8 @@ import configuration from '../utils/configuration';
 import styled, { withTheme, css } from 'styled-components';
 import Navbar, { NavbarItem } from '../components/Navbar';
 import Section from '../components/Section';
+import LinkCard from '../components/LinkCard';
+import Loading from '../components/Loading';
 import MagnifyIcon from 'mdi-react/MagnifyIcon';
 import TuneIcon from 'mdi-react/TuneIcon';
 import FormatLineSpacingIcon from 'mdi-react/FormatLineSpacingIcon';
@@ -26,13 +28,14 @@ const ProfileTile = styled.div`
 class DashboardPage extends PureComponent {
   constructor(props) {
     super(props);
+    const initialData = _.get(props, 'staticContext.data', []);
     this.state = {
       filters: undefined,
       author: undefined,
       channel: undefined,
       favorite: false,
       batchSize: 10,
-      data: _.get(props, 'staticContext.data', [])
+      data: typeof initialData === 'string' ? JSON.parse(initialData) : initialData
     };
   }
 
@@ -58,8 +61,8 @@ class DashboardPage extends PureComponent {
 
   render() {
     const { theme, user } = this.props;
-    console.log(user);
     const { name, avatar } = user;
+    const { data } = this.state;
     return (
       <Fragment>
         <Navbar background={theme.main}>
@@ -94,42 +97,17 @@ class DashboardPage extends PureComponent {
               </select>
             </div>
             <div>
-              <a hre="#">
-                <img src="https://placeimg.com/250/150/tech" alt="preview" />
-                <p>Link name</p>
-                <div>
-                  <span>Channel: tech-resources</span>
-                  <span>Shared by: Daniel</span>
-                  <span>Added at: DEC 12 2018</span>
-                </div>
-              </a>
-              <a hre="#">
-                <img src="https://placeimg.com/250/150/tech" alt="preview" />
-                <p>Link name</p>
-                <div>
-                  <span>Channel: tech-resources</span>
-                  <span>Shared by: Daniel</span>
-                  <span>Added at: DEC 12 2018</span>
-                </div>
-              </a>
-              <a hre="#">
-                <img src="https://placeimg.com/250/150/tech" alt="preview" />
-                <p>Link name</p>
-                <div>
-                  <span>Channel: tech-resources</span>
-                  <span>Shared by: Daniel</span>
-                  <span>Added at: DEC 12 2018</span>
-                </div>
-              </a>
-              <a hre="#">
-                <img src="https://placeimg.com/250/150/tech" alt="preview" />
-                <p>Link name</p>
-                <div>
-                  <span>Channel: tech-resources</span>
-                  <span>Shared by: Daniel</span>
-                  <span>Added at: DEC 12 2018</span>
-                </div>
-              </a>
+              {
+                data.map(({ _id, href, author, channel, createdAt }, i) => (
+                  <LinkCard
+                    key={i}
+                    href={href}
+                    createdAt={createdAt}
+                    authorName={author}
+                    channelName={channel.name}
+                  />
+                ))
+              }
             </div>
           </div>
         </Section>

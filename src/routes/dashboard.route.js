@@ -23,7 +23,12 @@ router.get(
     if (author) {
       query.author = author;
     }
-    const cursor = db.collection(collection).find(query).project({ author: 1, href: 1, channel: 1 });
+    const cursor = db.collection(collection).find(query).project({
+      author: 1,
+      href: 1,
+      channel: 1,
+      createdAt: 1
+    });
     if (sort) {
       const sorting = {};
       for (const entryString of sort) {

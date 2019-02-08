@@ -10,7 +10,7 @@ module.exports = ({ jsxString, title, initialState, fetchedData, styles }) => `
           <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
           <script>
             window.__APP_INITIAL_STATE__ = ${initialState};
-            window.__FETCHED_DATA__ = ${fetchedData};
+            ${fetchedData && (`window.__FETCHED_DATA__ = ${fetchedData};`)}
           </script>
           <style>
             body {
