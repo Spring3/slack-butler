@@ -8,7 +8,6 @@ import styled, { withTheme, css } from 'styled-components';
 import Navbar, { NavbarItem } from '../components/Navbar';
 import Section from '../components/Section';
 import LinkCard from '../components/LinkCard';
-import Loading from '../components/Loading';
 import MagnifyIcon from 'mdi-react/MagnifyIcon';
 import TuneIcon from 'mdi-react/TuneIcon';
 import FormatLineSpacingIcon from 'mdi-react/FormatLineSpacingIcon';
@@ -60,7 +59,7 @@ class DashboardPage extends PureComponent {
   }
 
   render() {
-    const { theme, user } = this.props;
+    const { theme, user = {} } = this.props;
     const { name, avatar } = user;
     const { data } = this.state;
     return (
