@@ -32,7 +32,13 @@ module.exports = async (req, res, next) => {
 
   let fetchedData = undefined;
   if (currentRoute && currentRoute.loadData) {
-    fetchedData = await currentRoute.loadData({ headers: { Cookie: req.header('Cookie') } });
+    fetchedData = await currentRoute.loadData({
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        Cookie: req.header('Cookie')
+      }
+    });
     if (fetchedData.ok)
     context.data = fetchedData;
   }

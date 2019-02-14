@@ -1,11 +1,11 @@
 import 'isomorphic-fetch';
 
-export default function loadData({ protocol = 'https:', method, host, route, headers = {}, query, body }) {
-  let uri = `${protocol}//${host}${route}`;
+export default function loadData({ protocol = 'https:', method, host, route, headers = {}, query, body, url }) {
+  let uri = url || `${protocol}//${host}${route}`;
   const options = {
+    crossDomain: true,
     headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
+      'Content-Type': 'text/html',
       ...headers
     },
     method

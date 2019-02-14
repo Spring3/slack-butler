@@ -27,7 +27,8 @@ module.exports = {
       batchSize: Joi.number().default(10),
       author: Joi.string(),
       channel: Joi.string(),
-      favorite: Joi.boolean()
+      favorite: Joi.boolean(),
+      offset: Joi.number().default(0)
     }
   }
 };
