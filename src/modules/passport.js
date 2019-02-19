@@ -5,7 +5,7 @@ const { CLIENT_ID, CLIENT_SECRET } = require('./configuration.js');
 passport.serializeUser((user, done) => done(null, {
   id: user.id,
   name: user.displayName,
-  avatar: user.user.image_512,
+  avatar: user.user.image_192,
   team: {
     id: user.team.id,
     name: user.team.name,

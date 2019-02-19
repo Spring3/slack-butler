@@ -1,6 +1,5 @@
 const express = require('express');
 const validate = require('express-validation');
-const ogs = require('open-graph-scraper');
 const { isAuthenticated } = require('../middlewares/auth.js');
 const validation = require('../utils/validation');
 const mongo = require('../modules/mongo.js');
