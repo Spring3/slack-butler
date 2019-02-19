@@ -68,7 +68,7 @@ class DashboardPage extends PureComponent {
           <NavbarItem>
             <ProfileTile img={avatar}>{name}</ProfileTile>
           </NavbarItem>
-          <NavbarItem>Log out</NavbarItem>
+          <NavbarItem href='/auth/logout'>Log out</NavbarItem>
         </Navbar>
         <Section
           direction="column"
@@ -97,13 +97,14 @@ class DashboardPage extends PureComponent {
             </div>
             <div>
               {
-                data.map(({ _id, href, author, channel, createdAt }, i) => (
+                data.map(({ href, author, channel, createdAt, ogp }, i) => (
                   <LinkCard
                     key={i}
                     href={href}
                     createdAt={createdAt}
-                    authorName={author}
-                    channelName={channel.name}
+                    author={author}
+                    channel={channel}
+                    ogp={ogp}
                   />
                 ))
               }

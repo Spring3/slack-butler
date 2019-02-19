@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const { WebClient, RTMClient } = require('@slack/client');
 const {
   AUTO_SCAN_INTERVAL_MS,
@@ -11,6 +12,7 @@ const Links = require('../../entities/links.js');
 const Highlights = require('../../entities/highlights.js');
 const Channel = require('./channel.js');
 const Command = require('./command.js');
+const urlUtils = require('../utils/url.js');
 
 const ignoredEventTypes = ['desktop_notification', 'hello', 'ping', 'pong', undefined];
 
@@ -174,7 +176,7 @@ class Bot {
       }
 
       console.log('Type:', type);
-      const channel = this.channels.get(msg.channel || (msg.item || {}).channel);
+      const channel = this.channels.get(msg.channel || _.get(msg, 'item.channel', {}));
 
       switch (type) {
         /*
@@ -305,10 +307,10 @@ class Bot {
           if (!msg.subtype) {
             const message = new Message(msg);
             if (message.hasLinks() && !message.isMarked()) {
-              const captionedLinks = message.getLinksData();
+              const ogpData = await urlUtils.forManyAsync(message.getLinks(), urlUtils.fetchOGP);
               try {
-                await Promise.all(captionedLinks.map((link) => {
-                  const linkData = Object.assign(link, {
+                await Promise.all(ogpData.map(({ href, ogp }) => {
+                  const linkData = Object.assign({ href, ogp }, {
                     author: message.author,
                     channel: {
                       id: channel.id,
@@ -352,17 +354,13 @@ class Bot {
             if (reactionsDetails.ok) {
               const message = new Message(reactionsDetails.message);
               if (message.hasLinks() && message.author !== this.id) {
-                const db = await mongo.connect();
-                const matchedLinks = await db.collection('Links')
-                  .find({ href: { $in: message.getLinks() }, teamId: this.teamId })
-                  .project({ _id: 1 })
-                  .toArray();
-                const highlights = matchedLinks
-                  .map(entry => ({
+                const highlights = await Links.findMatchingLinkIds(message.getLinks(), this.teamId, (entry) => {
+                  return {
                     _id: entry._id,
                     user: msg.user,
                     createdAt: new Date()
-                  }));
+                  };
+                });
                 await Highlights.save(highlights);
               }
             }
@@ -390,13 +388,9 @@ class Bot {
             if (reactionsDetails.ok) {
               const message = new Message(reactionsDetails.message);
               if (message.hasLinks() && message.author !== this.id) {
-                const db = await mongo.connect();
-                const matchedLinks = await db.collection('Links')
-                  .find({ href: { $in: message.getLinks() }, teamId: this.teamId })
-                  .project({ _id: 1 })
-                  .toArray();
+                const matchedLinks = await Links.findMatchingLinkIds(message.getLinks(), this.teamId, entry => entry._id);
                 if (matchedLinks.length) {
-                  await Highlights.remove(matchedLinks.map(entry => entry._id));
+                  await Highlights.remove(matchedLinks);
                 }
               }
             }

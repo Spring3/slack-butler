@@ -1,6 +1,5 @@
 const { BOT_REACTION_EMOJI } = require('../../modules/configuration.js');
 const botStorage = require('./botStorage.js');
-const urlUtils = require('../utils/url.js');
 
 const urlRegexp = /(https?|ftp):\/\/.*/;
 
@@ -88,10 +87,6 @@ class Message {
       }
       return acc;
     }, []);
-  }
-
-  getLinksData() {
-    return urlUtils.getCaption(this.getLinks());
   }
 
   /**

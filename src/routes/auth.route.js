@@ -59,6 +59,11 @@ router.get('/dashboard/callback', (req, res, next) => {
   })(req, res, next);
 });
 
+router.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
 // TODO: support client-side
 router.get('/error', (req, res) => {
   res.send(400).json('Something went wrong');

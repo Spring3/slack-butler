@@ -51,22 +51,7 @@ router.get(
       cursor.limit(batchSize);
     }
 
-    let results = await cursor.toArray();
-    results = await Promise.all(results.map(async item => {
-      try {
-        const { data, success } = await ogs({
-          url: item.href,
-          encoding: 'utf8',
-          headers: { 'accept-language': 'en' }
-        });
-        if (success) {
-          return { ...item, ogp: data };
-        }
-      } catch (e) {
-        console.error(`Error during OGP data fetching from url ${item.href}`, e.message);
-      }
-      return item;
-    }));
+    const results = await cursor.toArray();
     return res.send(results);
   }
 );

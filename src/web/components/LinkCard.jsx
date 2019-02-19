@@ -1,8 +1,7 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import Loading from './Loading';
 
-class LinkCard extends PureComponent {
+class LinkCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,38 +12,54 @@ class LinkCard extends PureComponent {
     };
   }
 
-  componentWillMount() {
-    this.setState({ loading: true });
-  }
-
   render() {
-    const { href, imageUrl, title, channelName, authorName, createdAt } = this.props;
-    const { loading } = this.state;
+    const { href, ogp = {}, channel = {}, author = {}, createdAt } = this.props;
+    const {
+      ogSiteName,
+      ogTitle,
+      ogDescription,
+      ogImage = {},
+      ogUrl
+    } = ogp;
+    const ogImageUrl = ogImage.url;
     return (
       // Move to HOC
-      <Loading height="100px" active={loading}>
-        <a href={href}>
-          { imageUrl && (<img src={imageUrl} alt="preview" /> ) }
-          <p>{title}</p>
-          <div>
-            <span>Channel: {channelName}</span>
-            <span>Shared by: {authorName}</span>
-            <span>Added at: {createdAt}</span>
-          </div>
-        </a>
-      </Loading>
+      <a href={ogUrl || href}>
+        { ogImageUrl  && (<img src={ogImageUrl} alt="preview" /> ) }
+        <p>{ogTitle}</p>
+        <div>
+          <span>Site Name: {ogSiteName}</span>
+          <span>Channel: {channel.name}</span>
+          <span>Description: {ogDescription}</span>
+          <span>Shared by: {author.name}</span>
+          <span>Added at: {createdAt}</span>
+        </div>
+      </a>
     );
   }
 }
 
 LinkCard.propTypes = {
   href: PropTypes.string.isRequired,
+  channel: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired
+  }).isRequired,
   channelName: PropTypes.string.isRequired,
-  authorName:  PropTypes.string.isRequired,
+  author:  PropTypes.shape({
+    name: PropTypes.string.isRequired
+  }).isRequired,
   createdAt: PropTypes.oneOfType([
     PropTypes.instanceOf(Date),
     PropTypes.string
-  ]).isRequired
-}
+  ]).isRequired,
+  ogp: PropTypes.shape({
+    ogSiteName: PropTypes.string,
+    ogTitle: PropTypes.string,
+    ogDescription: PropTypes.string,
+    ogImageUrl: PropTypes.string,
+    ogUrl: PropTypes.string
+  })
+};
 
 export default LinkCard;

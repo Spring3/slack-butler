@@ -6,8 +6,8 @@ module.exports = {
     const dataArray = Array.isArray(data) ? data : [data];
     if (dataArray.length) {
       const bulk = db.collection('Highlights').initializeUnorderedBulkOp();
-      for (const data of dataArray) {
-        bulk.find({ _id: data._id }).upsert().updateOne({ $setOnInsert: data });
+      for (const highlight of dataArray) {
+        bulk.find({ _id: highlight._id }).upsert().updateOne({ $setOnInsert: highlight });
       }
       return bulk.execute();
     }

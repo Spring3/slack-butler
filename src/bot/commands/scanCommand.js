@@ -1,6 +1,7 @@
 const assert = require('assert');
 const { activeBots } = require('../modules/botStorage.js');
 const mongo = require('../../modules/mongo.js');
+const urlUtils = require('../utils/url');
 
 /**
  * Command to run a scan of the channel for new links
@@ -23,13 +24,13 @@ async function handle({ channelId, teamId }, options = {}) {
   if (chatMessagesWithLinks.length) {
     const batch = db.collection('Links').initializeOrderedBulkOp();
     for (const chatMessage of chatMessagesWithLinks) {
-      const linksData = chatMessage.getLinksData();
-      for (const link of linksData) {
-        batch.find({ href: link.href, 'channel.id': channelId }).upsert().updateOne({
+      const ogpData = await urlUtils.forManyAsync(chatMessage.getLinks(), urlUtils.fetchOGP);
+      for (const { href, ogp } of ogpData) {
+        batch.find({ href, 'channel.id': channelId }).upsert().updateOne({
           $setOnInsert: {
-            href: link.href,
-            caption: link.caption,
+            href,
             author: chatMessage.author,
+            ogp,
             channel: {
               id: channelId,
               name: slackChannel.name
