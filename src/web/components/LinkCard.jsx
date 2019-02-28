@@ -45,7 +45,9 @@ LinkCard.propTypes = {
     name: PropTypes.string.isRequired,
     id: PropTypes.string.isRequired
   }).isRequired,
-  channelName: PropTypes.string.isRequired,
+  channel: PropTypes.shape({
+    name: PropTypes.string.isRequired
+  }).isRequired,
   author:  PropTypes.shape({
     name: PropTypes.string.isRequired
   }).isRequired,

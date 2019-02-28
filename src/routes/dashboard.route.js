@@ -3,6 +3,7 @@ const validate = require('express-validation');
 const { isAuthenticated } = require('../middlewares/auth.js');
 const validation = require('../utils/validation');
 const mongo = require('../modules/mongo.js');
+const helper = require('../utils/dashboard.route.helper.js');
 
 const router = new express.Router();
 
@@ -19,19 +20,14 @@ router.get(
       offset
     } = req.query;
     const db = await mongo.connect();
-    const collection = favorite === true ? 'Highlights' : 'Links';
-    const query = { teamId: req.user.team.id };
 
-    if (author) {
-      query.author = author;
+    let cursor;
+
+    if (favorite !== true) {
+      cursor = db.collection('Links').aggregate(helper.prepareLinksAggregation(req.user.team.id, author));
+    } else {
+      cursor = db.getCollection('Highlights').aggregate(helper.prepareHighlightsAggregation(req.user.team.id, author, req.user.id));
     }
-
-    const cursor = db.collection(collection).find(query).project({
-      author: 1,
-      href: 1,
-      channel: 1,
-      createdAt: 1
-    });
 
     if (offset) {
       cursor.skip(offset);

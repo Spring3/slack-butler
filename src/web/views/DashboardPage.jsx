@@ -1,5 +1,6 @@
 import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import Select from 'react-select';
 import _ from 'lodash';
 import loadData from '../utils/fetch';
 import queryUtils from '../utils/query';
