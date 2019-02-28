@@ -92,12 +92,27 @@ class DashboardPage extends PureComponent {
               <Select
                 options={[
                   { value: 'createdAt:1', label: 'Oldest first' },
-                  { value: 'createdAt:-1', label: 'Newest first' }
+                  { value: 'createdAt:-1', label: 'Newest first' },
+                  { value: 'name:1', label: 'Name A-Z' },
+                  { value: 'name:-1', label: 'Name Z-A' }
                 ]}
               />
-              <select>
-                <option>Date Down</option>
-              </select>
+              <Select
+                options={[
+                  { value: 'author1', label: 'author1' },
+                  { value: 'author2', label: 'author2' },
+                  { value: 'author3', label: 'author3' }
+                ]}
+              />
+              <Select
+                options={[
+                  { value: 'channel1', label: 'channel1' },
+                  { value: 'channel2', label: 'channel2' },
+                  { value: 'channel3', label: 'channel3' }
+                ]}
+              />
+              <label htmlFor="favorites">Favorites</label>
+              <input name="favorites" type="checkbox"></input>
             </div>
             <div>
               {
