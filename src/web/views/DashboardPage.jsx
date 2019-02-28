@@ -89,9 +89,12 @@ class DashboardPage extends PureComponent {
               <strong>Search Results (0)</strong>
               <FormatLineSpacingIcon />
               <ViewGridIcon />
-              <select>
-                <option>10 Per Pag</option>
-              </select>
+              <Select
+                options={[
+                  { value: 'createdAt:1', label: 'Oldest first' },
+                  { value: 'createdAt:-1', label: 'Newest first' }
+                ]}
+              />
               <select>
                 <option>Date Down</option>
               </select>

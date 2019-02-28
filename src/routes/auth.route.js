@@ -8,6 +8,7 @@ const Bot = require('../bot/modules/bot.js');
 const botStorage = require('../bot/modules/botStorage.js');
 const passport = require('../modules/passport.js');
 const validation = require('../utils/validation.js');
+const { connect } = require('../modules/mongo.js');
 
 const router = express.Router();
 
@@ -52,8 +53,26 @@ router.get('/dashboard', passport.authorize('slack'));
 router.get('/dashboard/callback', (req, res, next) => {
   passport.authenticate('slack', (error, user) => {
     if (error) return next(error);
-    return req.login(user, (err) => {
+    return req.login(user, async (err) => {
       if (err) return next(err);
+      try {
+        const db = await connect();
+        await db.collection('Users').updateOne({
+          id: user.id,
+          teamId: user.team.id
+        }, {
+          $setOnInsert: {
+            createdAt: new Date()
+          },
+          $set: {
+            name: user.displayName,
+            avatar: user.user.image_192,
+            updatedAt: new Date()
+          }
+        }, { upsert: true });
+      } catch (e) {
+        return next(e);
+      }
       return res.redirect('/dashboard');
     });
   })(req, res, next);
