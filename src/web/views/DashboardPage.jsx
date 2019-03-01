@@ -1,18 +1,14 @@
 import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
 import _ from 'lodash';
+import Select from 'react-select';
 import loadData from '../utils/fetch';
 import queryUtils from '../utils/query';
 import configuration from '../utils/configuration';
 import styled, { withTheme, css } from 'styled-components';
 import Navbar, { NavbarItem } from '../components/Navbar';
-import Section from '../components/Section';
 import LinkCard from '../components/LinkCard';
-import MagnifyIcon from 'mdi-react/MagnifyIcon';
-import TuneIcon from 'mdi-react/TuneIcon';
-import FormatLineSpacingIcon from 'mdi-react/FormatLineSpacingIcon';
-import ViewGridIcon from 'mdi-react/ViewGridIcon';
+import SearchInput from '../components/SearchInput';
 
 const ProfileTile = styled.div`
   background-size: contain;
@@ -25,11 +21,39 @@ const ProfileTile = styled.div`
   }
 `;
 
+const Aside = styled.aside`
+  min-width: 200px;
+  width: 240px;
+  padding: 20px 0px;
+  background: white;
+  border-radius: 5px;
+  position: fixed;
+`;
+
+const Section = styled.section`
+  padding: 20px 0px 0px 260px;
+`;
+
+const List = styled.ul`
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+
+  li {
+    margin-top: 10px;
+  }
+`;
+
+const Label = styled.label`
+  margin: 0 5px;
+`;
+
 class DashboardPage extends PureComponent {
   constructor(props) {
     super(props);
     const initialData = _.get(props, 'staticContext.data', []);
     this.state = {
+      search: undefined,
       filters: undefined,
       author: undefined,
       channel: undefined,
@@ -37,8 +61,22 @@ class DashboardPage extends PureComponent {
       batchSize: 10,
       data: typeof initialData === 'string' ? JSON.parse(initialData) : initialData
     };
+
+    this.authors = [
+      { name: 'author1', id: 1, amount: 10 },
+      { name: 'author2', id: 2, amount: 2 },
+      { name: 'author3', id: 3, amount: 3 },
+      { name: 'author4', id: 4, amount: 5 }
+    ];
+
+    this.channels = [
+      { name: 'channel1', id: 1, amount: 8 },
+      { name: 'channel2', id: 2, amount: 6 },
+      { name: 'channel3', id: 3, amount: 6 }
+    ];
   }
 
+  
   componentDidMount() {
     setTimeout(() => {
       if (window.__FETCHED_DATA__) {
@@ -58,7 +96,12 @@ class DashboardPage extends PureComponent {
       }
     }, 0);
   }
-
+  
+  searchChange = (e) => {
+    this.setState({
+      search: e.target.value
+    });
+  }
   render() {
     const { theme, user = {} } = this.props;
     const { name, avatar } = user;
@@ -71,48 +114,52 @@ class DashboardPage extends PureComponent {
           </NavbarItem>
           <NavbarItem href='/auth/logout'>Log out</NavbarItem>
         </Navbar>
-        <Section
-          direction="column"
-          align="center"
-        >
-          <div>
-            <MagnifyIcon />
+        <div style={{ width: '60%', margin: '0 auto', 'padding-top': '60px' }}>
+          <Aside>
+            <h4>General</h4>
             <div>
-              <span>
-                <TuneIcon />
-                Filters
-              </span>
-            </div>
-          </div>
-          <div>
-            <div>
-              <strong>Search Results (0)</strong>
-              <FormatLineSpacingIcon />
-              <ViewGridIcon />
-              <Select
-                options={[
-                  { value: 'createdAt:1', label: 'Oldest first' },
-                  { value: 'createdAt:-1', label: 'Newest first' },
-                  { value: 'name:1', label: 'Name A-Z' },
-                  { value: 'name:-1', label: 'Name Z-A' }
-                ]}
-              />
-              <Select
-                options={[
-                  { value: 'author1', label: 'author1' },
-                  { value: 'author2', label: 'author2' },
-                  { value: 'author3', label: 'author3' }
-                ]}
-              />
-              <Select
-                options={[
-                  { value: 'channel1', label: 'channel1' },
-                  { value: 'channel2', label: 'channel2' },
-                  { value: 'channel3', label: 'channel3' }
-                ]}
-              />
-              <label htmlFor="favorites">Favorites</label>
               <input name="favorites" type="checkbox"></input>
+              <Label htmlFor="favorites">Favorites</Label>
+              <span>(4)</span>
+            </div>
+            <h4>Author</h4>
+            <List>
+              {
+                this.authors.map(({ name, id, amount }) => (
+                  <li key={id}>
+                    <input name={id} type="checkbox"/>
+                    <Label htmlFor={id}>{name}</Label>
+                    <span>({amount})</span>
+                  </li>
+                ))
+              }
+            </List>
+            <h4>Channel</h4>
+            <List>
+              {
+                this.channels.map(({ name, id, amount }) => (
+                  <li key={id}>
+                    <input name={id} type="checkbox"/>
+                    <Label htmlFor={id}>{name}</Label>
+                    <span>({amount})</span>
+                  </li>
+                ))
+              }
+            </List>
+          </Aside>
+          <Section>
+            <SearchInput
+              onChange={this.searchChange}
+            />
+            <div>
+              <Select
+                options={[
+                  { name: 'createdAt:-1', label: 'Newest fisrt' },
+                  { name: 'createdAt:1', label: 'Oldest first' },
+                  { name: 'href:1', label: 'A-Z' },
+                  { name: 'href:-1', label: 'Z-A' }
+                ]}
+              />
             </div>
             <div>
               {
@@ -128,8 +175,8 @@ class DashboardPage extends PureComponent {
                 ))
               }
             </div>
-          </div>
-        </Section>
+          </Section>
+        </div>
       </Fragment>
     );
   }
