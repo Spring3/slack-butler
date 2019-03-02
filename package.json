@@ -5,8 +5,9 @@
   "main": "src/index.js",
   "scripts": {
     "test": "make test",
-    "start": "node src/index.js",
-    "dev": "make run"
+    "build": "webpack --progress",
+    "start": "NODE_ENV=production node src/index.js",
+    "dev": "NODE_ENV=development node src/index.js"
   },
   "repository": {
     "type": "git",
@@ -27,20 +28,57 @@
   "dependencies": {
     "@slack/client": "^4.8.0",
     "body-parser": "^1.18.3",
+    "connect-mongodb-session": "^2.0.6",
+    "connect-redis": "^3.4.0",
     "dotenv": "^6.2.0",
     "express": "^4.16.4",
+    "express-session": "^1.15.6",
+    "express-validation": "^1.0.2",
     "helmet": "^3.15.0",
-    "joi": "^14.3.0",
+    "isomorphic-fetch": "^2.2.1",
+    "isomorphic-loader": "^2.0.2",
+    "joi": "^14.3.1",
     "lodash": "^4.17.11",
+    "mdi-react": "^5.2.0",
     "mongodb": "^3.1.10",
+    "open-graph-scraper": "^3.6.0",
+    "passport": "^0.4.0",
+    "passport-slack-oauth2": "^1.0.2",
+    "prop-types": "^15.6.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "react-router-dom": "^4.3.1",
+    "react-select": "^2.4.1",
     "request": "^2.88.0",
-    "request-promise-native": "^1.0.5"
+    "request-promise-native": "^1.0.5",
+    "seedrandom": "^2.4.4",
+    "serialize-javascript": "^1.6.1",
+    "styled-components": "^4.1.3",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-transform-modules-commonjs": "^7.2.0",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-loader": "^8.0.4",
+    "babel-plugin-async-to-promises": "^1.0.5",
+    "babel-plugin-styled-components": "^1.10.0",
     "eslint": "^5.10.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.15.0",
+    "file-loader": "^3.0.1",
     "mocha": "^4.1.0",
     "nyc": "^13.1.0",
     "rewire": "^3.0.2",
-    "sinon": "^4.1.3"
+    "sinon": "^4.1.3",
+    "webpack": "^4.28.3",
+    "webpack-cli": "^3.2.0",
+    "webpack-dev-middleware": "^3.5.0",
+    "webpack-hot-middleware": "^2.24.3",
+    "webpack-node-externals": "^1.7.2"
   }
 }

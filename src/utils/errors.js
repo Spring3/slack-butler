@@ -5,5 +5,6 @@ function createError(msg, status) {
 }
 
 module.exports = {
-  badRequest: msg => createError(msg, 404)
+  badRequest: msg => createError(msg, 404),
+  unAuthorized: () => createError('Unauthorized', 401)
 };

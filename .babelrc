@@ -1,0 +1,27 @@
+{
+  "presets": [
+    "@babel/react",
+    [
+      "@babel/env", {
+        "targets": {
+          "browsers": "> 1%, not dead"
+        },
+        "exclude": ["transform-regenerator", "transform-async-to-generator"],
+        "debug": true,
+        "modules": false,
+        "useBuiltIns": "usage"
+      }
+    ]
+  ],
+  "plugins": [
+    "async-to-promises",
+    "@babel/plugin-proposal-class-properties",
+    ["babel-plugin-styled-components",
+      {
+        "ssr": true, 
+        "displayName": true, 
+        "preprocess": false 
+      }
+    ]
+  ]
+}

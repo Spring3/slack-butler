@@ -1,17 +1,15 @@
 const { MongoClient, ObjectId } = require('mongodb');
 const { parse } = require('url');
-const assert = require('assert');
+const { MONGODB_URI } = require('./configuration.js');
 
 let client = null;
 let dbName;
-
-assert(process.env.MONGODB_URI, 'MONGODB_URI is undefined');
 
 /**
  * Establish a connection to a remote mongodb database
  * @return {Promise(object)} - promise with a connection
  */
-async function connect(url = process.env.MONGODB_URI) {
+async function connect(url = MONGODB_URI) {
   if (client === null) {
     client = await MongoClient.connect(url, { useNewUrlParser: true });
     dbName = parse(url);

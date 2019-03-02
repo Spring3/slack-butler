@@ -1,5 +1,7 @@
 .DS_STORE
 node_modules/
+dist/
 coverage/
 .env
+.isomorphic-loader-config.json
 npm-debug.log
